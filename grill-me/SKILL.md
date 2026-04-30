@@ -1,6 +1,6 @@
 ---
 name: grill-me
-description: Interview the user one question at a time to resolve every open branch of a plan or decision before implementation. Use when the user says "grill me", "/grill-me", "interview me", "stress-test this plan", "poke holes", "push back on this", or asks for hard questions before committing to an approach. Also use proactively before plan mode when the user's request has unresolved design branches, ambiguous scope, or hidden assumptions. Adapted from Matt Pocock's grill-me skill.
+description: Interview the user one question at a time to resolve every open branch of a plan or decision before implementation. Use when the user says "grill me", "/grill-me", "interview me", "stress-test this plan", "poke holes", "push back on this", or asks for hard questions before committing to an approach. Also use proactively before plan mode when the user's request has unresolved design branches, ambiguous scope, or hidden assumptions. Do NOT use to test the user's knowledge of a subject — that's `quiz-me`. Do NOT use for code review or post-implementation critique. Adapted from Matt Pocock's grill-me skill.
 ---
 
 # Grill Me

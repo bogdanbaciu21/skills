@@ -1,0 +1,69 @@
+{
+  "skill": "handoff",
+  "description": "Trigger and output evals for the handoff skill. Positive prompts should fire the skill; negative prompts should not.",
+  "positive_triggers": [
+    {
+      "prompt": "handoff",
+      "reason": "Bare keyword — must trigger."
+    },
+    {
+      "prompt": "Let's wrap this up for handoff to the next session.",
+      "reason": "Explicit handoff phrasing."
+    },
+    {
+      "prompt": "Can you summarize what we did so I can paste it into a new chat?",
+      "reason": "Describes the handoff use case without using the word."
+    },
+    {
+      "prompt": "I'm running out of context — generate a handoff block.",
+      "reason": "Explicit trigger plus reason."
+    },
+    {
+      "prompt": "Pass this to the next session.",
+      "reason": "Listed trigger phrase variant."
+    },
+    {
+      "prompt": "I need to continue this in a new chat tomorrow. Get me ready.",
+      "reason": "Implicit cross-session continuity request."
+    },
+    {
+      "prompt": "Wrap up — what should the next Claude know to pick this up?",
+      "reason": "Forward-looking summary for next agent."
+    }
+  ],
+  "negative_triggers": [
+    {
+      "prompt": "Write a PR description for these changes.",
+      "reason": "PR descriptions summarize code for reviewers, not session state for the next agent."
+    },
+    {
+      "prompt": "Draft a commit message.",
+      "reason": "Commit messages are not handoffs."
+    },
+    {
+      "prompt": "Write release notes for v1.2.",
+      "reason": "Release notes target users, not the next session."
+    },
+    {
+      "prompt": "Summarize this file for me.",
+      "reason": "Generic summarization, not session handoff."
+    },
+    {
+      "prompt": "Dispatch parallel agents to finish these tracks.",
+      "reason": "Use parallel-dispatch instead."
+    },
+    {
+      "prompt": "Quiz me on what we just covered.",
+      "reason": "Use quiz-me — testing user retention is not handoff."
+    }
+  ],
+  "output_assertions": [
+    "Output is wrapped in a single fenced code block tagged ```markdown so the user can copy it in one click.",
+    "Block contains a `## Session Handoff — <title>` heading.",
+    "Block contains a `### What's Left` checklist with unchecked items, OR omits the section if nothing remains.",
+    "If `/tmp/.claude-session-issue-number` exists, the block contains a `### GitHub Issue` section with the issue number and URL.",
+    "Empty sections are omitted rather than rendered as 'None'.",
+    "File paths in `### Files Changed` come from `git diff --stat`, not invented from memory.",
+    "After the block, the assistant reminds the user to paste it as the first message in the new chat."
+  ]
+}

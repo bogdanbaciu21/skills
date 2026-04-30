@@ -88,6 +88,7 @@ Use this checklist before publishing a skill:
 | `handoff` | Ready | Creates a structured session handoff for continuation in a new chat. |
 | `grill-me` | Ready | Runs a one-question-at-a-time pressure-test interview for plans/decisions. |
 | `parallel-dispatch` | Ready | Generates multi-agent prompts and coordinator playbook from a parallel work plan. |
+| `quiz-me` | Ready | Active-recall quiz on a topic, doc, codebase area, or interview prep — one question at a time, adaptive difficulty. |
 | `excel-wow` | Draft | Placeholder for a future Excel/financial-modeling workflow skill. |
 
 ---
