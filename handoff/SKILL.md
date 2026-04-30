@@ -1,6 +1,6 @@
 ---
 name: handoff
-description: Summarize the current session's work into a structured handoff block that a fresh Claude Code chat can execute on. Use whenever the user says "handoff", "hand off", "pass to next session", "wrap up for handoff", "session summary for next chat", "continue in new chat", or anything about transferring context to a new conversation. Also use when the user is about to end a session with unfinished work. Includes the GitHub issue reference if one exists.
+description: Summarize the current session's work into a structured handoff block that a fresh Claude Code chat can execute on. Use whenever the user says "handoff", "hand off", "pass to next session", "wrap up for handoff", "session summary for next chat", "continue in new chat", or anything about transferring context to a new conversation. Also use when the user is about to end a session with unfinished work. Includes the GitHub issue reference if one exists. Do NOT use for PR descriptions, commit messages, or release notes — those summarize code changes for reviewers, not session state for the next agent. Do NOT use to dispatch parallel agents — that's `parallel-dispatch`.
 ---
 
 # Session Handoff

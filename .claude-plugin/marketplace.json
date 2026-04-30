@@ -1,0 +1,33 @@
+{
+  "name": "bogdanbaciu-skills",
+  "owner": {
+    "name": "Bogdan Baciu",
+    "url": "https://github.com/bogdanbaciu21"
+  },
+  "metadata": {
+    "description": "Thinking-partner and multi-session workflow skills for Claude Code.",
+    "version": "0.1.0"
+  },
+  "plugins": [
+    {
+      "name": "grill-me",
+      "source": "./grill-me",
+      "description": "Interview-style stress-test of a plan or decision. Walks every branch of the design tree, one question at a time, until shared understanding is reached."
+    },
+    {
+      "name": "handoff",
+      "source": "./handoff",
+      "description": "Generates a copy-pasteable handoff block so a fresh Claude Code session can resume work with zero context loss."
+    },
+    {
+      "name": "parallel-dispatch",
+      "source": "./parallel-dispatch",
+      "description": "Turns a pre-built parallel work plan into copy-paste agent prompts plus a coordinator playbook. Validates file-scope conflicts."
+    },
+    {
+      "name": "quiz-me",
+      "source": "./quiz-me",
+      "description": "Active-recall quiz on a topic, document, codebase area, or interview prep. One question at a time, adaptive difficulty."
+    }
+  ]
+}

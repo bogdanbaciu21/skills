@@ -1,6 +1,6 @@
 ---
 name: quiz-me
-description: Run an active-recall quiz on a topic, document, book chapter, codebase area, interview subject, meeting-prep topic, or study material the user wants to learn or retain. Use when the user says "quiz me", "test me on", "drill me on", "flashcard me", "ask me questions about", "help me study", "interview prep on", "I need to retain this", or asks to stress-test their understanding. Ask one question at a time and adapt difficulty based on responses.
+description: Run an active-recall quiz on a topic, document, book chapter, codebase area, interview subject, meeting-prep topic, or study material the user wants to learn or retain. Use when the user says "quiz me", "test me on", "drill me on", "flashcard me", "ask me questions about", "help me study", "interview prep on", "I need to retain this", or asks to stress-test their understanding of a body of material. Ask one question at a time and adapt difficulty based on responses. Do NOT use to stress-test a plan or decision before implementation — that's `grill-me`. Do NOT use for trivia games unrelated to learning.
 ---
 
 # Quiz Me
@@ -9,14 +9,14 @@ Run a focused, adaptive quiz that helps the user retain material. Probe understa
 
 ## Workflow
 
-### 1. Establish the source of truth
+### Step 1 — Establish the source of truth
 
 - Use the specific source the user names: a document, file, codebase area, book chapter, notes, pasted text, or topic.
 - If the source is a file, document, or codebase area, read it before generating questions. Do not quiz from memory when an available source can be inspected.
 - If the source is only a broad topic, ask what depth they want: intro, working knowledge, or expert.
 - If the topic depends on current facts, standards, laws, prices, APIs, schedules, or other changing information, verify the current source before quizzing.
 
-### 2. Set the format once
+### Step 2 — Set the format once
 
 Ask for only the missing preferences, then proceed:
 
@@ -26,14 +26,14 @@ Ask for only the missing preferences, then proceed:
 
 If the user already implies these choices, do not ask. Start the quiz.
 
-### 3. Ask one question at a time
+### Step 3 — Ask one question at a time
 
 - Ask one question, then wait for the user's answer.
 - Never dump all questions upfront.
 - Track score, current question number, correct/partial/incorrect count, streaks, and weak concepts internally.
 - Accept "I don't know" as an answer, then teach the answer before moving on.
 
-### 4. Design strong questions
+### Step 4 — Design strong questions
 
 Mix question types across the round:
 
@@ -54,7 +54,7 @@ Avoid:
 - Questions copied verbatim from the source.
 - Questions answerable by matching keywords without understanding.
 
-### 5. Grade before continuing
+### Step 5 — Grade before continuing
 
 After each answer:
 
@@ -64,14 +64,14 @@ After each answer:
 - Push back on hand-wavy answers by asking for the missing specificity when that would teach more than immediately revealing the answer.
 - Do not inflate praise. Be calibrated and useful.
 
-### 6. Adapt difficulty
+### Step 6 — Adapt difficulty
 
 - Two correct answers in a row: make the next question harder or probe an edge case.
 - Two partial or incorrect answers in a row: lower difficulty and revisit the underlying concept before continuing.
 - Consistently strong answers: shift toward application, synthesis, and transfer.
 - Consistently weak answers: shift toward foundations, definitions, and simple examples.
 
-### 7. End the round
+### Step 7 — End the round
 
 When the round is complete, provide:
 

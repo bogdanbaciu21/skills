@@ -1,6 +1,6 @@
 ---
 name: parallel-dispatch
-description: Generate copy-paste agent prompts and a coordinator playbook from a pre-built parallel work plan. Use when the user has decomposed a large task into conflict-free parallel tracks and needs formatted prompts for multiple Claude Code sessions. Triggers on "parallel dispatch", "parallel agents", "dispatch tracks", "multi-agent", "generate agent prompts".
+description: Generate copy-paste agent prompts and a coordinator playbook from a pre-built parallel work plan. Use when the user has decomposed a large task into conflict-free parallel tracks and needs formatted prompts for multiple Claude Code sessions. Triggers on "parallel dispatch", "parallel agents", "dispatch tracks", "multi-agent", "generate agent prompts". Do NOT use to decompose a task into tracks (the user does that upfront), to author handover documents, or to launch/monitor agents. Do NOT use for single-session sub-agent delegation via the Agent tool — this is for spinning up separate Claude Code sessions.
 ---
 
 # Parallel Dispatch
@@ -36,19 +36,12 @@ Before generating prompts, check for file overlap between tracks:
 
 ### Step 3 — Generate agent prompts
 
-For each track, produce a fenced code block (```markdown) the user can copy-paste into a new Claude Code session. Use this template:
+For each track, produce a fenced code block (```markdown) the user can copy-paste into a new Claude Code session. Use the template that matches the track type:
 
-#### Code track template
+- Code track: [`assets/agent-prompt-code.md`](assets/agent-prompt-code.md)
+- Analysis track: [`assets/agent-prompt-analysis.md`](assets/agent-prompt-analysis.md)
 
-```
-Read the handover document at `[handover doc path]` and execute all soldiers listed ([soldier IDs]). Read `CLAUDE.md` and `AGENTS.md` first — they contain hard rules you must follow. This is [Track Name] of a parallel workflow. You touch ONLY [CAN touch files]. Do NOT edit [CANNOT touch files]. [Post-completion gates]. Commit and push to main when done. **MANDATORY — do not end the session until you have done BOTH:** (1) Close each of these issues with `gh issue close <N> --comment "summary of what was done"`: [issue numbers]. (2) Verify closures: `for i in [issue numbers]; do gh issue view $i --json state -q .state; done` — all must print CLOSED.
-```
-
-#### Analysis track template
-
-```
-Read the handover document at `[handover doc path]` and execute all soldiers listed ([soldier IDs]). Read `CLAUDE.md` and `AGENTS.md` first. This is [Track Name] of a parallel workflow. This is READ-ONLY analysis — you do NOT edit any source code. [Describe output artifacts and where to write them]. Commit and push to main. **MANDATORY — do not end the session until you have done BOTH:** (1) Comment on each of these issues with your findings using `gh issue comment <N> --body "..."`: [issue numbers]. (2) Verify comments were posted by checking the issue URL output.
-```
+Read the appropriate template, fill in the bracketed placeholders, and emit the result inside a fenced markdown block.
 
 #### Template rules
 
@@ -63,41 +56,7 @@ Read the handover document at `[handover doc path]` and execute all soldiers lis
 
 ### Step 4 — Generate coordinator playbook
 
-After the agent prompts, produce a **Coordinator Playbook** section:
-
-```markdown
-## Coordinator Playbook
-
-### Launch Order
-| Phase | Tracks | Can start |
-|-------|--------|-----------|
-| 1 | [tracks with no dependencies] | Now |
-| 2 | [tracks waiting on phase 1] | After [dependencies] merge |
-| ... | ... | ... |
-
-### After Each Track Merges
-1. `git pull origin main`
-2. Scan for merge conflicts (should be none if file scopes are clean)
-3. Verify commit scope matches expected files: `git log -1 --stat` — flag if the commit only touched docs when code changes were expected
-4. Verify issue closures: `for i in <expected issue numbers>; do echo -n "#$i: "; gh issue view $i --json state -q .state; done`
-5. If any expected issues are still OPEN, close them now with the track's findings
-6. [Track-specific verification if any]
-
-### Final Gate (after ALL tracks merge)
-```bash
-npm run verify                    # Full CI mirror
-node scripts/dead-code-check.js   # Dead code scan
-# Verify ALL expected issues are closed
-gh issue list --label <workflow-label> --state open --limit 50
-```
-
-### Issue Closure Checklist
-- **[Track Name] closes:** [issue numbers]
-- **[Track Name] comments on:** [issue numbers]
-- ...
-
-**Coordinator responsibility:** If agents leave issues open (common — see Common Pitfalls), the coordinator closes them during the "After Each Track Merges" step. Do not defer to the Final Gate.
-```
+After the agent prompts, produce a **Coordinator Playbook** section by reading [`assets/coordinator-playbook.md`](assets/coordinator-playbook.md) and filling in the track names, issue numbers, and any track-specific verification commands.
 
 ### Step 5 — Summary table
 
