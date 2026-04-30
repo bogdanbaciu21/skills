@@ -1,0 +1,4 @@
+interface:
+  display_name: "Quiz Me"
+  short_description: "Adaptive active-recall study drills"
+  default_prompt: "Use $quiz-me to quiz me on this material one question at a time."
