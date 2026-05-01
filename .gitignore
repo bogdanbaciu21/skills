@@ -6,3 +6,7 @@
 node_modules/
 .env
 .env.local
+
+# chat-analysis ephemeral output (may contain redacted but still sensitive context)
+chat-analysis-review.md
+chat-analysis/chat-analysis-review.md
