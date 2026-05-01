@@ -10,6 +10,11 @@
   },
   "plugins": [
     {
+      "name": "agent-coordination",
+      "source": "./agent-coordination",
+      "description": "Coordinate a deliberation across multiple AI agents (Claude, Gemini, Codex, Cursor, Antigravity, …) using a shared markdown log. Enforces preface format, phase model, convergence ledger, approval gate, and handoff protocol."
+    },
+    {
       "name": "grill-me",
       "source": "./grill-me",
       "description": "Interview-style stress-test of a plan or decision. Walks every branch of the design tree, one question at a time, until shared understanding is reached."
