@@ -45,6 +45,8 @@ skills/
 ├─ CODE_OF_CONDUCT.md
 ├─ SECURITY.md
 ├─ .gitignore
+├─ agent-coordination/
+│  └─ SKILL.md
 ├─ handoff/
 │  └─ SKILL.md
 ├─ grill-me/
@@ -87,6 +89,7 @@ Use this checklist before publishing a skill:
 
 | Skill | Status | Purpose |
 |---|---|---|
+| `agent-coordination` | Ready | Coordinates multi-vendor AI deliberation through a shared markdown log — preface format, phase model, convergence ledger, approval gate, clean handoff. |
 | `handoff` | Ready | Creates a structured session handoff for continuation in a new chat. |
 | `grill-me` | Ready | Runs a one-question-at-a-time pressure-test interview for plans/decisions. |
 | `parallel-dispatch` | Ready | Generates multi-agent prompts and coordinator playbook from a parallel work plan. |
