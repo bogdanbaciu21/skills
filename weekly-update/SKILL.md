@@ -1,6 +1,6 @@
 ---
 name: weekly-update
-description: Draft a weekly stakeholder update for any software project. Use when the user asks for a weekly update, Friday email, status report, sprint summary, or stakeholder progress report. Pulls commits and closed issues automatically from git and gh, asks a short set of clarifying questions, and produces a draft markdown file in docs/weekly-updates/. Optionally renders an HTML email using a brand template if one is configured.
+description: Draft a weekly stakeholder update for any software project. Use when the user asks for a weekly update, Friday email, status report, sprint summary, or stakeholder progress report. Pulls commits and closed issues automatically from git and the project's issue tracker (GitHub Issues by default; tested with Linear, theoretically supports Jira), asks a short set of clarifying questions, and produces a draft markdown file in docs/weekly-updates/. Optionally renders an HTML email using a brand template if one is configured.
 ---
 
 # Weekly Update
@@ -50,7 +50,9 @@ Weeks are numbered sequentially from the start of the project. Default week-end 
 
 ### Step 2 — Pull Data Automatically
 
-Before asking anything, run these and cache the results:
+Before asking anything, run the queries below and cache the results. Commit and line-change stats come from `git` regardless of issue tracker. Issue counts come from whichever tracker the project uses — the rest of the workflow is tracker-agnostic as long as you can answer "what closed this week?" and "what's the all-time open/closed split by milestone?"
+
+#### Git (always)
 
 ```bash
 # Commits in the current week (since last week-end midnight)
@@ -62,7 +64,11 @@ git log --since="<last Sunday>" --shortstat --pretty=format:"" | \
 
 # Total commits since repo creation
 git rev-list --count HEAD
+```
 
+#### GitHub Issues (default tracker)
+
+```bash
 # Closed issues by milestone (this week)
 gh issue list --state closed \
   --search "closed:>=<last Sunday YYYY-MM-DD>" \
@@ -73,7 +79,35 @@ gh issue list --state all --limit 2000 \
   --json number,state,milestone
 ```
 
-Aggregate raw output into the tables the skill renders. If `gh` is rate-limited or errors, degrade gracefully: ask for the numbers manually rather than fabricating them.
+#### Linear (tested alternative)
+
+The same workflow runs against Linear: GitHub milestones map to Linear **projects** (long-lived workstreams) or **cycles** (sprint-shaped). Verified working in production.
+
+```bash
+# Closed issues this week
+[your Linear closed-this-week query — fill in before pushing]
+
+# All-time issues by project/cycle
+[your Linear all-time query — fill in before pushing]
+```
+
+If the project uses the Linear MCP server rather than the CLI, the equivalent calls are `list_issues` with a `completedAt`/`canceledAt` date filter and a project or cycle scope. Substitute the MCP call signature your harness exposes.
+
+#### Jira (untested, theoretical)
+
+The same shape should work against Jira via JQL — substitute `jira` (the Atlassian CLI) or the Atlassian MCP server. **Untested in production.** Validate the closed-this-week query against a known week before relying on the numbers.
+
+```bash
+# Closed issues this week — via JQL (untested)
+jira issue list --jql "resolved >= -7d AND statusCategory = Done" --limit 500
+
+# All-time issues by epic/sprint — via JQL (untested)
+jira issue list --jql "project = <KEY>" --limit 2000
+```
+
+#### Common rule
+
+Aggregate the raw output into the tables the skill renders. If the tracker is rate-limited or errors out, degrade gracefully: ask for the numbers manually rather than fabricating them.
 
 ### Step 3 — Ask the Four Questions
 
@@ -258,7 +292,7 @@ Common email template tokens to support:
 ## What This Skill Will Never Do
 
 - **Never send the email.** Output file only.
-- **Never fabricate numbers.** If git/gh data is missing, ask.
+- **Never fabricate numbers.** If git or tracker data is missing, ask.
 - **Never use adjective filler.** See tone rules.
 - **Never invent blockers or asks.** The author must confirm them.
 - **Never commit the draft** unless explicitly asked.
