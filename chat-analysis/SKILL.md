@@ -70,6 +70,9 @@ python3 scripts/chat_analysis.py --all
 
 # Custom output path
 python3 scripts/chat_analysis.py --output /tmp/review.md
+
+# Heuristic-only — no API calls, nothing leaves the machine
+python3 scripts/chat_analysis.py --no-label
 ```
 
 Stream output so the user sees progress. Report the final count:
