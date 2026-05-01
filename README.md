@@ -51,7 +51,9 @@ skills/
 │  └─ SKILL.md
 ├─ parallel-dispatch/
 │  └─ SKILL.md
-└─ excel-wow/
+├─ excel-wow/
+│  └─ SKILL.md
+└─ blog-image-gen/
    └─ SKILL.md
 ```
 
@@ -90,6 +92,7 @@ Use this checklist before publishing a skill:
 | `parallel-dispatch` | Ready | Generates multi-agent prompts and coordinator playbook from a parallel work plan. |
 | `quiz-me` | Ready | Active-recall quiz on a topic, doc, codebase area, or interview prep — one question at a time, adaptive difficulty. |
 | `excel-wow` | Draft | Placeholder for a future Excel/financial-modeling workflow skill. |
+| `blog-image-gen` | Ready | Generates editorial hero images for blog posts via OpenAI `gpt-image-2` (Responses API + thinking), with batch/ingest workflows. |
 
 ---
 
