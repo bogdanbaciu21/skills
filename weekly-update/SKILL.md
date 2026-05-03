@@ -123,6 +123,37 @@ Optionally ask (only if relevant):
 - Any "Bug of the Week" worth calling out with impact?
 - Screenshot to embed as a hero shot?
 
+### Step 3.5 — The Personal Preamble (two-voice composition)
+
+The canonical artifact is a **two-voice hybrid**: a short personal preamble in plain prose ABOVE the formal institutional report. Sent emails are typically composed as `[plain-prose preamble] + [formal SLG-style report block] + [auto-appended firm signature]`. Generate both voices.
+
+The preamble is *not* the formal report's TL;DR. It's the human cover note — the thing that makes the email feel sent by a person, not generated. It also carries **soft asks** (cadence preferences, CC confirmations, consent items, scope clarifications) that don't belong in the institutional "The Ask" table.
+
+**Preamble structure:**
+
+1. **Greeting** — `{Recipient} -` (em dash + space, no comma). Lowercase first word after.
+2. **Context / framing** — one or two sentences honestly framing the cadence, the report's automation level, or a caveat about the data. Example: *"The report is heavily automated and largely driven by GitHub activity (which I have almost none for you right now), so this week is a bit nonsensical, but it's good hygiene and I want to get into a healthy habit."*
+3. **Numbered questions** (when present) — soft asks the recipient should answer in reply. 1–4 items. Each phrased as a real question, not a demand. Include voluntary opt-outs and the *why* so the recipient can reply quickly. Examples of soft-ask categories:
+   - Cadence preferences ("Sunday vs before-Friday-meeting?")
+   - Recipient list ("Should X be cc'd?")
+   - Consent / permissions ("OK to use Granola for meeting transcripts?")
+   - Scope confirmations ("Are we scoping Y in or out for May?")
+4. **Friendly close** — one sentence acknowledging context outside the work (travel, family, holiday, prior meeting). Optional but humanizing.
+5. **Sign-off** — `Best,\n{First name}` on two lines.
+
+**Preamble vs formal-Ask split (important):**
+
+| Goes in preamble | Goes in formal "The Ask" table |
+|---|---|
+| Cadence / process questions | Decision-level asks tied to deadlines |
+| Recipient list confirmations | Resource / provisioning requests |
+| Consent / permission items | Scope holds and gates |
+| Personal acknowledgements | Anything that needs a date and an owner |
+
+If the same item could plausibly go in either place, prefer the preamble — the formal table is for items that need to be dated, owned, and tracked into next week's update.
+
+**Tone — preamble is the opposite of the report.** The report is institutional confident. The preamble is honest, conversational, slightly self-deprecating when warranted ("nitpicky", "a bit nonsensical"), and reads like an actual email between two humans. Don't strip the personality. Don't apologize for the cadence; just acknowledge it.
+
 ### Step 4 — Draft the Markdown File
 
 Write to `docs/weekly-updates/week-{NN}-{YYYY-MM-DD}.md` using the structure below. This is the primary output — review and edit it before sending.
@@ -140,6 +171,24 @@ Never send the email. The author sends it manually. The skill's job ends at the 
 ```markdown
 # {Project Name} — Weekly Update #{N}
 *Week ending {Date} · To: {Primary}, {CCs}*
+
+---
+
+## Preamble — plain prose to send above the formal report
+
+{Recipient first name} -
+
+{1–2 sentence honest framing of cadence, automation, or this week's data caveat.}
+
+Questions:
+1. {soft ask phrased as a real question, with the *why* embedded so the recipient can reply quickly}
+2. {soft ask}
+3. {soft ask — include voluntary opt-outs where relevant}
+
+{One-sentence friendly close acknowledging context outside the work.}
+
+Best,
+{First name}
 
 ---
 
