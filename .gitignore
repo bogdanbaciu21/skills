@@ -1,4 +1,3 @@
-.DS_Store
 *.swp
 *.swo
 .idea/
@@ -10,3 +9,7 @@ node_modules/
 # chat-analysis ephemeral output (may contain redacted but still sensitive context)
 chat-analysis-review.md
 chat-analysis/chat-analysis-review.md
+
+# macOS metadata
+.DS_Store
+**/.DS_Store
