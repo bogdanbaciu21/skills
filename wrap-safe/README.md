@@ -64,7 +64,11 @@ If you find yourself reaching for any of these as a "fix" for visible wrap weird
 
 ## Versioning
 
-Pinned by commit SHA or by tag. `@main` follows the latest commit on this branch — use only for development; production should pin.
+Pinned by commit SHA or by tag. `@main` follows the latest commit on this branch — use only for development; production should pin. The canonical hosted path is:
+
+```text
+https://cdn.jsdelivr.net/gh/bogdanbaciu21/skills@<ref>/wrap-safe/
+```
 
 ## License
 

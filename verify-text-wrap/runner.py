@@ -37,9 +37,8 @@ try:
 except ImportError:
     use_browserbase_if_available = lambda *a, **kw: None
 
-# Default location of the wrap-safe wrapcheck.js. After wrap-safe migrates into
-# the skills repo at skills/wrap-safe/, this URL is the source of truth. Override
-# via --wrapcheck-url during transition periods or for alternate hosting.
+# Default location of the wrap-safe probe. This repo is the canonical public
+# host; pin a commit SHA downstream when reproducibility matters.
 DEFAULT_WRAPCHECK_URL = "https://cdn.jsdelivr.net/gh/bogdanbaciu21/skills@main/wrap-safe/wrapcheck.js"
 VIEWPORT = {"width": 1440, "height": 900}
 

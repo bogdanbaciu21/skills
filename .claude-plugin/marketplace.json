@@ -33,6 +33,11 @@
       "name": "quiz-me",
       "source": "./quiz-me",
       "description": "Active-recall quiz on a topic, document, codebase area, or interview prep. One question at a time, adaptive difficulty."
+    },
+    {
+      "name": "verify-text-wrap",
+      "source": "./verify-text-wrap",
+      "description": "Verifies static HTML portals for caterpillar text, narrow containers, and right-edge layout drift using the bundled wrap-safe probe."
     }
   ]
 }
