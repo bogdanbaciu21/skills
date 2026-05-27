@@ -57,6 +57,8 @@ skills/
 │  ├─ SKILL.md
 │  ├─ runner.py
 │  └─ browserbase.py
+├─ skill-drift-scanner/
+│  └─ SKILL.md
 ├─ wrap-safe/
 │  ├─ README.md
 │  ├─ wrap-safe.css
@@ -103,6 +105,7 @@ Use this checklist before publishing a skill:
 | `parallel-dispatch` | Ready | Generates multi-agent prompts and coordinator playbook from a parallel work plan. |
 | `quiz-me` | Ready | Active-recall quiz on a topic, doc, codebase area, or interview prep — one question at a time, adaptive difficulty. |
 | `verify-text-wrap` | Ready | Verifies static HTML portals for caterpillar text, narrow containers, and right-edge layout drift using the bundled `wrap-safe` probe. |
+| `skill-drift-scanner` | Ready | Audits Codex and Claude skill deployment drift, autosync health, scheduler status, and reload requirements across machine-level skill installs. |
 | `wrap-safe` | Ready | Drop-in CSS and JS runtime probe used by `verify-text-wrap`; shipped as a library under this repo, not a standalone skill. |
 | `excel-wow` | Draft | Placeholder for a future Excel/financial-modeling workflow skill. |
 | `blog-image-gen` | Ready | Generates editorial hero images for blog posts via OpenAI `gpt-image-2` (Responses API + thinking), with batch/ingest workflows. |
