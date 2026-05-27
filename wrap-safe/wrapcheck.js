@@ -4,7 +4,7 @@
  * Runtime probe for caterpillar-text and container-collapse bugs.
  * Exposes window.__wrapcheck() for manual use; auto-runs on ?wrapcheck=1.
  *
- * Source: https://github.com/bogdanbaciu21/wrap-safe
+ * Source: https://github.com/bogdanbaciu21/skills/tree/main/wrap-safe
  * License: MIT
  *
  * v0.1.2 — MAJOR PRECISION UPGRADE.
@@ -26,7 +26,7 @@
  * v0.1.0 was: initial release with overly-narrow probe.
  *
  * Usage:
- *   <script src="https://cdn.jsdelivr.net/gh/bogdanbaciu21/wrap-safe@v0.1.2/wrapcheck.js" defer></script>
+ *   <script src="https://cdn.jsdelivr.net/gh/bogdanbaciu21/skills@main/wrap-safe/wrapcheck.js" defer></script>
  *
  * Then in the browser console:
  *   __wrapcheck()              // returns the report and prints to console

@@ -53,6 +53,14 @@ skills/
 │  └─ SKILL.md
 ├─ parallel-dispatch/
 │  └─ SKILL.md
+├─ verify-text-wrap/
+│  ├─ SKILL.md
+│  ├─ runner.py
+│  └─ browserbase.py
+├─ wrap-safe/
+│  ├─ README.md
+│  ├─ wrap-safe.css
+│  └─ wrapcheck.js
 ├─ excel-wow/
 │  └─ SKILL.md
 └─ blog-image-gen/
@@ -94,6 +102,8 @@ Use this checklist before publishing a skill:
 | `grill-me` | Ready | Runs a one-question-at-a-time pressure-test interview for plans/decisions. |
 | `parallel-dispatch` | Ready | Generates multi-agent prompts and coordinator playbook from a parallel work plan. |
 | `quiz-me` | Ready | Active-recall quiz on a topic, doc, codebase area, or interview prep — one question at a time, adaptive difficulty. |
+| `verify-text-wrap` | Ready | Verifies static HTML portals for caterpillar text, narrow containers, and right-edge layout drift using the bundled `wrap-safe` probe. |
+| `wrap-safe` | Ready | Drop-in CSS and JS runtime probe used by `verify-text-wrap`; shipped as a library under this repo, not a standalone skill. |
 | `excel-wow` | Draft | Placeholder for a future Excel/financial-modeling workflow skill. |
 | `blog-image-gen` | Ready | Generates editorial hero images for blog posts via OpenAI `gpt-image-2` (Responses API + thinking), with batch/ingest workflows. |
 

@@ -1,18 +1,18 @@
 /* ============================================================================
- * wrap-safe.css — v0.1.0
+ * wrap-safe.css — v0.1.2
  *
  * Drop-in typography reset that prevents the "caterpillar text" / container-
  * collapse class of CSS bugs (paragraphs that wrap one or two words per line,
  * pages that are 50,000px tall, prose containers that resolve to 36px wide).
  *
- * Source: https://github.com/bogdanbaciu21/wrap-safe
+ * Source: https://github.com/bogdanbaciu21/skills/tree/main/wrap-safe
  * License: MIT
  *
  * Usage:
- *   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/bogdanbaciu21/wrap-safe@v0.1.0/wrap-safe.css">
+ *   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/bogdanbaciu21/skills@main/wrap-safe/wrap-safe.css">
  *
  *   or inside an existing stylesheet:
- *   @import url("https://cdn.jsdelivr.net/gh/bogdanbaciu21/wrap-safe@v0.1.0/wrap-safe.css");
+ *   @import url("https://cdn.jsdelivr.net/gh/bogdanbaciu21/skills@main/wrap-safe/wrap-safe.css");
  *
  * The single most important rule below is `* { min-width: 0 }`. The default for
  * a flex/grid item's min-width is `auto` (NOT 0), which means a long unbroken
