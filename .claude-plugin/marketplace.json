@@ -38,6 +38,11 @@
       "name": "verify-text-wrap",
       "source": "./verify-text-wrap",
       "description": "Verifies static HTML portals for caterpillar text, narrow containers, and right-edge layout drift using the bundled wrap-safe probe."
+    },
+    {
+      "name": "skill-drift-scanner",
+      "source": "./skill-drift-scanner",
+      "description": "Audits Codex and Claude skill deployment drift, autosync health, scheduler status, and reload requirements across machine-level skill installs."
     }
   ]
 }
