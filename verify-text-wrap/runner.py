@@ -44,9 +44,13 @@ DEFAULT_WRAPCHECK_URL = "https://cdn.jsdelivr.net/gh/bogdanbaciu21/skills@main/w
 DEFAULT_WRAPCHECK_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "wrap-safe", "wrapcheck.js"))
 DEFAULT_VIEWPORTS = [
     {"name": "wide", "width": 1440, "height": 900},
+    {"name": "desktop", "width": 1280, "height": 900},
     {"name": "laptop", "width": 1024, "height": 900},
+    {"name": "tablet-wide", "width": 820, "height": 900},
     {"name": "tablet", "width": 768, "height": 900},
+    {"name": "phone-wide", "width": 430, "height": 844},
     {"name": "mobile", "width": 390, "height": 844},
+    {"name": "phone-narrow", "width": 360, "height": 780},
 ]
 
 # Right-edge spread that's just inline-box variance vs. a real cap mismatch.
@@ -220,8 +224,10 @@ def local_server(directory):
 
 # --------------------------------------------------------------- check core
 
-def check_page(page, page_url, known_issues, screenshot_dir, wrapcheck_source, viewport, settle_ms):
+def check_page(page, page_url, known_issues, screenshot_dir, wrapcheck_source, viewport, settle_ms, font_timeout_ms):
     """Run probe + right-edge check on the given (already-navigated) page."""
+    _wait_for_fonts(page, font_timeout_ms)
+
     if settle_ms > 0:
         page.wait_for_timeout(settle_ms)  # let charts / embeds settle
 
@@ -327,7 +333,7 @@ def run_local(args):
                 except Exception as e:
                     reports.append({"page": pname, "viewport": viewport, "error": str(e)})
                     continue
-                reports.append(check_page(page, pname, known, args.screenshot_dir, wrapcheck_source, viewport, args.settle_ms))
+                reports.append(check_page(page, pname, known, args.screenshot_dir, wrapcheck_source, viewport, args.settle_ms, args.font_timeout_ms))
             ctx.close()
         browser.close()
 
@@ -376,7 +382,7 @@ def run_deployed(args):
                         page.wait_for_timeout(2000)
                     except Exception:
                         pass  # fall through; check_page may still find content
-                reports.append(check_page(page, url, known, args.screenshot_dir, wrapcheck_source, viewport, args.settle_ms))
+                reports.append(check_page(page, url, known, args.screenshot_dir, wrapcheck_source, viewport, args.settle_ms, args.font_timeout_ms))
             ctx.close()
         browser.close()
 
@@ -430,6 +436,20 @@ def _install_gate_bypass(ctx, gate_key):
     ctx.add_init_script(script)
 
 
+def _wait_for_fonts(page, timeout_ms):
+    if timeout_ms <= 0:
+        return
+    try:
+        page.wait_for_function(
+            "() => !document.fonts || document.fonts.status === 'loaded'",
+            timeout=timeout_ms,
+        )
+    except Exception:
+        # Keep the guard useful even on pages with a slow/missing font file.
+        # The screenshot and report still show what rendered.
+        pass
+
+
 def _parse_viewports(raw):
     if not raw:
         return DEFAULT_VIEWPORTS
@@ -463,6 +483,9 @@ def _viewport_summary(viewports):
 
 def _emit(reports, args):
     """Print human-readable report and return exit code."""
+    if getattr(args, "json_report", None):
+        _write_json_report(args.json_report, reports)
+
     any_failure = False
     for r in reports:
         viewport = r.get("viewport") or {}
@@ -486,6 +509,12 @@ def _emit(reports, args):
                     print(f"        {kind}: <{f.get('selector', f.get('tag'))}> w={f.get('cellWidth')}px rules={rules} \"{f.get('textPreview','')}\"")
                 elif kind == "dense-prose-in-narrow-column":
                     print(f"        {kind}: <{f.get('selector', f.get('tag'))}> w={f.get('cellWidth')}px lines={f.get('textLines')} \"{f.get('textPreview','')}\"")
+                elif kind in ("display-text-orphan-line", "display-text-short-final-line"):
+                    label = f.get("orphanText") or f.get("finalLineText") or ""
+                    lines = " / ".join(f.get("lineTexts", [])[-3:])
+                    print(f"        {kind}: <{f.get('selector', f.get('tag'))}> w={f.get('cellWidth')}px final=\"{label}\" lines=\"{lines}\"")
+                elif kind == "clipped-text":
+                    print(f"        {kind}: <{f.get('selector', f.get('tag'))}> hiddenX={f.get('hiddenX')}px hiddenY={f.get('hiddenY')}px \"{f.get('textPreview','')}\"")
                 elif kind in ("body-horizontal-overflow", "element-horizontal-overflow"):
                     print(f"        {kind}: <{f.get('selector', f.get('tag', 'body'))}> overflow={f.get('overflowPx')}px \"{f.get('textPreview','')}\"")
                 else:
@@ -514,6 +543,20 @@ def _emit(reports, args):
     return 1 if any_failure else 0
 
 
+def _write_json_report(path, reports):
+    os.makedirs(os.path.dirname(os.path.abspath(path)), exist_ok=True)
+    payload = {
+        "ts": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+        "summary": {
+            "checks": len(reports),
+            "failures": sum(1 for r in reports if r.get("error") or r.get("findings_new") or r.get("edge_failure")),
+        },
+        "reports": reports,
+    }
+    with open(path, "w") as fh:
+        json.dump(payload, fh, indent=2)
+
+
 # --------------------------------------------------------------- CLI
 
 def main():
@@ -536,6 +579,10 @@ def main():
                    help="Per-page navigation timeout in milliseconds. Default 8000.")
     p.add_argument("--settle-ms", type=int, default=750,
                    help="Delay after navigation before measuring. Default 750; use 0-250 for fast full-estate static sweeps, higher for animated/chart-heavy pages.")
+    p.add_argument("--font-timeout-ms", type=int, default=2000,
+                   help="Wait up to this many ms for document.fonts to load before measuring. Default 2000; use 0 to disable.")
+    p.add_argument("--json-report", default=None,
+                   help="Optional path to write the structured report JSON.")
     p.add_argument("--wrapcheck-url", default=None,
                    help=f"URL or local path of wrap-safe's wrapcheck.js (default: sibling {DEFAULT_WRAPCHECK_PATH}, fallback {DEFAULT_WRAPCHECK_URL})")
     args = p.parse_args()

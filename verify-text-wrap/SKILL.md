@@ -7,7 +7,7 @@ description: Verify a static-HTML portal has no caterpillar text-wrap, ugly hyph
 
 A protocol for confirming a static-HTML portal renders correctly across viewport widths after CSS or markup changes. Pairs with the `wrap-safe` library (CSS reset + runtime probe) — same author, expected to be installed alongside under `skills/wrap-safe/`.
 
-Default runner coverage is intentionally strict: `wide` 1440x900, `laptop` 1024x900, `tablet` 768x900, and `mobile` 390x844. One viewport is not enough; many ugly wrap bugs appear only when a two-column card is squeezed at laptop width or when a mobile header gets too narrow.
+Default runner coverage is intentionally strict: `wide` 1440x900, `desktop` 1280x900, `laptop` 1024x900, `tablet-wide` 820x900, `tablet` 768x900, `phone-wide` 430x844, `mobile` 390x844, and `phone-narrow` 360x780. One viewport is not enough; many ugly wrap bugs appear only between named breakpoints or when a mobile header gets too narrow.
 
 ## When to invoke
 
@@ -40,7 +40,7 @@ python3 <skill-dir>/runner.py --local \
 
 Spins up an in-process `http.server` over the portal directory so `fetch()`-based pages (markdown renderers, etc.) work — `file://` blocks fetch and produces false-clean results. Headless Chromium via Playwright. The runner sets the gate key in both `sessionStorage` and `localStorage`, because portals vary.
 
-Navigation waits for `domcontentloaded` by default, then the probe waits briefly before measuring. That keeps portal-wide static sweeps fast while still letting charts/images settle enough for wrap measurement. Use `--wait-until load` or `--wait-until networkidle` only for a page that truly needs it. Use `--settle-ms 0` or `--settle-ms 250` for a fast full-estate static ratchet; use a higher value for chart-heavy pages.
+Navigation waits for `domcontentloaded` by default, waits briefly for `document.fonts` to report loaded, then the probe waits briefly before measuring. That keeps portal-wide static sweeps fast while reducing false-clean results caused by fallback-font line breaks. Use `--wait-until load` or `--wait-until networkidle` only for a page that truly needs it. Use `--font-timeout-ms 0` only when debugging a font problem itself. Use `--settle-ms 0` or `--settle-ms 250` for a fast full-estate static ratchet; use a higher value for chart-heavy pages.
 
 ### Deployed mode
 
@@ -71,6 +71,14 @@ For a full-estate ratchet where screenshots would be too heavy, disable them:
 
 ```
 python3 <skill-dir>/runner.py --local --portal portal --screenshot-dir '' --settle-ms 250
+```
+
+To keep a machine-readable artifact for auditing or a CI annotation step:
+
+```
+python3 <skill-dir>/runner.py --local --portal portal \
+  --pages target.html \
+  --json-report /tmp/verify-text-wrap-report.json
 ```
 
 If Browserbase MCP is configured (`BROWSERBASE_API_KEY` + `BROWSERBASE_PROJECT_ID` + an LLM provider key for Stagehand), deployed mode opens a Browserbase session in parallel as additional incremental check coverage. Falls back transparently to local Playwright if any Browserbase step fails. See `browserbase.py` for graceful-degradation details.
@@ -113,6 +121,9 @@ Or for a failure:
         short-text-many-lines: <p.label> w=85px lines=3 "<short-label-text>"
         typography-anti-pattern: <p.note> w=287px rules=hyphens:auto, text-wrap:pretty "..."
         dense-prose-in-narrow-column: <p.note> w=287px lines=5 "..."
+        display-text-orphan-line: <p.ns-target> w=258px final="margin." lines="Run on clean rails. / Harvest your own / margin."
+        display-text-short-final-line: <p.sub> w=980px final="control." lines="... on a clock you / control."
+        clipped-text: <p.note> hiddenX=0px hiddenY=18px "..."
         element-horizontal-overflow: <code> overflow=34px "..."
 ```
 
