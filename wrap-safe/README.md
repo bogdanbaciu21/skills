@@ -1,6 +1,6 @@
 # wrap-safe
 
-Drop-in CSS reset + JS runtime probe that prevents the "caterpillar text" class of static-HTML bugs — paragraphs that wrap one or two words per line, pages that render 50,000 pixels tall, prose containers that resolve to 36 pixels wide.
+Drop-in CSS reset + JS runtime probe that prevents the recurring static-HTML text-wrap failure classes: paragraphs that wrap one or two words per line, pages that render 50,000 pixels tall, prose containers that resolve to 36 pixels wide, automatic mid-word hyphenation, unstable `text-wrap` rules, dense prose trapped in narrow card/sidebar columns, and horizontal overflow.
 
 Designed to live alongside the [`verify-text-wrap`](../verify-text-wrap/SKILL.md) skill: this is the runtime library, that is the verification protocol.
 
@@ -48,6 +48,9 @@ Checks:
 3. **Caterpillar elements** — text wrapping to > 12 visual lines as measured by `Range.getClientRects()`.
 4. **Short-text-many-lines** — ≤ 40 chars wrapping to ≥ 3 lines (the narrow-grid-cell label class).
 5. **Heading-many-lines** — h1–h6 wrapping to > 3 lines.
+6. **Typography anti-patterns** — `hyphens:auto`, `text-wrap:pretty`, `text-wrap:balance`, and `word-break:break-all` on visible prose.
+7. **Dense prose in narrow columns** — long text trapped below 320px on tablet/desktop widths.
+8. **Horizontal overflow** — body or element scroll width exceeding its container.
 
 Returns a structured report. Playwright/Selenium can call `__wrapcheck({silent: true})` to assert on CI.
 

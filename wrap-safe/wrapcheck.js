@@ -1,11 +1,19 @@
 /* ============================================================================
- * wrapcheck.js — v0.1.2
+ * wrapcheck.js — v0.2.0
  *
  * Runtime probe for caterpillar-text and container-collapse bugs.
  * Exposes window.__wrapcheck() for manual use; auto-runs on ?wrapcheck=1.
  *
  * Source: https://github.com/bogdanbaciu21/skills/tree/main/wrap-safe
  * License: MIT
+ *
+ * v0.2.0 — TYPOGRAPHY RATCHET.
+ *   - Flags CSS typography anti-patterns that create visible word fragments:
+ *     `hyphens:auto`, `text-wrap:pretty`, `text-wrap:balance` on prose, and
+ *     `word-break:break-all`.
+ *   - Flags dense long prose trapped in narrow card/sidebar columns on
+ *     tablet/desktop widths.
+ *   - Flags horizontal overflow at body and element level.
  *
  * v0.1.2 — MAJOR PRECISION UPGRADE.
  *   - Counts visual lines via Range.getClientRects() instead of
@@ -44,12 +52,16 @@
   // ~56×, normal long-content pages cluster at 10–20×, so 30 is the natural
   // breakpoint. Override via __wrapcheck({nuclearMultiplier: N}).
   var NUCLEAR_SCROLL_MULTIPLIER = 30;
-  var NARROW_CONTAINER_SELECTOR = 'article, main, section, .doc, .article, .prose, .news-item, .ma-section, .pa-section, .ts-section';
+  var NARROW_CONTAINER_SELECTOR = 'article, main, section, .doc, .article, .prose, .news-item, .ma-section, .pa-section, .ts-section, [class$="-page"]';
   var NARROW_CONTAINER_THRESHOLD = 200; // px
   var SHORT_TEXT_MAX_CHARS = 40;        // chars considered "short"
   var SHORT_TEXT_MAX_LINES = 2;         // ≥ 3 lines for short text triggers
   var HEADING_MAX_LINES = 3;            // > 3 lines for any heading triggers
   var CATERPILLAR_LINES = 12;           // > 12 lines triggers regardless of length
+  var DENSE_BLOCK_MAX_WIDTH = 320;       // px, only enforced above mobile widths
+  var DENSE_BLOCK_MIN_CHARS = 90;
+  var DENSE_BLOCK_MIN_LINES = 4;
+  var HORIZONTAL_OVERFLOW_TOLERANCE = 2; // px
 
   // Suspect element selector for line-count checks. Broad on purpose — the
   // v0.1.0 probe missed table cells, KPI labels, and tile headings because
@@ -60,6 +72,21 @@
     'label', 'a', 'span', 'div',
     'summary', 'dt', 'dd',
     'blockquote', 'figcaption'
+  ].join(', ');
+
+  var PROSE_SELECTOR = [
+    'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
+    'p', 'li', 'dd', 'dt', 'blockquote', 'figcaption', 'summary',
+    'label', 'td', 'th', 'caption'
+  ].join(', ');
+
+  var OVERFLOW_SELECTOR = [
+    'main', 'section', 'article',
+    'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
+    'p', 'li', 'dd', 'dt', 'blockquote', 'figcaption',
+    'label', 'td', 'th', 'caption',
+    'pre', 'code', 'table',
+    'div', 'span', 'a'
   ].join(', ');
 
   // ------------------------------------------------------------------- helpers
@@ -85,6 +112,31 @@
       depth++;
     }
     return chain;
+  }
+
+  function textPreview(el, n) {
+    return (el.textContent || '').replace(/\s+/g, ' ').trim().slice(0, n || 80);
+  }
+
+  function shortSelector(el) {
+    var out = el.tagName.toLowerCase();
+    if (el.id) out += '#' + el.id;
+    if (el.className && typeof el.className === 'string') {
+      var cls = el.className.split(/\s+/).filter(Boolean).slice(0, 4);
+      if (cls.length) out += '.' + cls.join('.');
+    }
+    return out;
+  }
+
+  function isVisible(el) {
+    var cs = getComputedStyle(el);
+    if (cs.display === 'none' || cs.visibility === 'hidden' || cs.opacity === '0') return false;
+    var r = el.getBoundingClientRect();
+    return r.width >= 1 && r.height >= 1;
+  }
+
+  function skipTypographyCheck(el) {
+    return !!el.closest('pre, code, kbd, samp, script, style, noscript, svg, canvas, .sr-only, [aria-hidden="true"]');
   }
 
   /**
@@ -124,7 +176,8 @@
       cellWidth: Math.round(r.width),
       cellHeight: Math.round(r.height),
       textLines: lines,
-      textPreview: (el.textContent || '').trim().slice(0, 80),
+      selector: shortSelector(el),
+      textPreview: textPreview(el),
       textLen: (el.textContent || '').trim().length,
       ancestors: ancestorChain(el)
     };
@@ -197,6 +250,120 @@
     return findings;
   }
 
+  function checkTypographyAntiPatterns() {
+    var findings = [];
+    var seen = Object.create(null);
+    var nodes = document.querySelectorAll(PROSE_SELECTOR);
+    for (var i = 0; i < nodes.length; i++) {
+      var el = nodes[i];
+      if (!isVisible(el) || skipTypographyCheck(el)) continue;
+      var text = textPreview(el, 100);
+      if (text.length < 8) continue;
+      var cs = getComputedStyle(el);
+      var r = el.getBoundingClientRect();
+      var bad = [];
+
+      if (cs.hyphens === 'auto' || cs.webkitHyphens === 'auto') {
+        bad.push('hyphens:auto');
+      }
+      if (cs.wordBreak === 'break-all') {
+        bad.push('word-break:break-all');
+      }
+      if (cs.textWrap === 'pretty') {
+        bad.push('text-wrap:pretty');
+      } else if (cs.textWrap === 'balance') {
+        bad.push('text-wrap:balance');
+      }
+
+      if (!bad.length) continue;
+      var key = bad.join('|') + '|' + shortSelector(el);
+      if (seen[key]) continue;
+      seen[key] = 1;
+      findings.push({
+        kind: 'typography-anti-pattern',
+        selector: shortSelector(el),
+        tag: el.tagName.toLowerCase(),
+        cls: (el.className && typeof el.className === 'string') ? el.className.split(/\s+/).filter(Boolean).slice(0, 4).join('.') : '',
+        cellWidth: Math.round(r.width),
+        textLen: text.length,
+        rules: bad,
+        textPreview: text,
+        ancestors: ancestorChain(el)
+      });
+      if (findings.length >= 80) break;
+    }
+    return findings;
+  }
+
+  function checkDenseNarrowTextBlocks() {
+    var findings = [];
+    var viewportW = window.innerWidth || document.documentElement.clientWidth;
+    if (viewportW < 700) return findings;
+
+    var nodes = document.querySelectorAll('p, li, dd, blockquote, figcaption, summary, td, th');
+    for (var i = 0; i < nodes.length; i++) {
+      var el = nodes[i];
+      if (!isVisible(el) || skipTypographyCheck(el)) continue;
+      var text = textPreview(el, 160);
+      if (text.length < DENSE_BLOCK_MIN_CHARS) continue;
+      var r = el.getBoundingClientRect();
+      if (r.width > DENSE_BLOCK_MAX_WIDTH) continue;
+      var lines = textLineCount(el);
+      if (lines === null || lines < DENSE_BLOCK_MIN_LINES) continue;
+      findings.push({
+        kind: 'dense-prose-in-narrow-column',
+        selector: shortSelector(el),
+        tag: el.tagName.toLowerCase(),
+        cls: (el.className && typeof el.className === 'string') ? el.className.split(/\s+/).filter(Boolean).slice(0, 4).join('.') : '',
+        cellWidth: Math.round(r.width),
+        textLines: lines,
+        textLen: (el.textContent || '').trim().length,
+        textPreview: text,
+        ancestors: ancestorChain(el)
+      });
+      if (findings.length >= 50) break;
+    }
+    return findings;
+  }
+
+  function checkHorizontalOverflow() {
+    var findings = [];
+    var viewportW = window.innerWidth || document.documentElement.clientWidth;
+    var bodyOverflow = Math.max(document.body.scrollWidth, document.documentElement.scrollWidth) - viewportW;
+    if (bodyOverflow > HORIZONTAL_OVERFLOW_TOLERANCE) {
+      findings.push({
+        kind: 'body-horizontal-overflow',
+        overflowPx: Math.round(bodyOverflow),
+        scrollWidth: Math.max(document.body.scrollWidth, document.documentElement.scrollWidth),
+        viewportWidth: viewportW
+      });
+    }
+
+    var nodes = document.querySelectorAll(OVERFLOW_SELECTOR);
+    for (var i = 0; i < nodes.length; i++) {
+      var el = nodes[i];
+      if (!isVisible(el)) continue;
+      if (el.closest('svg, canvas, script, style, noscript')) continue;
+      var overflow = el.scrollWidth - el.clientWidth;
+      if (overflow <= HORIZONTAL_OVERFLOW_TOLERANCE) continue;
+      var r = el.getBoundingClientRect();
+      if (r.width < 20 || r.height < 8) continue;
+      findings.push({
+        kind: 'element-horizontal-overflow',
+        selector: shortSelector(el),
+        tag: el.tagName.toLowerCase(),
+        cls: (el.className && typeof el.className === 'string') ? el.className.split(/\s+/).filter(Boolean).slice(0, 4).join('.') : '',
+        overflowPx: Math.round(overflow),
+        clientWidth: el.clientWidth,
+        scrollWidth: el.scrollWidth,
+        textPreview: textPreview(el, 100),
+        ancestors: ancestorChain(el)
+      });
+      if (findings.length >= 50) break;
+    }
+    return findings;
+  }
+
   // ----------------------------------------------------------------------- run
 
   function runCheck(opts) {
@@ -209,6 +376,9 @@
 
     findings = findings.concat(checkNarrowContainers());
     findings = findings.concat(checkLineCounts());
+    findings = findings.concat(checkTypographyAntiPatterns());
+    findings = findings.concat(checkDenseNarrowTextBlocks());
+    findings = findings.concat(checkHorizontalOverflow());
 
     var byKind = {};
     findings.forEach(function (f) { byKind[f.kind] = (byKind[f.kind] || 0) + 1; });
@@ -221,7 +391,7 @@
       findingsByKind: byKind,
       url: location.href,
       ts: new Date().toISOString(),
-      probeVersion: '0.1.2'
+      probeVersion: '0.2.0'
     };
 
     if (!opts.silent) {
