@@ -1,6 +1,6 @@
 ---
 name: verify-text-wrap
-description: Verify a static-HTML portal has no caterpillar text-wrap, ugly hyphenation, narrow-card prose, horizontal overflow, or container-collapse bugs, both locally and against the deployed URL. Use after any CSS edit, after any deploy, or when the user reports "the text wrapping is broken" / "this looks off" / "random text wrapping" / "phantom right edge" / "magician divider". Runs the wrap-safe runtime probe across desktop/tablet/mobile viewports plus a right-edge alignment check that catches container-vs-element max-width mismatches. Compares findings against a per-repo `tests/wrap-known-issues.json` allowlist if present. Do NOT use for generic CSS bugs unrelated to text wrapping or container width.
+description: Verify a static-HTML portal has no caterpillar text-wrap, ugly hyphenation, display-text orphan lines, narrow-card prose, horizontal overflow, or container-collapse bugs, both locally and against the deployed URL. Use after any CSS edit, after any deploy, or when the user reports "the text wrapping is broken" / "this looks off" / "random text wrapping" / "phantom right edge" / "magician divider". Runs the wrap-safe runtime probe across desktop/tablet/mobile viewports plus a right-edge alignment check that catches container-vs-element max-width mismatches. Compares findings against a per-repo `tests/wrap-known-issues.json` allowlist if present. Do NOT use for generic CSS bugs unrelated to text wrapping or container width.
 ---
 
 # verify-text-wrap
@@ -21,7 +21,7 @@ The root cause of visible text-wrap weirdness is almost always upstream containe
 
 Correct diagnostic order:
 
-1. **Run the wrap-safe probe across default viewports** (`window.__wrapcheck()` in the browser console for a single page, or this runner for real work). Catches caterpillar paragraphs, narrow prose containers, short-text-in-narrow-box wraps, heading line-count anomalies, banned typography rules, dense prose in narrow columns, and horizontal overflow.
+1. **Run the wrap-safe probe across default viewports** (`window.__wrapcheck()` in the browser console for a single page, or this runner for real work). Catches caterpillar paragraphs, narrow prose containers, short-text-in-narrow-box wraps, heading line-count anomalies, display-text orphan lines, banned typography rules, dense prose in narrow columns, and horizontal overflow.
 2. **Measure right-edge alignment.** Main-flow prose elements (h1-h6, p, li, blockquote) should share a single right-X coordinate. If they don't, the container is wider than the prose cap and the user perceives a phantom vertical line where text wraps but section dividers or h2 underlines extend further. Framed cards/panels/notes are skipped because they own their own padding box.
 3. **Look at the deployed page**, not just the local test. Tests catch the known bug classes; the user's eye catches everything else. Always open the live URL after pushing.
 
