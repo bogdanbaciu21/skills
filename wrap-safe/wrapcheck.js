@@ -1,11 +1,15 @@
 /* ============================================================================
- * wrapcheck.js — v0.2.2
+ * wrapcheck.js — v0.2.3
  *
  * Runtime probe for caterpillar-text and container-collapse bugs.
  * Exposes window.__wrapcheck() for manual use; auto-runs on ?wrapcheck=1.
  *
  * Source: https://github.com/bogdanbaciu21/skills/tree/main/wrap-safe
  * License: MIT
+ *
+ * v0.2.3 — STRICTER DISPLAY TAIL RATCHET.
+ *   - Treats visibly undersized three-word final lines as line-quality
+ *     failures when they are short relative to both the prior line and box.
  *
  * v0.2.2 — LINE QUALITY + CLIPPING RATCHET.
  *   - Extends display-text checks beyond one-word orphans to very short
@@ -76,10 +80,10 @@
   var ORPHAN_TEXT_MAX_CHARS = 220;
   var ORPHAN_LAST_LINE_MAX_WORDS = 1;
   var ORPHAN_LAST_LINE_MAX_CHARS = 14;
-  var SHORT_FINAL_LINE_MAX_WORDS = 2;
-  var SHORT_FINAL_LINE_MAX_CHARS = 24;
-  var SHORT_FINAL_LINE_PREV_RATIO = 0.48;
-  var SHORT_FINAL_LINE_BOX_RATIO = 0.28;
+  var SHORT_FINAL_LINE_MAX_WORDS = 3;
+  var SHORT_FINAL_LINE_MAX_CHARS = 32;
+  var SHORT_FINAL_LINE_PREV_RATIO = 0.36;
+  var SHORT_FINAL_LINE_BOX_RATIO = 0.25;
   var CLIPPED_TEXT_TOLERANCE = 3;
 
   // Suspect element selector for line-count checks. Broad on purpose — the
@@ -623,7 +627,7 @@
       findingsByKind: byKind,
       url: location.href,
       ts: new Date().toISOString(),
-      probeVersion: '0.2.2'
+      probeVersion: '0.2.3'
     };
 
     if (!opts.silent) {

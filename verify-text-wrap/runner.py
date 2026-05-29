@@ -579,8 +579,8 @@ def main():
                    help="Per-page navigation timeout in milliseconds. Default 8000.")
     p.add_argument("--settle-ms", type=int, default=750,
                    help="Delay after navigation before measuring. Default 750; use 0-250 for fast full-estate static sweeps, higher for animated/chart-heavy pages.")
-    p.add_argument("--font-timeout-ms", type=int, default=2000,
-                   help="Wait up to this many ms for document.fonts to load before measuring. Default 2000; use 0 to disable.")
+    p.add_argument("--font-timeout-ms", type=int, default=5000,
+                   help="Wait up to this many ms for document.fonts to load before measuring. Default 5000; use 0 to disable.")
     p.add_argument("--json-report", default=None,
                    help="Optional path to write the structured report JSON.")
     p.add_argument("--wrapcheck-url", default=None,

@@ -40,7 +40,7 @@ python3 <skill-dir>/runner.py --local \
 
 Spins up an in-process `http.server` over the portal directory so `fetch()`-based pages (markdown renderers, etc.) work — `file://` blocks fetch and produces false-clean results. Headless Chromium via Playwright. The runner sets the gate key in both `sessionStorage` and `localStorage`, because portals vary.
 
-Navigation waits for `domcontentloaded` by default, waits briefly for `document.fonts` to report loaded, then the probe waits briefly before measuring. That keeps portal-wide static sweeps fast while reducing false-clean results caused by fallback-font line breaks. Use `--wait-until load` or `--wait-until networkidle` only for a page that truly needs it. Use `--font-timeout-ms 0` only when debugging a font problem itself. Use `--settle-ms 0` or `--settle-ms 250` for a fast full-estate static ratchet; use a higher value for chart-heavy pages.
+Navigation waits for `domcontentloaded` by default, waits up to 5 seconds for `document.fonts` to report loaded, then the probe waits briefly before measuring. That keeps portal-wide static sweeps fast while reducing false-clean results caused by fallback-font line breaks. Use `--wait-until load` or `--wait-until networkidle` only for a page that truly needs it. Use `--font-timeout-ms 0` only when debugging a font problem itself. Use `--settle-ms 0` or `--settle-ms 250` for a fast full-estate static ratchet; use a higher value for chart-heavy pages.
 
 ### Deployed mode
 

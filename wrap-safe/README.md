@@ -51,7 +51,7 @@ Checks:
 6. **Typography anti-patterns** — `hyphens:auto`, `text-wrap:pretty`, `text-wrap:balance`, and `word-break:break-all` on visible prose.
 7. **Dense prose in narrow columns** — long text trapped below 320px on tablet/desktop widths.
 8. **Display-text orphan lines** — headline/lede/display text ending with a stranded one-word final line, including text split across inline `<b>` or `<em>` children.
-9. **Display-text short final lines** — headline/lede/display text ending with a very short final line that is visibly disproportionate to the prior line.
+9. **Display-text short final lines** — headline/lede/display text ending with a very short final line, including short three-word tails, that is visibly disproportionate to the prior line.
 10. **Clipped text** — visible text hidden by overflow-hidden/clip boxes when the element is not using intentional ellipsis.
 11. **Horizontal overflow** — body or element scroll width exceeding its container.
 
