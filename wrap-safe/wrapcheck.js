@@ -1,11 +1,17 @@
 /* ============================================================================
- * wrapcheck.js — v0.2.1
+ * wrapcheck.js — v0.2.2
  *
  * Runtime probe for caterpillar-text and container-collapse bugs.
  * Exposes window.__wrapcheck() for manual use; auto-runs on ?wrapcheck=1.
  *
  * Source: https://github.com/bogdanbaciu21/skills/tree/main/wrap-safe
  * License: MIT
+ *
+ * v0.2.2 — LINE QUALITY + CLIPPING RATCHET.
+ *   - Extends display-text checks beyond one-word orphans to very short
+ *     final lines that are visibly disproportionate to the prior line.
+ *   - Flags visible text clipped by overflow-hidden boxes when the text is
+ *     not using intentional ellipsis.
  *
  * v0.2.1 — DISPLAY-TEXT ORPHAN RATCHET.
  *   - Flags headline/lede/display text whose final visual line is a stranded
@@ -70,6 +76,11 @@
   var ORPHAN_TEXT_MAX_CHARS = 220;
   var ORPHAN_LAST_LINE_MAX_WORDS = 1;
   var ORPHAN_LAST_LINE_MAX_CHARS = 14;
+  var SHORT_FINAL_LINE_MAX_WORDS = 2;
+  var SHORT_FINAL_LINE_MAX_CHARS = 24;
+  var SHORT_FINAL_LINE_PREV_RATIO = 0.48;
+  var SHORT_FINAL_LINE_BOX_RATIO = 0.28;
+  var CLIPPED_TEXT_TOLERANCE = 3;
 
   // Suspect element selector for line-count checks. Broad on purpose — the
   // v0.1.0 probe missed table cells, KPI labels, and tile headings because
@@ -474,7 +485,73 @@
           ancestors: ancestorChain(el)
         });
         if (findings.length >= 60) break;
+        continue;
       }
+
+      var lastWidthRatioToPrev = prev.width > 0 ? last.width / prev.width : 1;
+      var lastWidthRatioToBox = r.width > 0 ? last.width / r.width : 1;
+      if (last.wordCount <= SHORT_FINAL_LINE_MAX_WORDS &&
+          lastCleanChars <= SHORT_FINAL_LINE_MAX_CHARS &&
+          lastWidthRatioToPrev <= SHORT_FINAL_LINE_PREV_RATIO &&
+          lastWidthRatioToBox <= SHORT_FINAL_LINE_BOX_RATIO) {
+        findings.push({
+          kind: 'display-text-short-final-line',
+          selector: selector,
+          tag: el.tagName.toLowerCase(),
+          cls: (el.className && typeof el.className === 'string') ? el.className.split(/\s+/).filter(Boolean).slice(0, 4).join('.') : '',
+          cellWidth: Math.round(r.width),
+          fontSize: Math.round(fontSize),
+          textLines: lines.length,
+          finalLineText: last.text,
+          previousLineText: prev.text,
+          finalLineWidth: last.width,
+          previousLineWidth: prev.width,
+          finalToPreviousRatio: Number(lastWidthRatioToPrev.toFixed(2)),
+          finalToBoxRatio: Number(lastWidthRatioToBox.toFixed(2)),
+          lineTexts: lines.map(function (line) { return line.text; }),
+          textPreview: text,
+          ancestors: ancestorChain(el)
+        });
+        if (findings.length >= 60) break;
+      }
+    }
+    return findings;
+  }
+
+  function checkClippedText() {
+    var findings = [];
+    var nodes = document.querySelectorAll(TEXT_LEAF_SELECTOR);
+    for (var i = 0; i < nodes.length; i++) {
+      var el = nodes[i];
+      if (!isVisible(el) || skipTypographyCheck(el)) continue;
+      var text = textPreview(el, 120);
+      if (text.length < 8) continue;
+      var cs = getComputedStyle(el);
+      var clipsX = /(hidden|clip)/.test(cs.overflowX);
+      var clipsY = /(hidden|clip)/.test(cs.overflowY);
+      if (!clipsX && !clipsY) continue;
+      if (cs.textOverflow === 'ellipsis' && cs.whiteSpace === 'nowrap') continue;
+
+      var hiddenX = el.scrollWidth - el.clientWidth;
+      var hiddenY = el.scrollHeight - el.clientHeight;
+      if (hiddenX <= CLIPPED_TEXT_TOLERANCE && hiddenY <= CLIPPED_TEXT_TOLERANCE) continue;
+
+      var r = el.getBoundingClientRect();
+      findings.push({
+        kind: 'clipped-text',
+        selector: shortSelector(el),
+        tag: el.tagName.toLowerCase(),
+        cls: (el.className && typeof el.className === 'string') ? el.className.split(/\s+/).filter(Boolean).slice(0, 4).join('.') : '',
+        cellWidth: Math.round(r.width),
+        cellHeight: Math.round(r.height),
+        hiddenX: Math.max(0, Math.round(hiddenX)),
+        hiddenY: Math.max(0, Math.round(hiddenY)),
+        overflowX: cs.overflowX,
+        overflowY: cs.overflowY,
+        textPreview: text,
+        ancestors: ancestorChain(el)
+      });
+      if (findings.length >= 50) break;
     }
     return findings;
   }
@@ -532,6 +609,7 @@
     findings = findings.concat(checkTypographyAntiPatterns());
     findings = findings.concat(checkDenseNarrowTextBlocks());
     findings = findings.concat(checkVisualOrphans());
+    findings = findings.concat(checkClippedText());
     findings = findings.concat(checkHorizontalOverflow());
 
     var byKind = {};
@@ -545,7 +623,7 @@
       findingsByKind: byKind,
       url: location.href,
       ts: new Date().toISOString(),
-      probeVersion: '0.2.1'
+      probeVersion: '0.2.2'
     };
 
     if (!opts.silent) {
