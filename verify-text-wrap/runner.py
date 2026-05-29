@@ -9,7 +9,7 @@ Usage:
 
 Exit codes:
     0 — all pages pass (or only known-issue matches)
-    1 — at least one NEW finding (caterpillar / narrow / right-edge spread)
+    1 — at least one NEW finding (wrap, typography, overflow, right-edge spread)
     2 — operational failure (URL unreachable, Playwright not installed, etc.)
 """
 import argparse
@@ -37,10 +37,17 @@ try:
 except ImportError:
     use_browserbase_if_available = lambda *a, **kw: None
 
-# Default location of the wrap-safe probe. This repo is the canonical public
-# host; pin a commit SHA downstream when reproducibility matters.
+# Default location of the wrap-safe probe. Prefer the sibling local file so
+# edits to this skill take effect immediately against deployed pages. Fall back
+# to the public CDN when the runner is copied without wrap-safe next to it.
 DEFAULT_WRAPCHECK_URL = "https://cdn.jsdelivr.net/gh/bogdanbaciu21/skills@main/wrap-safe/wrapcheck.js"
-VIEWPORT = {"width": 1440, "height": 900}
+DEFAULT_WRAPCHECK_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "wrap-safe", "wrapcheck.js"))
+DEFAULT_VIEWPORTS = [
+    {"name": "wide", "width": 1440, "height": 900},
+    {"name": "laptop", "width": 1024, "height": 900},
+    {"name": "tablet", "width": 768, "height": 900},
+    {"name": "mobile", "width": 390, "height": 844},
+]
 
 # Right-edge spread that's just inline-box variance vs. a real cap mismatch.
 RIGHT_EDGE_TOLERANCE_PX = 24
@@ -56,12 +63,12 @@ RIGHT_EDGE_JS = r"""() => {
   // reading column. Cards/grids are intentional design, not bugs.
 
   function isInMultiColumnLayout(el) {
-    // Walk up to .article/.doc/.prose ancestor, checking for any grid/flex
+    // Walk up to the main page/prose ancestor, checking for any grid/flex
     // parent with > 1 visible column.
     let node = el.parentElement;
     let depth = 0;
     while (node && depth < 8) {
-      if (node.matches('.article, .doc, .prose, body, html')) break;
+      if (node.matches('.article, .doc, .prose, main, [class$="-page"], body, html')) break;
       const cs = getComputedStyle(node);
       if (cs.display === 'grid') {
         const cols = cs.gridTemplateColumns;
@@ -90,7 +97,43 @@ RIGHT_EDGE_JS = r"""() => {
     return false;
   }
 
-  const SEL = '.doc h1, .doc h2, .doc h3, .doc h4, .doc h5, .doc h6, ' +
+  function isInFramedComponent(el) {
+    // Right-edge alignment is a main-reading-flow check. Text inside cards,
+    // notes, panels, hero bands, footers, and other framed components has its
+    // own padding box by design and should not be compared to the page edge.
+    let node = el.parentElement;
+    let depth = 0;
+    while (node && depth < 8) {
+      if (node.matches('.article, .doc, .prose, [class$="-page"], main, body, html')) break;
+      const cls = typeof node.className === 'string' ? node.className : '';
+      if (/(^|[-_\\s])(card|tile|panel|note|not|callout|hero|foot|footer|nav|stage|stop|chip|badge|kpi|metric|banner|alert|summary|meta|head|body|link|quote)([-_\\s]|$)/i.test(cls)) {
+        return true;
+      }
+      const cs = getComputedStyle(node);
+      const bg = cs.backgroundColor;
+      const hasPaintedBox = (
+        cs.borderTopStyle !== 'none' ||
+        cs.borderRightStyle !== 'none' ||
+        cs.borderBottomStyle !== 'none' ||
+        cs.borderLeftStyle !== 'none' ||
+        parseFloat(cs.borderTopWidth) > 0 ||
+        cs.boxShadow !== 'none' ||
+        parseFloat(cs.borderTopLeftRadius) > 0 ||
+        (bg && bg !== 'rgba(0, 0, 0, 0)' && bg !== 'transparent')
+      );
+      if (hasPaintedBox) return true;
+      node = node.parentElement;
+      depth++;
+    }
+    return false;
+  }
+
+  const SEL = 'main h1, main h2, main h3, main h4, main h5, main h6, ' +
+              'main p, main li, main blockquote, main dd, main dt, main figcaption, ' +
+              '[class$="-page"] h1, [class$="-page"] h2, [class$="-page"] h3, ' +
+              '[class$="-page"] h4, [class$="-page"] h5, [class$="-page"] h6, ' +
+              '[class$="-page"] p, [class$="-page"] li, [class$="-page"] blockquote, ' +
+              '.doc h1, .doc h2, .doc h3, .doc h4, .doc h5, .doc h6, ' +
               '.doc p, .doc li, .doc blockquote, ' +
               '.article h1, .article h2, .article h3, .article h4, .article h5, .article h6, ' +
               '.article p, .article li, .article blockquote, ' +
@@ -105,6 +148,7 @@ RIGHT_EDGE_JS = r"""() => {
                    '.scenario-pair, .scenario-card, .per-patient, .callout, .openq, ' +
                    '.section-summary, .day-summary, .kpis, .kpi, .lab-card, ' +
                    '.inverse, .compare')) continue;
+    if (isInFramedComponent(el)) { skipped++; continue; }
     if (el.classList.contains('lede') || el.classList.contains('sub-lede')) continue;
     if (isInMultiColumnLayout(el)) { skipped++; continue; }
     // Skip horizontally-centered elements (margin: auto) — those are deliberately
@@ -176,17 +220,18 @@ def local_server(directory):
 
 # --------------------------------------------------------------- check core
 
-def check_page(page, page_url, known_issues, screenshot_dir, wrapcheck_url):
+def check_page(page, page_url, known_issues, screenshot_dir, wrapcheck_source, viewport, settle_ms):
     """Run probe + right-edge check on the given (already-navigated) page."""
-    page.wait_for_timeout(1500)  # let charts / embeds settle
+    if settle_ms > 0:
+        page.wait_for_timeout(settle_ms)  # let charts / embeds settle
 
     # Load wrap-safe probe if not already on the page.
     if not page.evaluate("typeof window.__wrapcheck === 'function'"):
-        page.add_script_tag(url=wrapcheck_url)
+        _add_wrapcheck_script(page, wrapcheck_source)
         try:
             page.wait_for_function("typeof window.__wrapcheck === 'function'", timeout=5000)
         except Exception:
-            return {"page": page_url, "error": f"could not load wrapcheck.js from {wrapcheck_url}"}
+            return {"page": page_url, "viewport": viewport, "error": f"could not load wrapcheck.js from {wrapcheck_source}"}
 
     wrap_report = page.evaluate("window.__wrapcheck({silent: true})")
     edge_report = page.evaluate(RIGHT_EDGE_JS)
@@ -207,6 +252,7 @@ def check_page(page, page_url, known_issues, screenshot_dir, wrapcheck_url):
     if screenshot_dir:
         os.makedirs(screenshot_dir, exist_ok=True)
         slug = page_url.replace("://", "_").replace("/", "_").replace("?", "_").replace("=", "_").replace(":", "_")
+        slug = f"{slug}__{viewport['name']}_{viewport['width']}x{viewport['height']}"
         sp = os.path.join(screenshot_dir, slug + ".png")
         try:
             page.screenshot(path=sp, full_page=True)
@@ -217,6 +263,7 @@ def check_page(page, page_url, known_issues, screenshot_dir, wrapcheck_url):
 
     return {
         "page": page_url,
+        "viewport": viewport,
         "findings_total": len(findings),
         "findings_new": new_findings,
         "findings_known": len(findings) - len(new_findings),
@@ -261,24 +308,27 @@ def run_local(args):
     portal = os.path.abspath(args.portal)
     known = _load_known_issues(args.known_issues)
     pages = _enumerate_pages(portal, args.pages)
-    print(f"\n[verify-text-wrap] local mode · portal={portal} · pages={len(pages)}", flush=True)
+    viewports = _parse_viewports(args.viewports)
+    wrapcheck_source = _default_wrapcheck_source(args.wrapcheck_url)
+    print(f"\n[verify-text-wrap] local mode · portal={portal} · pages={len(pages)} · viewports={_viewport_summary(viewports)}", flush=True)
+    print(f"[verify-text-wrap] wrapcheck={wrapcheck_source}", flush=True)
 
     with local_server(portal) as base_url, sync_playwright() as pw:
         browser = pw.chromium.launch()
-        ctx = browser.new_context(viewport=VIEWPORT)
-        if args.gate_key:
-            ctx.add_init_script(f"try {{ sessionStorage.setItem('{args.gate_key}', '1'); }} catch (e) {{}}")
-        page = ctx.new_page()
         reports = []
-        for pname in pages:
-            url = f"{base_url}/{pname}"
-            try:
-                page.goto(url, wait_until="networkidle", timeout=15000)
-            except Exception as e:
-                reports.append({"page": pname, "error": str(e)})
-                continue
-            reports.append(check_page(page, pname, known, args.screenshot_dir, args.wrapcheck_url))
-        ctx.close()
+        for viewport in viewports:
+            ctx = browser.new_context(viewport={"width": viewport["width"], "height": viewport["height"]})
+            _install_gate_bypass(ctx, args.gate_key)
+            page = ctx.new_page()
+            for pname in pages:
+                url = f"{base_url}/{pname}"
+                try:
+                    page.goto(url, wait_until=args.wait_until, timeout=args.nav_timeout_ms)
+                except Exception as e:
+                    reports.append({"page": pname, "viewport": viewport, "error": str(e)})
+                    continue
+                reports.append(check_page(page, pname, known, args.screenshot_dir, wrapcheck_source, viewport, args.settle_ms))
+            ctx.close()
         browser.close()
 
     return _emit(reports, args)
@@ -288,43 +338,46 @@ def run_deployed(args):
     known = _load_known_issues(args.known_issues)
     base_url = args.deployed.rstrip("/")
     pages = args.pages or ["/"]
-    print(f"\n[verify-text-wrap] deployed mode · base={base_url} · pages={len(pages)}", flush=True)
+    viewports = _parse_viewports(args.viewports)
+    wrapcheck_source = _default_wrapcheck_source(args.wrapcheck_url)
+    print(f"\n[verify-text-wrap] deployed mode · base={base_url} · pages={len(pages)} · viewports={_viewport_summary(viewports)}", flush=True)
+    print(f"[verify-text-wrap] wrapcheck={wrapcheck_source}", flush=True)
 
     # If Browserbase is wired up, prefer it; otherwise fall back to local Playwright.
     bb_ctx = use_browserbase_if_available()
 
     with sync_playwright() as pw:
         browser = pw.chromium.launch()
-        ctx = browser.new_context(viewport=VIEWPORT)
-        if args.gate_key:
-            ctx.add_init_script(f"try {{ sessionStorage.setItem('{args.gate_key}', '1'); }} catch (e) {{}}")
-        page = ctx.new_page()
         reports = []
-        for pname in pages:
-            url = base_url if pname == "/" else f"{base_url}/{pname.lstrip('/')}"
-            try:
-                resp = page.goto(url, wait_until="networkidle", timeout=20000)
-            except Exception as e:
-                reports.append({"page": pname, "error": str(e)})
-                continue
-            # Sanity guard: real HTTP 200 + real content.
-            if resp and resp.status >= 400:
-                reports.append({"page": pname, "error": f"HTTP {resp.status} (URL probably wrong)"})
-                continue
-            body_len = page.evaluate("document.body.textContent.trim().length")
-            if body_len < 200:
-                reports.append({"page": pname, "error": f"body length {body_len} chars — wrong URL or hard error"})
-                continue
-            # If gate is still showing (sessionStorage didn't unlock), try password.
-            if args.gate_password and page.evaluate("!!document.querySelector('input[type=password]')") and page.evaluate("document.querySelector('input[type=password]').offsetParent !== null"):
+        for viewport in viewports:
+            ctx = browser.new_context(viewport={"width": viewport["width"], "height": viewport["height"]})
+            _install_gate_bypass(ctx, args.gate_key)
+            page = ctx.new_page()
+            for pname in pages:
+                url = base_url if pname == "/" else f"{base_url}/{pname.lstrip('/')}"
                 try:
-                    page.fill("input[type=password]", args.gate_password)
-                    page.press("input[type=password]", "Enter")
-                    page.wait_for_timeout(2000)
-                except Exception:
-                    pass  # fall through; check_page may still find content
-            reports.append(check_page(page, url, known, args.screenshot_dir, args.wrapcheck_url))
-        ctx.close()
+                    resp = page.goto(url, wait_until=args.wait_until, timeout=args.nav_timeout_ms)
+                except Exception as e:
+                    reports.append({"page": pname, "viewport": viewport, "error": str(e)})
+                    continue
+                # Sanity guard: real HTTP 200 + real content.
+                if resp and resp.status >= 400:
+                    reports.append({"page": pname, "viewport": viewport, "error": f"HTTP {resp.status} (URL probably wrong)"})
+                    continue
+                body_len = page.evaluate("document.body.textContent.trim().length")
+                if body_len < 200:
+                    reports.append({"page": pname, "viewport": viewport, "error": f"body length {body_len} chars — wrong URL or hard error"})
+                    continue
+                # If gate is still showing, try password.
+                if args.gate_password and page.evaluate("!!document.querySelector('input[type=password]')") and page.evaluate("document.querySelector('input[type=password]').offsetParent !== null"):
+                    try:
+                        page.fill("input[type=password]", args.gate_password)
+                        page.press("input[type=password]", "Enter")
+                        page.wait_for_timeout(2000)
+                    except Exception:
+                        pass  # fall through; check_page may still find content
+                reports.append(check_page(page, url, known, args.screenshot_dir, wrapcheck_source, viewport, args.settle_ms))
+            ctx.close()
         browser.close()
 
     if bb_ctx:
@@ -350,17 +403,77 @@ def _load_known_issues(path):
     return data.get("known", [])
 
 
+def _default_wrapcheck_source(cli_value):
+    if cli_value:
+        return cli_value
+    if os.path.exists(DEFAULT_WRAPCHECK_PATH):
+        return DEFAULT_WRAPCHECK_PATH
+    return DEFAULT_WRAPCHECK_URL
+
+
+def _add_wrapcheck_script(page, source):
+    if source.startswith(("http://", "https://")):
+        page.add_script_tag(url=source)
+    else:
+        page.add_script_tag(path=os.path.abspath(source))
+
+
+def _install_gate_bypass(ctx, gate_key):
+    if not gate_key:
+        return
+    script = (
+        "try { "
+        f"sessionStorage.setItem({json.dumps(gate_key)}, '1'); "
+        f"localStorage.setItem({json.dumps(gate_key)}, '1'); "
+        "} catch (e) {}"
+    )
+    ctx.add_init_script(script)
+
+
+def _parse_viewports(raw):
+    if not raw:
+        return DEFAULT_VIEWPORTS
+    presets = {v["name"]: v for v in DEFAULT_VIEWPORTS}
+    out = []
+    items = []
+    for part in raw:
+        items.extend([x for x in part.split(",") if x])
+    for item in items:
+        item = item.strip()
+        if not item:
+            continue
+        if item in presets:
+            out.append(dict(presets[item]))
+            continue
+        if "x" not in item:
+            raise SystemExit(f"unknown viewport '{item}' (use one of {', '.join(presets)} or WIDTHxHEIGHT)")
+        width, height = item.lower().split("x", 1)
+        try:
+            width_i = int(width)
+            height_i = int(height)
+        except ValueError:
+            raise SystemExit(f"bad viewport '{item}' (expected WIDTHxHEIGHT)")
+        out.append({"name": item, "width": width_i, "height": height_i})
+    return out or DEFAULT_VIEWPORTS
+
+
+def _viewport_summary(viewports):
+    return ", ".join(f"{v['name']}:{v['width']}x{v['height']}" for v in viewports)
+
+
 def _emit(reports, args):
     """Print human-readable report and return exit code."""
     any_failure = False
     for r in reports:
+        viewport = r.get("viewport") or {}
+        vp_label = f"{viewport.get('name', '?')} {viewport.get('width', '?')}x{viewport.get('height', '?')}"
         if "error" in r:
-            print(f"\n  ✗ {r['page']}: {r['error']}")
+            print(f"\n  ✗ {r['page']} [{vp_label}]: {r['error']}")
             any_failure = True
             continue
         new = r["findings_new"]
         edge = r["edge_failure"]
-        print(f"\n  {r['page']}")
+        print(f"\n  {r['page']} [{vp_label}]")
         if new:
             any_failure = True
             print(f"    ✗ wrap-safe probe: {len(new)} NEW finding(s)")
@@ -368,6 +481,13 @@ def _emit(reports, args):
                 kind = f.get("kind", "?")
                 if kind in ("short-text-many-lines", "heading-many-lines", "caterpillar-element"):
                     print(f"        {kind}: <{f.get('tag')}.{f.get('cls','')}> w={f.get('cellWidth')}px lines={f.get('textLines')} \"{f.get('textPreview','')}\"")
+                elif kind == "typography-anti-pattern":
+                    rules = ", ".join(f.get("rules", []))
+                    print(f"        {kind}: <{f.get('selector', f.get('tag'))}> w={f.get('cellWidth')}px rules={rules} \"{f.get('textPreview','')}\"")
+                elif kind == "dense-prose-in-narrow-column":
+                    print(f"        {kind}: <{f.get('selector', f.get('tag'))}> w={f.get('cellWidth')}px lines={f.get('textLines')} \"{f.get('textPreview','')}\"")
+                elif kind in ("body-horizontal-overflow", "element-horizontal-overflow"):
+                    print(f"        {kind}: <{f.get('selector', f.get('tag', 'body'))}> overflow={f.get('overflowPx')}px \"{f.get('textPreview','')}\"")
                 else:
                     print(f"        {kind}: {f.get('tag')} w={f.get('width', f.get('cellWidth'))}")
         else:
@@ -407,8 +527,17 @@ def main():
     p.add_argument("--known-issues", default=None, help="Path to tests/wrap-known-issues.json")
     p.add_argument("--pages", nargs="+", help="Specific pages to test (default: all *.html in portal)")
     p.add_argument("--screenshot-dir", default="/tmp/verify-text-wrap", help="Where to drop screenshots")
-    p.add_argument("--wrapcheck-url", default=DEFAULT_WRAPCHECK_URL,
-                   help=f"URL of wrap-safe's wrapcheck.js (default: {DEFAULT_WRAPCHECK_URL})")
+    p.add_argument("--viewports", nargs="*", default=None,
+                   help="Viewport presets/numbers to test. Default: wide laptop tablet mobile. Accepts comma-separated values and WIDTHxHEIGHT.")
+    p.add_argument("--wait-until", default="domcontentloaded",
+                   choices=["commit", "domcontentloaded", "load", "networkidle"],
+                   help="Playwright navigation readiness. Default domcontentloaded keeps portal-wide static sweeps fast; the probe still waits briefly before measuring.")
+    p.add_argument("--nav-timeout-ms", type=int, default=8000,
+                   help="Per-page navigation timeout in milliseconds. Default 8000.")
+    p.add_argument("--settle-ms", type=int, default=750,
+                   help="Delay after navigation before measuring. Default 750; use 0-250 for fast full-estate static sweeps, higher for animated/chart-heavy pages.")
+    p.add_argument("--wrapcheck-url", default=None,
+                   help=f"URL or local path of wrap-safe's wrapcheck.js (default: sibling {DEFAULT_WRAPCHECK_PATH}, fallback {DEFAULT_WRAPCHECK_URL})")
     args = p.parse_args()
 
     if args.local:
