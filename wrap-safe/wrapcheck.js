@@ -1,11 +1,16 @@
 /* ============================================================================
- * wrapcheck.js — v0.2.0
+ * wrapcheck.js — v0.2.1
  *
  * Runtime probe for caterpillar-text and container-collapse bugs.
  * Exposes window.__wrapcheck() for manual use; auto-runs on ?wrapcheck=1.
  *
  * Source: https://github.com/bogdanbaciu21/skills/tree/main/wrap-safe
  * License: MIT
+ *
+ * v0.2.1 — DISPLAY-TEXT ORPHAN RATCHET.
+ *   - Flags headline/lede/display text whose final visual line is a stranded
+ *     one-word orphan, including elements with inline children such as <b> and
+ *     <em>. This catches "Harvest your own / margin."-class failures.
  *
  * v0.2.0 — TYPOGRAPHY RATCHET.
  *   - Flags CSS typography anti-patterns that create visible word fragments:
@@ -62,6 +67,9 @@
   var DENSE_BLOCK_MIN_CHARS = 90;
   var DENSE_BLOCK_MIN_LINES = 4;
   var HORIZONTAL_OVERFLOW_TOLERANCE = 2; // px
+  var ORPHAN_TEXT_MAX_CHARS = 220;
+  var ORPHAN_LAST_LINE_MAX_WORDS = 1;
+  var ORPHAN_LAST_LINE_MAX_CHARS = 14;
 
   // Suspect element selector for line-count checks. Broad on purpose — the
   // v0.1.0 probe missed table cells, KPI labels, and tile headings because
@@ -87,6 +95,20 @@
     'label', 'td', 'th', 'caption',
     'pre', 'code', 'table',
     'div', 'span', 'a'
+  ].join(', ');
+
+  var ORPHAN_SELECTOR = [
+    'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
+    'p',
+    '[class*="title"]',
+    '[class*="target"]',
+    '[class*="headline"]',
+    '[class*="heading"]',
+    '[class*="headtext"]',
+    '[class*="lede"]',
+    '[class*="sub"]',
+    '[class*="hero"]',
+    '[class*="kicker"]'
   ].join(', ');
 
   // ------------------------------------------------------------------- helpers
@@ -162,6 +184,75 @@
       if (!ys[y]) { ys[y] = 1; n++; }
     }
     return n || rects.length;
+  }
+
+  function visualWordLines(el) {
+    var walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, {
+      acceptNode: function (node) {
+        if (!node.nodeValue || !/\S/.test(node.nodeValue)) return NodeFilter.FILTER_REJECT;
+        var parent = node.parentElement;
+        if (!parent || skipTypographyCheck(parent) || !isVisible(parent)) return NodeFilter.FILTER_REJECT;
+        return NodeFilter.FILTER_ACCEPT;
+      }
+    });
+    var words = [];
+    var range = document.createRange();
+    var node;
+    while ((node = walker.nextNode())) {
+      var text = node.nodeValue || '';
+      var match;
+      var re = /\S+/g;
+      while ((match = re.exec(text))) {
+        range.setStart(node, match.index);
+        range.setEnd(node, match.index + match[0].length);
+        var rect = range.getBoundingClientRect();
+        if (rect.width < 1 || rect.height < 1) continue;
+        words.push({
+          text: match[0],
+          top: rect.top,
+          left: rect.left,
+          right: rect.right,
+          width: rect.width
+        });
+      }
+    }
+    range.detach && range.detach();
+    if (!words.length) return [];
+
+    words.sort(function (a, b) {
+      if (Math.abs(a.top - b.top) > 2) return a.top - b.top;
+      return a.left - b.left;
+    });
+
+    var lines = [];
+    for (var i = 0; i < words.length; i++) {
+      var w = words[i];
+      var line = null;
+      for (var j = lines.length - 1; j >= 0; j--) {
+        if (Math.abs(lines[j].top - w.top) <= 2) {
+          line = lines[j];
+          break;
+        }
+      }
+      if (!line) {
+        line = { top: w.top, left: w.left, right: w.right, words: [] };
+        lines.push(line);
+      }
+      line.words.push(w);
+      line.left = Math.min(line.left, w.left);
+      line.right = Math.max(line.right, w.right);
+    }
+
+    lines.sort(function (a, b) { return a.top - b.top; });
+    for (var k = 0; k < lines.length; k++) {
+      lines[k].words.sort(function (a, b) { return a.left - b.left; });
+      lines[k].text = lines[k].words.map(function (w) { return w.text; }).join(' ');
+      lines[k].wordCount = lines[k].words.length;
+      lines[k].charCount = lines[k].text.replace(/\s+/g, '').length;
+      lines[k].width = Math.round(lines[k].right - lines[k].left);
+      lines[k].top = Math.round(lines[k].top);
+    }
+    return lines;
   }
 
   function describe(el, lines) {
@@ -326,6 +417,68 @@
     return findings;
   }
 
+  function checkVisualOrphans() {
+    var findings = [];
+    var nodes = document.querySelectorAll(ORPHAN_SELECTOR);
+    var seen = Object.create(null);
+    for (var i = 0; i < nodes.length; i++) {
+      var el = nodes[i];
+      if (!isVisible(el) || skipTypographyCheck(el)) continue;
+
+      var selector = shortSelector(el);
+      if (seen[selector]) continue;
+      seen[selector] = 1;
+
+      var text = textPreview(el, ORPHAN_TEXT_MAX_CHARS + 1);
+      if (text.length < 12 || text.length > ORPHAN_TEXT_MAX_CHARS) continue;
+
+      var cs = getComputedStyle(el);
+      var fontSize = parseFloat(cs.fontSize) || 0;
+      var cls = (el.className && typeof el.className === 'string') ? el.className : '';
+      var displayText = /^h[1-6]$/i.test(el.tagName) ||
+        fontSize >= 18 ||
+        /(title|target|headline|heading|headtext|lede|sub|hero|kicker)/i.test(cls);
+      if (!displayText) continue;
+
+      var r = el.getBoundingClientRect();
+      if (r.width < 80) continue;
+
+      var lines = visualWordLines(el);
+      if (lines.length < 2) continue;
+
+      var last = lines[lines.length - 1];
+      var prev = lines[lines.length - 2];
+      if (!last || !prev) continue;
+
+      var priorLines = lines.slice(0, -1);
+      var avgPriorWords = priorLines.reduce(function (sum, line) {
+        return sum + line.wordCount;
+      }, 0) / priorLines.length;
+      if (prev.wordCount < 3 && avgPriorWords < 2) continue;
+
+      var lastCleanChars = last.text.replace(/[^A-Za-z0-9$%]/g, '').length;
+      if (last.wordCount <= ORPHAN_LAST_LINE_MAX_WORDS &&
+          lastCleanChars <= ORPHAN_LAST_LINE_MAX_CHARS) {
+        findings.push({
+          kind: 'display-text-orphan-line',
+          selector: selector,
+          tag: el.tagName.toLowerCase(),
+          cls: (el.className && typeof el.className === 'string') ? el.className.split(/\s+/).filter(Boolean).slice(0, 4).join('.') : '',
+          cellWidth: Math.round(r.width),
+          fontSize: Math.round(fontSize),
+          textLines: lines.length,
+          orphanText: last.text,
+          previousLineText: prev.text,
+          lineTexts: lines.map(function (line) { return line.text; }),
+          textPreview: text,
+          ancestors: ancestorChain(el)
+        });
+        if (findings.length >= 60) break;
+      }
+    }
+    return findings;
+  }
+
   function checkHorizontalOverflow() {
     var findings = [];
     var viewportW = window.innerWidth || document.documentElement.clientWidth;
@@ -378,6 +531,7 @@
     findings = findings.concat(checkLineCounts());
     findings = findings.concat(checkTypographyAntiPatterns());
     findings = findings.concat(checkDenseNarrowTextBlocks());
+    findings = findings.concat(checkVisualOrphans());
     findings = findings.concat(checkHorizontalOverflow());
 
     var byKind = {};
@@ -391,7 +545,7 @@
       findingsByKind: byKind,
       url: location.href,
       ts: new Date().toISOString(),
-      probeVersion: '0.2.0'
+      probeVersion: '0.2.1'
     };
 
     if (!opts.silent) {
