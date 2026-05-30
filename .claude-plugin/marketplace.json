@@ -35,6 +35,11 @@
       "description": "Active-recall quiz on a topic, document, codebase area, or interview prep. One question at a time, adaptive difficulty."
     },
     {
+      "name": "pagecraft",
+      "source": "./pagecraft",
+      "description": "Portable HTML formatting and visual-safety guardrails — robust tables, financial number formats, headers/section dividers, and text-wrap prevention — as reusable patterns plus installable deterministic checks."
+    },
+    {
       "name": "table-system-migration",
       "source": "./table-system-migration",
       "description": "Audit, migrate, and regression-test messy HTML table systems with a canonical component, compatibility layer, no-new-violations ratchet, browser CSS checks, and public-safe scrub gate."
