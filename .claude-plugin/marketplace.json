@@ -37,7 +37,7 @@
     {
       "name": "pagecraft",
       "source": "./pagecraft",
-      "description": "Portable HTML formatting and visual-safety bundle (multi-skill plugin). Contains verify-text-wrap (caterpillar/right-edge probe + the wrap-safe runtime library), table-system-migration, number-formats (Macabacus financial format standard), and a pagecraft overview/installer — robust tables, financial number formats, headers/section dividers, and text-wrap prevention as patterns plus installable deterministic checks."
+      "description": "Portable HTML formatting and visual-safety bundle (multi-skill plugin). Contains verify-text-wrap (caterpillar/right-edge probe + the wrap-safe runtime library), table-system-migration, number-formats (Macabacus financial format standard), reskin (detect a repo's design system and apply its brand frame across the site), and a pagecraft overview/installer — robust tables, financial number formats, headers/section dividers, design-system reskinning, and text-wrap prevention as patterns plus installable deterministic checks."
     },
     {
       "name": "skill-drift-scanner",
