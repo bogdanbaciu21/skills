@@ -224,6 +224,67 @@ h4[id].pc-heading-anchor::before {
   width: 3px;
   border-radius: 2px;
   background: var(--pc-blue);
+  transition: background 0.15s;
+  pointer-events: none;
+}
+
+/* Hover affordance: a quiet underline on the heading + a darker bar.
+   The bar lives in the margin, so neither hover state reflows prose. */
+.pc-heading-anchor[id]:hover,
+h3[id].pc-heading-anchor:hover,
+h4[id].pc-heading-anchor:hover {
+  text-decoration: underline;
+  text-decoration-color: color-mix(in srgb, var(--pc-blue), transparent 45%);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 6px;
+}
+
+.pc-heading-anchor[id]:hover::before,
+h3[id].pc-heading-anchor:hover::before,
+h4[id].pc-heading-anchor:hover::before {
+  background: color-mix(in srgb, var(--pc-blue), black 18%);
+}
+
+/* Numbered-section opt-out. When the gutter bar is auto-applied to every
+   anchored subheading, sections that already carry an ordinal counter
+   (a numbered editorial sequence) must skip the bar so two ordinal
+   systems don't compete. Add `.pc-no-anchor`, or scope the auto-rule
+   with `:not([id^="step-"])` against the repo's numbered-id prefix. */
+.pc-heading-anchor.pc-no-anchor::before,
+h3[id].pc-no-anchor::before,
+h4[id].pc-no-anchor::before {
+  content: none;
+}
+
+/* Chapter divider — an eyebrow + ink hairline marks a major part.
+   Heavier than the subhead gutter bar, lighter than .pc-section-break.
+   Fires on any heading that wraps a `.pc-chapter-label` eyebrow. */
+.pc-chapter,
+h2:has(> .pc-chapter-label) {
+  border-top: 2px solid var(--pc-ink);
+  padding-top: 14px;
+}
+
+.pc-chapter-label {
+  display: block;
+  margin: 0 0 6px;
+  color: var(--pc-ink-soft);
+  font-family: var(--pc-serif);
+  font-style: italic;
+  font-size: 18px;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  text-transform: none;
+}
+
+.pc-chapter-label + br { display: none; }
+
+/* Safety net: never render a legacy floating "#"/"§" anchor link, even
+   if a stale build re-injects one. It reserved layout space and shifted
+   text on hover — the exact bug the gutter bar replaces. */
+a.pc-anchor-legacy,
+.pc-heading-anchor > a[href^="#"].anchor {
+  display: none;
 }
 
 .pc-table-figure,

@@ -30,7 +30,8 @@ It does not reinvent the checks. It bundles them:
    - Headers / section dividers: `references/headers.md`
    - Lifted flourish inventory: `references/flourishes-lift.md` · Backlog: `references/future-ideas.md`
 3. **Prefer the bundled primitives before new CSS.** `.pc-grid`, `.pc-card-grid`,
-   `.bbt` (+ `.pc-table` alias), `.pc-section-break`, `.pc-eyebrow`, `.num`, the
+   `.bbt` (+ `.pc-table` alias), `.pc-section-break`, `.pc-chapter`,
+   `.pc-heading-anchor` (the always-on gutter bar), `.pc-eyebrow`, `.num`, the
    `.cell-*` Macabacus provenance colors, etc. Raw grid/table CSS is a code smell.
 4. **Validate with the bundled tools — two layers, both required:**
 
