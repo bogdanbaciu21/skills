@@ -15,6 +15,26 @@ Default runner coverage is intentionally strict: `wide` 1440x900, `desktop` 1280
 - **After deploying to any host** (Netlify, Vercel, etc.). Build-time tests pass against local; the deployed render is where CDN cache, font race conditions, and real network conditions show up.
 - **When the user reports** any of: "text wrapping", "wraps weird", "random text wrap", "phantom right edge", "magician divider", "caterpillar text", "h2 underline runs past my paragraphs", "text stops in a weird place".
 
+## Deterministic keystone guard (no browser) — run this FIRST
+
+`runner.py` detects wrap bugs *after* they render, and only at the viewports it
+happens to test. `check-keystone.py` catches the most common *root cause* before
+anything renders — no browser, no flake — so it belongs in pre-commit / CI:
+
+```
+python3 <skill-dir>/check-keystone.py --portal <static-html-dir>
+```
+
+It fails (exit 1) when a repo uses flex/grid layout but is missing the wrap-safe
+keystone `*, *::before, *::after { min-width: 0 }` — the single rule that stops a
+flex/grid sibling from collapsing a paragraph into caterpillar text ("text
+wrapping when it shouldn't"). A repo satisfies it by having the keystone in any
+stylesheet, or by linking `wrap-safe.css` (which ships it). Exit 0 = present or
+no flex/grid found; exit 2 = nothing to scan. This is the guard that keeps "I
+forgot the keystone" from ever reaching a deploy; `runner.py` stays the
+post-edit / post-deploy *render* check for everything the keystone alone can't
+prove.
+
 ## Hard rule — don't reach for text-wrap / hyphens / word-break
 
 The root cause of visible text-wrap weirdness is almost always upstream container collapse, a too-narrow component column, or container-vs-element max-width mismatch. It is not fixed by clever browser typography. Do NOT add `text-wrap: balance`, `text-wrap: pretty`, `hyphens: auto`, or `word-break: break-all` as a fix. They create new bugs and the hardened probe now fails them.
