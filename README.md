@@ -58,6 +58,7 @@ skills/
 │  ├─ runner.py
 │  └─ browserbase.py
 ├─ skill-drift-scanner/
+├─ table-system-migration/
 │  └─ SKILL.md
 ├─ wrap-safe/
 │  ├─ README.md
@@ -104,6 +105,7 @@ Use this checklist before publishing a skill:
 | `grill-me` | Ready | Runs a one-question-at-a-time pressure-test interview for plans/decisions. |
 | `parallel-dispatch` | Ready | Generates multi-agent prompts and coordinator playbook from a parallel work plan. |
 | `quiz-me` | Ready | Active-recall quiz on a topic, doc, codebase area, or interview prep — one question at a time, adaptive difficulty. |
+| `table-system-migration` | Ready | Audits, migrates, and regression-tests messy HTML table systems with a public-safe scrub gate. |
 | `verify-text-wrap` | Ready | Verifies static HTML portals for caterpillar text, narrow containers, and right-edge layout drift using the bundled `wrap-safe` probe. |
 | `skill-drift-scanner` | Ready | Audits Codex and Claude skill deployment drift, autosync health, scheduler status, and reload requirements across machine-level skill installs. |
 | `wrap-safe` | Ready | Drop-in CSS and JS runtime probe used by `verify-text-wrap`; shipped as a library under this repo, not a standalone skill. |
