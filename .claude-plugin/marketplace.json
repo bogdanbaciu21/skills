@@ -37,22 +37,7 @@
     {
       "name": "pagecraft",
       "source": "./pagecraft",
-      "description": "Portable HTML formatting and visual-safety guardrails — robust tables, financial number formats, headers/section dividers, and text-wrap prevention — as reusable patterns plus installable deterministic checks."
-    },
-    {
-      "name": "number-formats",
-      "source": "./number-formats",
-      "description": "Apply the Macabacus financial number-format standard to Excel models and HTML tables — en-dash zeros, parenthesized decimal-aligned negatives, $ on the top row only, blue inputs, green cross-sheet links, red errors, grey-italic margins, bold totals, plus percent/multiple/toggle formats. Ships byte-exact Excel format codes (formats.json) and an openpyxl applicator."
-    },
-    {
-      "name": "table-system-migration",
-      "source": "./table-system-migration",
-      "description": "Audit, migrate, and regression-test messy HTML table systems with a canonical component, compatibility layer, no-new-violations ratchet, browser CSS checks, and public-safe scrub gate."
-    },
-    {
-      "name": "verify-text-wrap",
-      "source": "./verify-text-wrap",
-      "description": "Verifies static HTML portals for caterpillar text, narrow containers, and right-edge layout drift using the bundled wrap-safe probe."
+      "description": "Portable HTML formatting and visual-safety bundle (multi-skill plugin). Contains verify-text-wrap (caterpillar/right-edge probe + the wrap-safe runtime library), table-system-migration, number-formats (Macabacus financial format standard), and a pagecraft overview/installer — robust tables, financial number formats, headers/section dividers, and text-wrap prevention as patterns plus installable deterministic checks."
     },
     {
       "name": "skill-drift-scanner",

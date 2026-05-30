@@ -20,7 +20,7 @@ It does not reinvent the checks. It bundles them:
 
 ## Operating model
 
-1. **Install or inspect first.** `sh scripts/install-pagecraft.sh <repo-root>`
+1. **Install or inspect first.** `sh install-pagecraft.sh <repo-root>`
    copies the CSS, probe, and verifiers in. If the repo already has a design
    system, adapt class names/variables instead of replacing it.
 2. **Use the references as needed.**
@@ -33,14 +33,16 @@ It does not reinvent the checks. It bundles them:
    `.bbt` (+ `.pc-table` alias), `.pc-section-break`, `.pc-chapter`,
    `.pc-heading-anchor` (the always-on gutter bar), `.pc-eyebrow`, `.num`, the
    `.cell-*` Macabacus provenance colors, etc. Raw grid/table CSS is a code smell.
-4. **Validate with the bundled tools — two layers, both required:**
+4. **Validate with the bundled tools — two layers, both required.** The probe and
+   verifiers live in the sibling `verify-text-wrap` skill (see its SKILL.md for
+   full options):
 
 ```bash
 # Deterministic root-cause guard (no browser, CI-safe, never flakes):
-python3 scripts/check-keystone.py --portal <static-html-root>
+python3 ../verify-text-wrap/check-keystone.py --portal <static-html-root>
 
 # Real-browser probe across 8 viewports + right-edge alignment:
-python3 scripts/runner.py --local --portal <static-html-root> \
+python3 ../verify-text-wrap/runner.py --local --portal <static-html-root> \
   --known-issues tests/pagecraft/wrap-known-issues.json
 ```
 
@@ -62,26 +64,38 @@ obvious bad primitives, allowlist only confirmed non-defects, then ratchet.
   use parentheses (not red), units stated once in the header.
 - Every exception needs a same-line reason: `/* wrap-exempt: metric-only KPI grid */`.
 
-## What's bundled
+## What's in the bundle
+
+Pagecraft is a multi-skill plugin. Each member skill is self-contained (it owns
+its own tools — no copies shared or vendored between skills):
 
 ```
-assets/css/pagecraft.css     comprehensive stylesheet: keystone, .bbt tables,
-                             number formats + Macabacus colors, safe grids,
-                             headers, callouts, focus, print
-assets/wrap-safe.css         minimal drop-in reset (the wrap-safe library)
-assets/wrapcheck.js          the wrap-safe runtime probe (caterpillar/collapse)
-assets/wrap-lab/*.html       synthetic good/bad fixtures for testing the checker
-scripts/check-keystone.py    deterministic keystone guard (no browser)
-scripts/runner.py            verify-text-wrap browser verifier (8 viewports + right-edge)
-scripts/browserbase.py       optional Browserbase backend for runner.py
-scripts/install-pagecraft.sh install the bundle into another repo
-references/*.md              tables, text-wrap, number-formats, headers, …
+pagecraft/                          the plugin
+├─ .claude-plugin/plugin.json       plugin manifest
+└─ skills/
+   ├─ pagecraft/                    THIS overview skill
+   │  ├─ SKILL.md
+   │  ├─ install-pagecraft.sh       install the bundle into another repo
+   │  ├─ assets/css/pagecraft.css   comprehensive stylesheet: keystone, .bbt
+   │  │                             tables, number formats + Macabacus colors,
+   │  │                             safe grids, headers, callouts, focus, print
+   │  ├─ assets/wrap-lab/*.html     synthetic good/bad fixtures for the checker
+   │  └─ references/*.md            tables, text-wrap, number-formats, headers, …
+   ├─ verify-text-wrap/             the wrap probe + verifiers (canonical home)
+   │  ├─ runner.py                  browser verifier (8 viewports + right-edge)
+   │  ├─ check-keystone.py          deterministic keystone guard (no browser)
+   │  ├─ browserbase.py             optional Browserbase backend for runner.py
+   │  ├─ wrap-safe.css              minimal drop-in reset (the wrap-safe library)
+   │  └─ wrapcheck.js               the wrap-safe runtime probe
+   ├─ table-system-migration/       audit/migrate a messy table estate to `.bbt`
+   └─ number-formats/               Macabacus financial number-format standard
+      ├─ apply-number-formats.py    openpyxl applicator
+      └─ formats.json               byte-exact Excel format codes
 ```
 
-`wrapcheck.js`, `runner.py`, `check-keystone.py`, and `wrap-safe.css` are the
-canonical implementations from the `wrap-safe` and `verify-text-wrap` skills,
-vendored here so the bundle is self-contained. Keep them in sync with their
-source skills via `sync-skills.sh`.
+The probe and verifiers have a single canonical home in `verify-text-wrap/` —
+`install-pagecraft.sh` copies from there. Nothing is vendored or duplicated, so
+nothing can drift.
 
 ## Portability
 
