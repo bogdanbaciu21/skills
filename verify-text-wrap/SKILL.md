@@ -5,7 +5,7 @@ description: Verify a static-HTML portal has no caterpillar text-wrap, ugly hyph
 
 # verify-text-wrap
 
-A protocol for confirming a static-HTML portal renders correctly across viewport widths after CSS or markup changes. Pairs with the `wrap-safe` library (CSS reset + runtime probe) — same author, expected to be installed alongside under `skills/wrap-safe/`.
+A protocol for confirming a static-HTML portal renders correctly across viewport widths after CSS or markup changes. The `wrap-safe` runtime library (the `wrap-safe.css` reset + the `wrapcheck.js` probe) is **bundled in this skill** — `runner.py` loads `./wrapcheck.js` by default, and `check-keystone.py` recognizes `wrap-safe.css` as the keystone source. See [The bundled wrap-safe library](#the-bundled-wrap-safe-library) below.
 
 Default runner coverage is intentionally strict: `wide` 1440x900, `desktop` 1280x900, `laptop` 1024x900, `tablet-wide` 820x900, `tablet` 768x900, `phone-wide` 430x844, `mobile` 390x844, and `phone-narrow` 360x780. One viewport is not enough; many ugly wrap bugs appear only between named breakpoints or when a mobile header gets too narrow.
 
@@ -85,7 +85,7 @@ python3 <skill-dir>/runner.py --local --portal portal \
   --viewports 1280x900,390x844
 ```
 
-Default `wrapcheck.js` source is the local sibling file at `../wrap-safe/wrapcheck.js` so skill edits take effect immediately even against deployed URLs. Pass `--wrapcheck-url https://.../wrapcheck.js` only when intentionally testing the CDN copy.
+Default `wrapcheck.js` source is the copy bundled in this skill directory (`./wrapcheck.js`) so skill edits take effect immediately even against deployed URLs. Pass `--wrapcheck-url https://.../wrapcheck.js` only when intentionally testing the CDN copy.
 
 For a full-estate ratchet where screenshots would be too heavy, disable them:
 
@@ -156,6 +156,55 @@ Exit code: 0 if all pages pass (or only known-issue matches), 1 if any new findi
 - Does NOT run during `pytest` unless the consuming repo wires it in — the consuming repo's own `tests/test_wrap.py` is the CI-time check. This skill is the interactive-and-post-deploy check.
 - Does NOT diagnose bugs unrelated to text wrap / container width (color contrast, JS errors, accessibility, etc.).
 - Does NOT bake in any project-specific URLs, gate keys, or passwords. All consumer-specific values come from CLI args.
+
+## The bundled wrap-safe library
+
+Two files ship in this skill directory and are the runtime half of the protocol —
+`runner.py` and `check-keystone.py` are the verification half. They can also be
+dropped straight into a site so the guarantees hold at runtime, not only at
+verify time.
+
+**Install into a live page** (two lines in `<head>`):
+
+```html
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/bogdanbaciu21/skills@main/verify-text-wrap/wrap-safe.css">
+<script src="https://cdn.jsdelivr.net/gh/bogdanbaciu21/skills@main/verify-text-wrap/wrapcheck.js" defer></script>
+```
+
+Pin a commit SHA (`@<sha>`) instead of `@main` for production. Or `@import` the
+CSS from an existing stylesheet. License: MIT.
+
+### `wrap-safe.css` — the reset
+
+- `*, *::before, *::after { min-width: 0 }` — the **keystone**; defeats the #1
+  cause of flex/grid container collapse (`check-keystone.py` enforces it).
+- `box-sizing: border-box` on all elements (restated).
+- `overflow-wrap: break-word` + `word-break: normal` + `hyphens: manual` on prose
+  (`h1-h6`, `p`, `li`, `td`, `th`, `a`, …).
+- `overflow-wrap: anywhere` on `code`, `kbd`, `samp`, `pre` so long unbreakable
+  tokens (URLs, hashes) break instead of overflowing; `pre { white-space: pre-wrap }`.
+- `img, svg, video, canvas, iframe { max-width: 100%; height: auto }`; `table { max-width: 100% }`.
+
+It is **not** a full reset (does not zero margins/padding), does not pick fonts,
+and deliberately does **not** set `max-width` on prose — that belongs to the
+site's design.
+
+### `wrapcheck.js` — the probe
+
+No dependencies. Exposes `window.__wrapcheck()` for manual use and auto-runs when
+the URL carries `?wrapcheck=1`. Pure observation — never mutates the DOM.
+Playwright/Selenium can call `__wrapcheck({silent: true})` to assert in CI.
+Checks: nuclear scroll height, narrow prose containers (<200px), caterpillar
+elements (>12 lines), short-text-many-lines (≤40 chars over ≥3 lines),
+heading-many-lines (>3), typography anti-patterns, dense prose in narrow columns,
+display-text orphan / short-final lines, clipped text, and horizontal overflow.
+
+### Anti-patterns the library deliberately avoids
+
+`text-wrap: balance`, `text-wrap: pretty`, `hyphens: auto`, and
+`word-break: break-all` are **not** used and are **flagged** by the probe. If you
+reach for one as a "fix" for visible wrap weirdness, run `__wrapcheck()` first —
+the bug is almost always an upstream container collapse, not a text rule.
 
 ## Why this skill exists
 
