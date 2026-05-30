@@ -148,7 +148,7 @@ The escape hatch is always an inline reason, never deletion of the rule:
 **Layer 1 — deterministic keystone guard (no browser, CI-safe, never flakes):**
 
 ```bash
-python3 scripts/check-text-wrap.py --portal <static-html-root>   # or check-keystone
+python3 scripts/check-keystone.py --portal <static-html-root>
 ```
 
 Fails when a repo uses flex/grid but is missing `* { min-width: 0 }`, or when a
@@ -159,7 +159,14 @@ pre-commit and CI on every push.
 **Layer 2 — real-browser probe across viewports** (catches what only renders):
 
 Render each page at the full breakpoint ladder — **1440, 1280, 1024, 820, 768,
-430, 390, 360** — and run two checks per page:
+430, 390, 360** — with the bundled `verify-text-wrap` runner:
+
+```bash
+python3 scripts/runner.py --local --portal <root> \
+  --known-issues tests/pagecraft/wrap-known-issues.json
+```
+
+It runs two checks per page:
 
 1. **Wrap probe.** Flags `caterpillar-element`, `short-text-many-lines`,
    `heading-many-lines`, `narrow-container`, `dense-prose-in-narrow-column`,
