@@ -49,12 +49,14 @@ What the codes encode (this is *why* they look right):
 | **Input** | `#0000FF` blue | `#FFFFCC` yellow | a hardcoded assumption a human typed |
 | **Hardcode** | `#0000FF` blue | — | a hardcoded value inline |
 | **Formula** | default ink | — | a calculation (no special color) |
-| **Cross-sheet link** | `#008000` green | — | pulled from another sheet |
+| **Cross-sheet link** | `#00B050` green | — | pulled from another sheet |
 | **Error / check** | `#FF0000` red | — | a failed check or broken link **only** |
 
 Rules: **blue means "a human typed this"** (a reader can change it and watch the
 model recalc). **Red is errors only** — a *negative* number uses parentheses, never
-red. The driver convention is blue font on yellow fill.
+red. The driver convention is blue font on yellow fill. **Green is `#00B050`** —
+the Macabacus link standard (Excel `FF00B050` + web `#00B050`), authoritative
+across every surface; a generic `#008000` is superseded.
 
 ## Row styles
 
@@ -102,7 +104,7 @@ For HTML tables (pairs with the `pagecraft` / `.bbt` table system):
 .aff-l, .aff-r  { visibility:hidden; }            /* reserve paren width so negatives align */
 .cell-input     { color:#0000FF; }                /* blue input  */
 .cell-input.fill{ background:#FFFFCC; }            /* + yellow driver fill */
-.cell-link      { color:#008000; }                /* green cross-sheet link */
+.cell-link      { color:#00B050; }                /* green cross-sheet link */
 .cell-error     { color:#FF0000; }                /* red, errors only */
 tr.tot td       { font-weight:700; }              /* bold totals */
 .margin         { color:#808080; font-style:italic; }   /* grey-italic margins */
