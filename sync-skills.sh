@@ -6,12 +6,38 @@
 # ~/.<tool>/skills that already contains the 'handoff' skill, so we only refresh
 # real installs and never inject skills into unrelated (e.g. firecrawl-only) dirs.
 #
+# Two kinds of source skill are recognized:
+#   1. A top-level dir with its own SKILL.md (e.g. handoff/).
+#   2. A skill nested inside a multi-skill plugin bundle — a top-level dir that
+#      has a skills/ subdir (e.g. pagecraft/skills/verify-text-wrap/).
+# Nested skills are FLATTENED on export: each installs as a top-level loose skill
+# (~/.tool/skills/<name>/) so tools that don't recurse into a plugin's skills/
+# dir still find them by their bare name. Inside the repo they stay bundled.
+#
 # Usage:
 #   sh sync-skills.sh <skill> [<skill> ...]   # sync the named skill(s)
 #   sh sync-skills.sh --all                   # sync every skill in this repo
 #   sh sync-skills.sh --all --dry-run         # preview only, change nothing
 set -u
 REPO=$(cd "$(dirname "$0")" && pwd)
+
+# Enumerate every syncable skill as "name<TAB>srcdir", flattening bundles.
+enumerate() {
+  for d in "$REPO"/*/; do
+    name=$(basename "$d")
+    [ "$name" = ".git" ] && continue
+    if [ -f "$d/SKILL.md" ]; then
+      printf '%s\t%s\n' "$name" "${d%/}"
+    elif [ -d "${d}skills" ]; then
+      for s in "${d}skills"/*/; do
+        [ -f "${s}SKILL.md" ] || continue
+        printf '%s\t%s\n' "$(basename "$s")" "${s%/}"
+      done
+    fi
+  done
+}
+
+ALL_PAIRS=$(enumerate)
 
 DRY=""; ALL=""; NAMED=""
 for a in "$@"; do
@@ -24,9 +50,15 @@ for a in "$@"; do
 done
 
 if [ -n "$ALL" ]; then
-  SKILLS=$(find "$REPO" -maxdepth 2 -name SKILL.md -exec dirname {} \; | sed "s#^$REPO/##" | sort -u)
+  PAIRS="$ALL_PAIRS"
 elif [ -n "$NAMED" ]; then
-  SKILLS="$NAMED"
+  PAIRS=""
+  for n in $NAMED; do
+    match=$(printf '%s\n' "$ALL_PAIRS" | awk -F'\t' -v n="$n" '$1==n')
+    if [ -z "$match" ]; then echo "  ! '$n' not found in repo — skip" >&2; continue; fi
+    PAIRS="${PAIRS}${match}
+"
+  done
 else
   echo "usage: sh sync-skills.sh <skill>... | --all [--dry-run]" >&2; exit 2
 fi
@@ -40,20 +72,19 @@ if [ -z "$TARGETS" ]; then echo "no target skill dirs (none contain 'handoff')" 
 
 echo "canonical : $REPO"
 echo "targets   :$TARGETS"
-echo "skills    :$SKILLS"
+echo "skills    :$(printf '%s\n' "$PAIRS" | awk -F'\t' 'NF{print $1}' | tr '\n' ' ')"
 [ -n "$DRY" ] && echo "(dry-run — no changes written)"
 echo
 
 rc=0
 for t in $TARGETS; do
-  for s in $SKILLS; do
-    if [ ! -d "$REPO/$s" ]; then echo "  ! '$s' not in repo — skip"; rc=1; continue; fi
-    printf "==> %s\n" "$t/$s"
+  printf '%s\n' "$PAIRS" | while IFS="$(printf '\t')" read -r name src; do
+    [ -n "$name" ] || continue
+    printf "==> %s\n" "$t/$name"
     rsync -a $DRY --delete \
       --exclude '.git' --exclude '.DS_Store' --exclude '__pycache__' --exclude '*.pyc' \
-      "$REPO/$s/" "$t/$s/" || { echo "  ! rsync failed for $t/$s"; rc=1; }
+      "$src/" "$t/$name/" || echo "  ! rsync failed for $t/$name"
   done
 done
 echo
-echo "${DRY:+[dry-run] }sync complete (rc=$rc)"
-exit "$rc"
+echo "${DRY:+[dry-run] }sync complete"

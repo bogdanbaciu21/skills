@@ -167,8 +167,8 @@ verify time.
 **Install into a live page** (two lines in `<head>`):
 
 ```html
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/bogdanbaciu21/skills@main/verify-text-wrap/wrap-safe.css">
-<script src="https://cdn.jsdelivr.net/gh/bogdanbaciu21/skills@main/verify-text-wrap/wrapcheck.js" defer></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/bogdanbaciu21/skills@main/pagecraft/skills/verify-text-wrap/wrap-safe.css">
+<script src="https://cdn.jsdelivr.net/gh/bogdanbaciu21/skills@main/pagecraft/skills/verify-text-wrap/wrapcheck.js" defer></script>
 ```
 
 Pin a commit SHA (`@<sha>`) instead of `@main` for production. Or `@import` the

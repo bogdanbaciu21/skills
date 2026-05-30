@@ -1,0 +1,9 @@
+{
+  "name": "pagecraft",
+  "version": "0.1.0",
+  "description": "Portable HTML formatting and visual-safety bundle: robust tables, financial number formatting, headers/section dividers, and text-wrap prevention — patterns plus proven, installable checks.",
+  "author": {
+    "name": "Bogdan Baciu",
+    "url": "https://github.com/bogdanbaciu21"
+  }
+}

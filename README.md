@@ -54,30 +54,38 @@ skills/
 │  └─ SKILL.md
 ├─ parallel-dispatch/
 │  └─ SKILL.md
-├─ verify-text-wrap/
-│  ├─ SKILL.md
-│  ├─ runner.py
-│  ├─ check-keystone.py
-│  ├─ browserbase.py
-│  ├─ wrap-safe.css       (bundled runtime reset)
-│  └─ wrapcheck.js        (bundled runtime probe)
 ├─ skill-drift-scanner/
-├─ pagecraft/
-│  ├─ SKILL.md
-│  ├─ assets/        (pagecraft.css, wrapcheck, wrap-lab fixtures)
-│  ├─ references/    (tables, headers, text-wrap, number-formats, …)
-│  └─ scripts/       (check-pagecraft-policy.sh, install-pagecraft.sh)
-├─ number-formats/
-│  ├─ SKILL.md
-│  ├─ formats.json   (byte-exact Excel format codes)
-│  └─ apply-number-formats.py
-├─ table-system-migration/
-│  └─ SKILL.md
+├─ pagecraft/                    (multi-skill plugin bundle)
+│  ├─ .claude-plugin/plugin.json
+│  └─ skills/
+│     ├─ pagecraft/              (overview + installer + shared design assets)
+│     │  ├─ SKILL.md
+│     │  ├─ install-pagecraft.sh
+│     │  ├─ assets/css/pagecraft.css
+│     │  ├─ assets/wrap-lab/     (good/bad wrap fixtures)
+│     │  └─ references/          (tables, headers, text-wrap, number-formats, …)
+│     ├─ verify-text-wrap/       (canonical home of the wrap probe + verifiers)
+│     │  ├─ SKILL.md
+│     │  ├─ runner.py · check-keystone.py · browserbase.py
+│     │  └─ wrap-safe.css · wrapcheck.js   (wrap-safe runtime library)
+│     ├─ table-system-migration/
+│     │  └─ SKILL.md
+│     └─ number-formats/
+│        ├─ SKILL.md
+│        ├─ formats.json         (byte-exact Excel format codes)
+│        └─ apply-number-formats.py
 ├─ excel-wow/
 │  └─ SKILL.md
 └─ blog-image-gen/
    └─ SKILL.md
 ```
+
+> **Bundles vs. loose skills.** Most folders are single skills (one `SKILL.md`).
+> `pagecraft` is a multi-skill **plugin bundle**: its members live under
+> `pagecraft/skills/` and stay self-contained (each owns its own tools, nothing
+> vendored or duplicated). `sync-skills.sh` *flattens* bundle members on export,
+> so each still installs as a top-level loose skill (`~/.tool/skills/<name>/`)
+> invokable by its bare name.
 
 **Conventions**
 
@@ -114,10 +122,10 @@ Use this checklist before publishing a skill:
 | `grill-me` | Ready | Runs a one-question-at-a-time pressure-test interview for plans/decisions. |
 | `parallel-dispatch` | Ready | Generates multi-agent prompts and coordinator playbook from a parallel work plan. |
 | `quiz-me` | Ready | Active-recall quiz on a topic, doc, codebase area, or interview prep — one question at a time, adaptive difficulty. |
-| `pagecraft` | Ready | Portable HTML formatting + visual-safety guardrails (tables, number formats, headers, text-wrap prevention) with installable deterministic checks. |
-| `number-formats` | Ready | Applies the Macabacus financial number-format standard (en-dash zeros, aligned parenthesized negatives, blue inputs, green links, grey-italic margins, bold totals) to Excel models and HTML tables. Byte-exact codes + openpyxl applicator. |
-| `table-system-migration` | Ready | Audits, migrates, and regression-tests messy HTML table systems with a public-safe scrub gate. |
-| `verify-text-wrap` | Ready | Verifies static HTML portals for caterpillar text, narrow containers, and right-edge layout drift. Bundles the `wrap-safe` runtime library (`wrap-safe.css` reset + `wrapcheck.js` probe) it drives. |
+| `pagecraft` | Ready | Multi-skill **plugin bundle** for HTML formatting + visual safety. Contains the four skills below; `pagecraft/skills/pagecraft` is the overview + installer. |
+| `pagecraft » verify-text-wrap` | Ready | Verifies static HTML portals for caterpillar text, narrow containers, and right-edge layout drift. Canonical home of the `wrap-safe` runtime library (`wrap-safe.css` reset + `wrapcheck.js` probe) it drives. |
+| `pagecraft » table-system-migration` | Ready | Audits, migrates, and regression-tests messy HTML table systems with a public-safe scrub gate. |
+| `pagecraft » number-formats` | Ready | Applies the Macabacus financial number-format standard (en-dash zeros, aligned parenthesized negatives, blue inputs, green links, grey-italic margins, bold totals) to Excel models and HTML tables. Byte-exact codes + openpyxl applicator. |
 | `skill-drift-scanner` | Ready | Audits Codex and Claude skill deployment drift, autosync health, scheduler status, and reload requirements across machine-level skill installs. |
 | `excel-wow` | Draft | Placeholder for a future Excel/financial-modeling workflow skill. |
 | `blog-image-gen` | Ready | Generates editorial hero images for blog posts via OpenAI `gpt-image-2` (Responses API + thinking), with batch/ingest workflows. |

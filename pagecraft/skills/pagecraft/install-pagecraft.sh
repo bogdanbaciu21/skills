@@ -10,7 +10,10 @@
 
 set -eu
 
-skill_dir=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
+# This script lives in the pagecraft overview skill (pagecraft/skills/pagecraft).
+# The probe + verifiers are self-contained in the sibling verify-text-wrap skill.
+skill_dir=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+vtw_dir=$(CDPATH= cd -- "$skill_dir/../verify-text-wrap" && pwd)
 target=${1:-$(pwd)}
 static_root=${2:-"$target"}
 
@@ -19,13 +22,16 @@ mkdir -p "$target/scripts" "$target/tests/pagecraft" "$target/assets/css"
 # CSS — the comprehensive Pagecraft stylesheet (keystone + .bbt + number formats)
 # plus the minimal wrap-safe reset for repos that want only the reset.
 cp "$skill_dir/assets/css/pagecraft.css" "$target/assets/css/pagecraft.css"
-cp "$skill_dir/assets/wrap-safe.css"     "$target/assets/css/wrap-safe.css"
+cp "$vtw_dir/wrap-safe.css"              "$target/assets/css/wrap-safe.css"
 
-# Probe + verifiers — the real implementations (wrap-safe + verify-text-wrap).
-cp "$skill_dir/assets/wrapcheck.js"       "$target/assets/wrapcheck.js"     # runner.py looks here (../assets)
-cp "$skill_dir/scripts/check-keystone.py" "$target/scripts/check-keystone.py"
-cp "$skill_dir/scripts/runner.py"         "$target/scripts/runner.py"
-cp "$skill_dir/scripts/browserbase.py"    "$target/scripts/browserbase.py"
+# Probe + verifiers — the real implementations from the verify-text-wrap skill.
+# runner.py defaults to a wrapcheck.js sibling, so install one next to it in
+# scripts/; also drop a copy in assets/ for sites that <script src> the probe.
+cp "$vtw_dir/wrapcheck.js"       "$target/assets/wrapcheck.js"
+cp "$vtw_dir/wrapcheck.js"       "$target/scripts/wrapcheck.js"
+cp "$vtw_dir/check-keystone.py"  "$target/scripts/check-keystone.py"
+cp "$vtw_dir/runner.py"          "$target/scripts/runner.py"
+cp "$vtw_dir/browserbase.py"     "$target/scripts/browserbase.py"
 chmod +x "$target/scripts/check-keystone.py" "$target/scripts/runner.py"
 
 # Synthetic good/bad fixtures for testing the checker without keeping broken pages.

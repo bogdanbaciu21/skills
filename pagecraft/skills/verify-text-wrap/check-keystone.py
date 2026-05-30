@@ -160,7 +160,7 @@ def main():
         print(f"  Add to your GLOBAL stylesheet (not per-page):")
         print(f"\n      *, *::before, *::after {{ min-width: 0; }}   /* wrap-safe keystone */\n")
         print(f"  …or install wrap-safe.css, which ships it:")
-        print(f"      <link rel=\"stylesheet\" href=\"https://cdn.jsdelivr.net/gh/bogdanbaciu21/skills@main/wrap-safe/wrap-safe.css\">")
+        print(f"      <link rel=\"stylesheet\" href=\"https://cdn.jsdelivr.net/gh/bogdanbaciu21/skills@main/pagecraft/skills/verify-text-wrap/wrap-safe.css\">")
         return 1
 
     if not args.quiet:
