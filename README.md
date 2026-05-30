@@ -70,10 +70,14 @@ skills/
 │     │  └─ wrap-safe.css · wrapcheck.js   (wrap-safe runtime library)
 │     ├─ table-system-migration/
 │     │  └─ SKILL.md
-│     └─ number-formats/
+│     ├─ number-formats/
+│     │  ├─ SKILL.md
+│     │  ├─ formats.json         (byte-exact Excel format codes)
+│     │  └─ apply-number-formats.py
+│     └─ reskin/
 │        ├─ SKILL.md
-│        ├─ formats.json         (byte-exact Excel format codes)
-│        └─ apply-number-formats.py
+│        ├─ reskin.py            (detect → sync → reframe; hybrid bespoke/generic)
+│        └─ reskin.example.json
 ├─ excel-wow/
 │  └─ SKILL.md
 └─ blog-image-gen/
@@ -126,6 +130,7 @@ Use this checklist before publishing a skill:
 | `pagecraft » verify-text-wrap` | Ready | Verifies static HTML portals for caterpillar text, narrow containers, and right-edge layout drift. Canonical home of the `wrap-safe` runtime library (`wrap-safe.css` reset + `wrapcheck.js` probe) it drives. |
 | `pagecraft » table-system-migration` | Ready | Audits, migrates, and regression-tests messy HTML table systems with a public-safe scrub gate. |
 | `pagecraft » number-formats` | Ready | Applies the Macabacus financial number-format standard (en-dash zeros, aligned parenthesized negatives, blue inputs, green links, grey-italic margins, bold totals) to Excel models and HTML tables. Byte-exact codes + openpyxl applicator. |
+| `pagecraft » reskin` | Ready | Detects a repo's design system (a `*-design`/`*-brand` skill, tokens stylesheet, or `reskin.json`) and applies its brand frame (nav/hero/footer + tokens + assets) across the site. Hybrid: runs the repo's bespoke applier if present, else a built-in frame injector. Idempotent + dry-run-able. |
 | `skill-drift-scanner` | Ready | Audits Codex and Claude skill deployment drift, autosync health, scheduler status, and reload requirements across machine-level skill installs. |
 | `excel-wow` | Draft | Placeholder for a future Excel/financial-modeling workflow skill. |
 | `blog-image-gen` | Ready | Generates editorial hero images for blog posts via OpenAI `gpt-image-2` (Responses API + thinking), with batch/ingest workflows. |
