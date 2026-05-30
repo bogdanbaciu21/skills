@@ -37,11 +37,11 @@ try:
 except ImportError:
     use_browserbase_if_available = lambda *a, **kw: None
 
-# Default location of the wrap-safe probe. Prefer the sibling local file so
-# edits to this skill take effect immediately against deployed pages. Fall back
-# to the public CDN when the runner is copied without wrap-safe next to it.
-DEFAULT_WRAPCHECK_URL = "https://cdn.jsdelivr.net/gh/bogdanbaciu21/skills@main/wrap-safe/wrapcheck.js"
-DEFAULT_WRAPCHECK_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "wrap-safe", "wrapcheck.js"))
+# Default location of the wrap-safe probe. Prefer the local file bundled in this
+# skill so edits take effect immediately against deployed pages. Fall back to the
+# public CDN when the runner is copied somewhere without wrapcheck.js next to it.
+DEFAULT_WRAPCHECK_URL = "https://cdn.jsdelivr.net/gh/bogdanbaciu21/skills@main/verify-text-wrap/wrapcheck.js"
+DEFAULT_WRAPCHECK_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), "wrapcheck.js"))
 DEFAULT_VIEWPORTS = [
     {"name": "wide", "width": 1440, "height": 900},
     {"name": "desktop", "width": 1280, "height": 900},

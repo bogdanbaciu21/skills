@@ -57,7 +57,10 @@ skills/
 ├─ verify-text-wrap/
 │  ├─ SKILL.md
 │  ├─ runner.py
-│  └─ browserbase.py
+│  ├─ check-keystone.py
+│  ├─ browserbase.py
+│  ├─ wrap-safe.css       (bundled runtime reset)
+│  └─ wrapcheck.js        (bundled runtime probe)
 ├─ skill-drift-scanner/
 ├─ pagecraft/
 │  ├─ SKILL.md
@@ -66,10 +69,6 @@ skills/
 │  └─ scripts/       (check-pagecraft-policy.sh, install-pagecraft.sh)
 ├─ table-system-migration/
 │  └─ SKILL.md
-├─ wrap-safe/
-│  ├─ README.md
-│  ├─ wrap-safe.css
-│  └─ wrapcheck.js
 ├─ excel-wow/
 │  └─ SKILL.md
 └─ blog-image-gen/
@@ -113,9 +112,8 @@ Use this checklist before publishing a skill:
 | `quiz-me` | Ready | Active-recall quiz on a topic, doc, codebase area, or interview prep — one question at a time, adaptive difficulty. |
 | `pagecraft` | Ready | Portable HTML formatting + visual-safety guardrails (tables, number formats, headers, text-wrap prevention) with installable deterministic checks. |
 | `table-system-migration` | Ready | Audits, migrates, and regression-tests messy HTML table systems with a public-safe scrub gate. |
-| `verify-text-wrap` | Ready | Verifies static HTML portals for caterpillar text, narrow containers, and right-edge layout drift using the bundled `wrap-safe` probe. |
+| `verify-text-wrap` | Ready | Verifies static HTML portals for caterpillar text, narrow containers, and right-edge layout drift. Bundles the `wrap-safe` runtime library (`wrap-safe.css` reset + `wrapcheck.js` probe) it drives. |
 | `skill-drift-scanner` | Ready | Audits Codex and Claude skill deployment drift, autosync health, scheduler status, and reload requirements across machine-level skill installs. |
-| `wrap-safe` | Ready | Drop-in CSS and JS runtime probe used by `verify-text-wrap`; shipped as a library under this repo, not a standalone skill. |
 | `excel-wow` | Draft | Placeholder for a future Excel/financial-modeling workflow skill. |
 | `blog-image-gen` | Ready | Generates editorial hero images for blog posts via OpenAI `gpt-image-2` (Responses API + thinking), with batch/ingest workflows. |
 
