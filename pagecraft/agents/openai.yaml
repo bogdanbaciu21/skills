@@ -1,0 +1,4 @@
+interface:
+  display_name: "Pagecraft"
+  short_description: "HTML formatting guardrails"
+  default_prompt: "Use Pagecraft to format, harden, and verify static HTML so tables, headers, numbers, and text wrapping stay polished and robust."

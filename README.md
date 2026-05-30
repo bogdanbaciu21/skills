@@ -45,6 +45,7 @@ skills/
 ├─ CODE_OF_CONDUCT.md
 ├─ SECURITY.md
 ├─ .gitignore
+├─ sync-skills.sh    (propagate canonical skills → machine skill dirs)
 ├─ agent-coordination/
 │  └─ SKILL.md
 ├─ handoff/
@@ -58,6 +59,11 @@ skills/
 │  ├─ runner.py
 │  └─ browserbase.py
 ├─ skill-drift-scanner/
+├─ pagecraft/
+│  ├─ SKILL.md
+│  ├─ assets/        (pagecraft.css, wrapcheck, wrap-lab fixtures)
+│  ├─ references/    (tables, headers, text-wrap, number-formats, …)
+│  └─ scripts/       (check-pagecraft-policy.sh, install-pagecraft.sh)
 ├─ table-system-migration/
 │  └─ SKILL.md
 ├─ wrap-safe/
@@ -105,6 +111,7 @@ Use this checklist before publishing a skill:
 | `grill-me` | Ready | Runs a one-question-at-a-time pressure-test interview for plans/decisions. |
 | `parallel-dispatch` | Ready | Generates multi-agent prompts and coordinator playbook from a parallel work plan. |
 | `quiz-me` | Ready | Active-recall quiz on a topic, doc, codebase area, or interview prep — one question at a time, adaptive difficulty. |
+| `pagecraft` | Ready | Portable HTML formatting + visual-safety guardrails (tables, number formats, headers, text-wrap prevention) with installable deterministic checks. |
 | `table-system-migration` | Ready | Audits, migrates, and regression-tests messy HTML table systems with a public-safe scrub gate. |
 | `verify-text-wrap` | Ready | Verifies static HTML portals for caterpillar text, narrow containers, and right-edge layout drift using the bundled `wrap-safe` probe. |
 | `skill-drift-scanner` | Ready | Audits Codex and Claude skill deployment drift, autosync health, scheduler status, and reload requirements across machine-level skill installs. |
