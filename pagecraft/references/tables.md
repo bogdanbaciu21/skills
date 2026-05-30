@@ -11,6 +11,10 @@ you can build the whole system from this file in any repo.
 > neutral prefix. Pick one per repo and never mix — a table system with two
 > names is the #1 source of table drift.
 
+**Migrating a messy table estate?** Use the `table-system-migration` skill
+alongside this bundle — that's the audit → migrate → ratchet methodology; this
+file is the canonical component it migrates *to*.
+
 ---
 
 ## The contract (memorize this shape)

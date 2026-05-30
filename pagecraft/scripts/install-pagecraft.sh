@@ -1,11 +1,12 @@
 #!/bin/sh
-# Install Pagecraft assets and checks into a repo.
+# Install the Pagecraft bundle (the real, proven tools) into a repo.
 #
 # Usage:
 #   sh install-pagecraft.sh /path/to/repo [static-root]
 #
-# static-root is optional and defaults to the repo root. The installer copies
-# assets only; it does not edit application templates automatically.
+# static-root is optional and defaults to the repo root. Copies the bundled CSS,
+# the wrap-safe probe, and the verifiers. It does not edit app templates — add
+# assets/css/pagecraft.css to the app's CSS entrypoint yourself.
 
 set -eu
 
@@ -15,12 +16,19 @@ static_root=${2:-"$target"}
 
 mkdir -p "$target/scripts" "$target/tests/pagecraft" "$target/assets/css"
 
+# CSS — the comprehensive Pagecraft stylesheet (keystone + .bbt + number formats)
+# plus the minimal wrap-safe reset for repos that want only the reset.
 cp "$skill_dir/assets/css/pagecraft.css" "$target/assets/css/pagecraft.css"
-cp "$skill_dir/assets/wrapcheck-pagecraft.js" "$target/tests/pagecraft/wrapcheck.js"
-cp "$skill_dir/scripts/check-pagecraft-policy.sh" "$target/scripts/check-pagecraft-policy.sh"
-cp "$skill_dir/scripts/check-text-wrap.py" "$target/scripts/check-text-wrap.py"
-chmod +x "$target/scripts/check-pagecraft-policy.sh" "$target/scripts/check-text-wrap.py"
+cp "$skill_dir/assets/wrap-safe.css"     "$target/assets/css/wrap-safe.css"
 
+# Probe + verifiers — the real implementations (wrap-safe + verify-text-wrap).
+cp "$skill_dir/assets/wrapcheck.js"       "$target/assets/wrapcheck.js"     # runner.py looks here (../assets)
+cp "$skill_dir/scripts/check-keystone.py" "$target/scripts/check-keystone.py"
+cp "$skill_dir/scripts/runner.py"         "$target/scripts/runner.py"
+cp "$skill_dir/scripts/browserbase.py"    "$target/scripts/browserbase.py"
+chmod +x "$target/scripts/check-keystone.py" "$target/scripts/runner.py"
+
+# Synthetic good/bad fixtures for testing the checker without keeping broken pages.
 if [ -d "$skill_dir/assets/wrap-lab" ]; then
   rm -rf "$target/tests/pagecraft/wrap-lab"
   mkdir -p "$target/tests/pagecraft/wrap-lab"
@@ -32,11 +40,15 @@ if [ ! -f "$target/tests/pagecraft/wrap-known-issues.json" ]; then
 fi
 
 cat <<MSG
-Pagecraft installed.
+Pagecraft bundle installed into: $target
 
-CSS:          assets/css/pagecraft.css
-Policy:       scripts/check-pagecraft-policy.sh --full
-Browser wrap: python3 scripts/check-text-wrap.py --root "$static_root" --known-issues tests/pagecraft/wrap-known-issues.json
+  CSS            assets/css/pagecraft.css   — add to the app's HTML/CSS entrypoint
+  Keystone guard python3 scripts/check-keystone.py --portal "$static_root"
+                 (deterministic, no browser — wire into pre-commit + CI)
+  Browser probe  python3 scripts/runner.py --local --portal "$static_root" \\
+                   --known-issues tests/pagecraft/wrap-known-issues.json
+                 (8-viewport wrap + right-edge check — run post-edit / post-deploy)
 
-Add assets/css/pagecraft.css to the app's HTML/CSS entrypoint, then wire the two checks into pre-commit, pre-push, or CI.
+For migrating a messy table estate to one canonical component, use the
+table-system-migration skill alongside this bundle.
 MSG

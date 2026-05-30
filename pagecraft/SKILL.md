@@ -1,60 +1,93 @@
 ---
 name: pagecraft
-description: Portable HTML formatting, editorial polish, and visual-safety guardrails for static HTML, portal pages, dashboards, blog posts, and one-off deliverables. Use when Codex is creating or reviewing HTML/CSS that needs robust tables, financial number formatting, headers/section dividers, text-wrap prevention, reusable formatting primitives, or repo-wide installable checks.
+description: Portable HTML formatting and visual-safety bundle for static HTML, portal pages, dashboards, blog posts, and one-off deliverables. Use when creating or reviewing HTML/CSS that needs robust tables, financial number formatting, headers/section dividers, or text-wrap prevention. Bundles the real wrap-safe probe + verify-text-wrap runner + keystone guard so you validate with proven tools, not hand-rolled checks.
 ---
 
 # Pagecraft
 
-Pagecraft is Dan's portable HTML finishing system: reusable patterns plus deterministic checks that keep static pages polished without hand-fixing the same table, header, number, and text-wrap bugs in every repo.
+Pagecraft is a portable HTML finishing **bundle**: a comprehensive stylesheet
+plus the *real, proven* verifiers — vendored in so one install gives you the
+whole toolchain. It exists so you stop hand-fixing the same table, number,
+header, and text-wrap bugs in every repo.
 
-## Operating Model
+It does not reinvent the checks. It bundles them:
 
-1. **Install or inspect first.** If the repo does not have Pagecraft assets, use `scripts/install-pagecraft.sh <repo-root>` or copy the needed assets manually. If it has an existing design system, adapt the class names and variables instead of replacing the whole system.
-2. **Use subskill references as needed.**
-   - Tables: `references/tables.md`
-   - Headers and section dividers: `references/headers.md`
+- **`wrap-safe`** — the CSS keystone/reset and the `wrapcheck.js` runtime probe.
+- **`verify-text-wrap`** — the `runner.py` browser verifier (8 viewports + the
+  right-edge "magician's divider" check) and the deterministic `check-keystone.py`.
+- For migrating a messy table estate to one canonical component, reach for the
+  **`table-system-migration`** skill alongside this bundle.
+
+## Operating model
+
+1. **Install or inspect first.** `sh scripts/install-pagecraft.sh <repo-root>`
+   copies the CSS, probe, and verifiers in. If the repo already has a design
+   system, adapt class names/variables instead of replacing it.
+2. **Use the references as needed.**
+   - Tables: `references/tables.md` (the `.bbt` system + when to use `table-system-migration`)
    - Text wrap: `references/text-wrap.md`
    - Number formats: `references/number-formats.md`
-   - Lifted flourish inventory: `references/flourishes-lift.md`
-   - Future backlog: `references/future-ideas.md`
-3. **Prefer Pagecraft primitives before new CSS.** Use `.pc-grid`, `.pc-card-grid`, `.pc-table`, `.pc-section-break`, `.pc-eyebrow`, `.pc-num`, etc. Raw grid and table CSS is a code smell unless the page has a real one-off layout need.
-4. **Validate before calling it done.** Run the deterministic policy, then the browser probe when available:
+   - Headers / section dividers: `references/headers.md`
+   - Lifted flourish inventory: `references/flourishes-lift.md` · Backlog: `references/future-ideas.md`
+3. **Prefer the bundled primitives before new CSS.** `.pc-grid`, `.pc-card-grid`,
+   `.bbt` (+ `.pc-table` alias), `.pc-section-break`, `.pc-eyebrow`, `.num`, the
+   `.cell-*` Macabacus provenance colors, etc. Raw grid/table CSS is a code smell.
+4. **Validate with the bundled tools — two layers, both required:**
 
 ```bash
-sh scripts/check-pagecraft-policy.sh --full
-python3 scripts/check-text-wrap.py --root <static-html-root>
+# Deterministic root-cause guard (no browser, CI-safe, never flakes):
+python3 scripts/check-keystone.py --portal <static-html-root>
+
+# Real-browser probe across 8 viewports + right-edge alignment:
+python3 scripts/runner.py --local --portal <static-html-root> \
+  --known-issues tests/pagecraft/wrap-known-issues.json
 ```
 
-For newly-created repos, make both strict from day one. For legacy repos, run once, normalize the obvious bad primitives, allowlist only confirmed non-defects, then ratchet.
+New repos: both strict from day one. Legacy repos: run once, normalize the
+obvious bad primitives, allowlist only confirmed non-defects, then ratchet.
 
-## Key Rules
+## Key rules
 
-- Text wrap bugs are usually bad containers, not bad text. Fix grid/width primitives first.
-- Do not use `repeat(3, 1fr)` or `repeat(3, minmax(0, 1fr))` for text-bearing cards. Use `repeat(auto-fit, minmax(220px, 1fr))` or wider.
-- Do not cap ordinary prose with `max-width: NNch` inside wide page containers. Let the page/content container own width.
-- Do not apply `hyphens: auto`, `word-break: break-all`, or `text-wrap: pretty/balance` to ordinary prose as a "fix".
-- Tables get explicit wrappers, captions, numeric alignment, total rows, source lines, and print behavior.
-- Header/divider flourishes should carry structure: eyebrow, title, deck, rule, section counter, anchor affordance. Avoid decorative marks that do not help scanning.
-- All exceptions need a same-line reason comment such as `/* wrap-exempt: metric-only KPI grid */`.
+- **The keystone is the #1 wrap rule:** `* { min-width: 0 }` (shipped in
+  `pagecraft.css`). Text-wrap bugs are bad containers, not bad text.
+- Don't use `repeat(3, 1fr)` / `repeat(3, minmax(0,1fr))` for text cards — use
+  `repeat(auto-fit, minmax(220px, 1fr))` or a wider floor.
+- Don't cap ordinary prose with `max-width: NNch`; the page container owns width.
+- Don't apply `hyphens: auto`, `word-break: break-all`, or `text-wrap: pretty/balance`
+  to ordinary prose as a "fix" — the probe fails them.
+- Tables get explicit `.bbt-wrap` wrappers, captions, numeric alignment, total
+  rows, source lines, and print behavior — never `<figure>`, never per-post classes.
+- Numbers follow the Macabacus convention: color encodes provenance, negatives
+  use parentheses (not red), units stated once in the header.
+- Every exception needs a same-line reason: `/* wrap-exempt: metric-only KPI grid */`.
 
-## Bundled Assets
+## What's bundled
 
-- `assets/css/pagecraft.css`: portable CSS primitives for tables, headers, numbers, callouts, figures, focus, print, and safe grids.
-- `assets/wrapcheck-pagecraft.js`: stable browser probe for collapsed/narrow text boxes and long-page allowlisting.
-- `assets/wrap-lab/*.html`: synthetic good/bad fixtures for testing the checker without preserving broken pages in production.
+```
+assets/css/pagecraft.css     comprehensive stylesheet: keystone, .bbt tables,
+                             number formats + Macabacus colors, safe grids,
+                             headers, callouts, focus, print
+assets/wrap-safe.css         minimal drop-in reset (the wrap-safe library)
+assets/wrapcheck.js          the wrap-safe runtime probe (caterpillar/collapse)
+assets/wrap-lab/*.html       synthetic good/bad fixtures for testing the checker
+scripts/check-keystone.py    deterministic keystone guard (no browser)
+scripts/runner.py            verify-text-wrap browser verifier (8 viewports + right-edge)
+scripts/browserbase.py       optional Browserbase backend for runner.py
+scripts/install-pagecraft.sh install the bundle into another repo
+references/*.md              tables, text-wrap, number-formats, headers, …
+```
 
-## Scripts
+`wrapcheck.js`, `runner.py`, `check-keystone.py`, and `wrap-safe.css` are the
+canonical implementations from the `wrap-safe` and `verify-text-wrap` skills,
+vendored here so the bundle is self-contained. Keep them in sync with their
+source skills via `sync-skills.sh`.
 
-- `scripts/install-pagecraft.sh`: install CSS, wrap probe, fixtures, and checks into another repo.
-- `scripts/check-pagecraft-policy.sh`: deterministic source-level guard for risky width, grid, typography, and table patterns.
-- `scripts/check-text-wrap.py`: local Playwright sweep that injects the bundled wrap probe and checks right-edge alignment.
+## Portability
 
-## Portability Discipline
-
-When moving this into a repo:
-
-1. Add the assets and scripts.
-2. Add a small design-token shim if the repo lacks variables like `--ink`, `--paper`, `--rule`, `--accent`, `--navy`.
-3. Convert tables and text-bearing grids to Pagecraft classes.
-4. Add synthetic wrap lab fixtures but exclude failing `bad-*` fixtures from production sweeps.
-5. Wire deterministic checks into pre-commit/pre-push/CI before the first serious page build.
+1. Add the assets and scripts (`install-pagecraft.sh`).
+2. Add a token shim if the repo lacks `--ink`, `--paper`, `--rule`, `--accent`,
+   `--navy` (every bundled rule has a hardcoded fallback, so this is optional).
+3. Convert tables and text-bearing grids to the bundled classes.
+4. Keep `bad-*` wrap-lab fixtures out of production sweeps.
+5. Wire `check-keystone.py` into pre-commit/CI and `runner.py` into the
+   post-deploy check before the first serious page build.
