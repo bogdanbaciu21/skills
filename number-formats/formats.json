@@ -25,8 +25,8 @@
       "meaning": "calculation — default ink, no special color"
     },
     "link": {
-      "font_argb": "FF008000",
-      "meaning": "pulled from another sheet — green text"
+      "font_argb": "FF00B050",
+      "meaning": "pulled from another sheet — green text. Authoritative green is #00B050 (Macabacus link standard, Excel FF00B050 + web); the model's generic #008000 is superseded."
     },
     "error": {
       "font_argb": "FFFF0000",
