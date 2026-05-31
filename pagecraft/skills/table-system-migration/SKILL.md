@@ -54,6 +54,8 @@ Make narrow, reviewable passes.
 
 Add a deterministic check that blocks new table debt without requiring a full historical cleanup.
 
+- Start from the bundled `table-ratchet.py` script and `table-ratchet-checklist.md` artifact when the target repo does not already have a table-debt gate.
+- Configure the canonical table class, canonical wrapper class, generated-folder excludes, and any narrow legacy/admin table allowlists before creating the baseline.
 - Scan content/templates for new unsanctioned table classes, new per-page table CSS, and new unwrapped tables.
 - Store a baseline when legacy debt already exists.
 - Fail only when a file exceeds the baseline or a new file introduces debt.
@@ -73,6 +75,7 @@ Use browser-backed tests for layout behavior that DOM-only environments cannot s
 Run the smallest complete gate set for the touched stack.
 
 - Run the table ratchet.
+- If using the bundled artifact, run `python3 table-ratchet.py --root <repo> ...` with the same class and allowlist flags used to write the baseline.
 - Rebuild CSS/assets if tests import generated bundles.
 - Run browser/CSS regression tests.
 - Run compile/type/lint checks that CI uses for touched code.
@@ -84,7 +87,7 @@ Run the smallest complete gate set for the touched stack.
 When reporting status, distinguish these clearly:
 
 - **Landed changes:** canonical CSS/classes, migrated files, tests, linter, docs.
-- **Verification:** exact commands run and pass/fail results.
+- **Verification:** exact commands run and pass/fail results, including the table-ratchet command and baseline path if one was added.
 - **Remaining debt:** legacy classes/unwrapped tables that are intentionally baselined.
 - **Review notes:** files staged, files not staged, and any suspicious scrub findings that were removed or intentionally kept.
 

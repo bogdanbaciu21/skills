@@ -73,7 +73,9 @@ skills/
 │     │  ├─ runner.py · check-keystone.py · browserbase.py
 │     │  └─ wrap-safe.css · wrapcheck.js   (wrap-safe runtime library)
 │     ├─ table-system-migration/
-│     │  └─ SKILL.md
+│     │  ├─ SKILL.md
+│     │  ├─ table-ratchet.py       (baseline ratchet for no-new table debt)
+│     │  └─ table-ratchet-checklist.md
 │     ├─ number-formats/
 │     │  ├─ SKILL.md
 │     │  ├─ formats.json         (byte-exact Excel format codes)
