@@ -43,6 +43,11 @@
       "name": "skill-drift-scanner",
       "source": "./skill-drift-scanner",
       "description": "Audits Codex and Claude skill deployment drift, autosync health, scheduler status, and reload requirements across machine-level skill installs."
+    },
+    {
+      "name": "bogdan-baciu-design",
+      "source": "./bogdan-baciu-design",
+      "description": "Applies Bogdan Baciu's personal editorial design system to websites, static HTML, prototypes, documents, slide decks, and scoped financial-model artifacts. Bundles the Puddles sky-blue on warm-cream palette, Instrument Serif + Geist + JetBrains Mono typography, flat editorial layout rules, fonts, imagery, previews, and the .db-scope artifact styling."
     }
   ]
 }

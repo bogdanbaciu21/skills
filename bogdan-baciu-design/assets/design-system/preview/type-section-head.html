@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Type — Section head</title>
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  body { background: var(--paper); padding: 22px 28px; }
+  .head { display: flex; justify-content: space-between; align-items: end; border-bottom: 2px solid var(--ink); padding-bottom: 14px; }
+  .head h2 { font-family: 'Instrument Serif', serif; font-weight: 400; font-size: 64px; line-height: 1; letter-spacing: -0.02em; margin: 0; color: var(--ink); }
+  .head h2 em { font-style: italic; color: var(--sky-600); }
+  .head .eyebrow { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--sky-600); }
+  .meta { margin-top: 14px; display: flex; gap: 18px; font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-faint); }
+  .meta b { color: var(--ink-soft); font-weight: 500; }
+</style>
+</head>
+<body>
+  <div class="head">
+    <h2>Recent <em>writing</em></h2>
+    <span class="eyebrow">Section · 02</span>
+  </div>
+  <div class="meta">
+    <span><b>Family</b> Instrument Serif 400</span>
+    <span><b>Size</b> clamp(48,6vw,96)</span>
+    <span><b>Rule</b> 2px solid ink</span>
+  </div>
+</body>
+</html>

@@ -1,0 +1,606 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>UI Kit — bogdanbaciu.com (website)</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="../../colors_and_type.css">
+<style>
+  /* Page-level rhythm */
+  html { scroll-behavior: smooth; }
+  body { background: var(--paper); color: var(--ink); margin: 0; font-family: var(--font-body); }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } * { animation: none !important; transition: none !important; } }
+
+  /* Grain overlay */
+  .grain { position: relative; }
+  .grain::before {
+    content: ''; position: absolute; inset: 0; pointer-events: none; opacity: 0.6; mix-blend-mode: multiply;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' seed='5'/><feColorMatrix values='0 0 0 0 0.05  0 0 0 0 0.05  0 0 0 0 0.05  0 0 0 0.18 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+  }
+
+  /* Chrome / header */
+  header.chrome { position: sticky; top: 0; z-index: 30; background: var(--sky-700); color: #fff; height: 104px; display: flex; align-items: center; padding: 0 36px; gap: 28px; font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; }
+  header.chrome .brand { font-family: 'Instrument Serif', serif; font-style: italic; font-size: 22px; letter-spacing: 0; text-transform: none; opacity: 1; margin-right: auto; }
+  header.chrome nav { display: flex; gap: 22px; }
+  header.chrome a { color: #fff; text-decoration: none; opacity: 0.78; transition: opacity 0.2s ease; }
+  header.chrome a:hover { opacity: 1; }
+  header.chrome a.active { opacity: 1; border-bottom: 1px solid #fff; padding-bottom: 2px; }
+  header.chrome .meta { opacity: 0.7; font-family: 'Instrument Serif', serif; font-style: italic; font-size: 13px; letter-spacing: 0; text-transform: none; }
+
+  /* Section scaffolding */
+  main { max-width: 1400px; margin: 0 auto; padding: 0 36px 80px; }
+  section { padding: 64px 0; border-top: 1px solid var(--rule); }
+  section:first-of-type { border-top: 0; }
+  .section-head { display: flex; justify-content: space-between; align-items: end; gap: 24px; border-bottom: 2px solid var(--ink); padding-bottom: 16px; margin-bottom: 36px; }
+  .section-head h2 { font-family: 'Instrument Serif', serif; font-weight: 400; font-size: clamp(40px, 5.4vw, 72px); line-height: 1; letter-spacing: -0.02em; margin: 0; text-wrap: balance; }
+  .section-head h2 em { font-style: italic; color: var(--sky-600); }
+  .section-head .eyebrow { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--sky-600); white-space: nowrap; padding-bottom: 6px; }
+
+  /* HERO */
+  .hero { padding: 88px 0 72px; display: grid; grid-template-columns: 1.35fr 0.95fr; gap: 60px; align-items: end; border-top: 0; }
+  .hero h1 { font-family: 'Instrument Serif', serif; font-weight: 400; font-size: clamp(72px, 10.5vw, 168px); line-height: 0.92; letter-spacing: -0.03em; margin: 0; text-wrap: balance; }
+  .hero h1 em { font-style: italic; color: var(--sky-600); }
+  .hero .meta-col { font-family: 'Instrument Serif', serif; font-style: italic; font-size: clamp(18px, 1.6vw, 22px); line-height: 1.45; color: var(--ink-soft); text-align: right; max-width: 460px; justify-self: end; }
+  .hero .meta-col p { margin: 0 0 14px; }
+  .hero .meta-col p:last-child { margin-bottom: 0; }
+  .hero .meta-col strong { color: var(--ink); font-weight: 400; font-style: normal; font-family: var(--font-body); font-size: 0.86em; }
+  .hero-eyebrow { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--sky-600); margin-bottom: 18px; display: flex; gap: 14px; align-items: center; }
+  .hero-eyebrow .availability { display: inline-flex; align-items: center; gap: 8px; padding: 6px 12px; border: 1px solid var(--sky-400); border-radius: 999px; color: var(--sky-700); font-size: 10px; }
+  .hero-eyebrow .availability::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: var(--sky-600); }
+
+  /* INTRO LEDE */
+  .lede { font-family: 'Instrument Serif', serif; font-style: italic; font-size: clamp(20px, 1.8vw, 26px); line-height: 1.4; color: var(--ink-soft); max-width: 70ch; margin: 0; text-wrap: pretty; }
+
+  /* BODY PROSE */
+  .prose { max-width: 74ch; }
+  .prose p { font-size: 18px; line-height: 1.78; margin: 0 0 18px; text-align: justify; hyphens: auto; -webkit-hyphens: auto; hyphenate-limit-chars: 10 4 4; font-variant-numeric: oldstyle-nums proportional-nums; }
+  .prose a { color: var(--sky-600); text-decoration: none; border-bottom: 1px solid currentColor; padding-bottom: 1px; transition: color 0.15s ease, background 0.15s ease; }
+  .prose a:hover { color: var(--sky-700); background: var(--sky-100); }
+
+  /* PORTRAIT — sticky 4:5 */
+  .bio-grid { display: grid; grid-template-columns: 360px 1fr; gap: 56px; align-items: start; }
+  .portrait { position: sticky; top: 128px; }
+  .portrait .frame { aspect-ratio: 4 / 5; background: var(--sky-300); border: 1px solid var(--rule); border-radius: 2px; overflow: hidden; position: relative; }
+  .portrait .frame img { width: 100%; height: 100%; object-fit: cover; filter: grayscale(0.15) contrast(1.03); display: block; }
+  .portrait figcaption { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-faint); margin-top: 10px; display: flex; justify-content: space-between; }
+
+  /* PUDDLES GRID */
+  .puddles-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: var(--rule); border: 1px solid var(--rule); border-radius: 2px; overflow: hidden; }
+  .puddles-grid figure { margin: 0; aspect-ratio: 4 / 5; position: relative; background: var(--sky-200); overflow: hidden; }
+  .puddles-grid img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 1.2s ease; }
+  .puddles-grid figure:hover img { transform: scale(1.04); }
+  .puddles-grid figcaption { position: absolute; left: 12px; bottom: 12px; font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: #fff; background: rgba(0,0,0,0.45); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); padding: 6px 10px; border-radius: 999px; }
+  .puddles-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: var(--rule); border: 1px solid var(--rule); margin-top: 1px; }
+  .puddles-stats .stat { background: var(--paper); padding: 18px 20px; }
+  .puddles-stats .num { font-family: 'Instrument Serif', serif; font-size: 36px; line-height: 1; letter-spacing: -0.02em; color: var(--sky-600); font-style: italic; }
+  .puddles-stats .lbl { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-soft); margin-top: 6px; }
+
+  /* TABLES — places, posts, xp */
+  table.bb { width: 100%; border-collapse: separate; border-spacing: 0; font-feature-settings: 'tnum' 1, 'zero' 1; }
+  table.bb td, table.bb th { padding: 14px 6px; vertical-align: baseline; border-bottom: 1px dashed var(--rule); text-align: left; font-weight: 400; }
+  table.bb tr:hover td { background: var(--sky-100); }
+  table.bb .city { font-family: 'Instrument Serif', serif; font-size: 26px; letter-spacing: -0.01em; }
+  table.bb .city em { font-style: italic; color: var(--sky-600); }
+  table.bb .role { font-family: 'Instrument Serif', serif; font-size: 22px; letter-spacing: -0.01em; }
+  table.bb .when { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-soft); white-space: nowrap; }
+  table.bb .org { font-family: 'Instrument Serif', serif; font-style: italic; font-size: 18px; color: var(--ink-soft); }
+
+  table.places .row-city td:not(:last-child)::after { content: ' → '; color: var(--sky-600); font-family: var(--font-mono); font-size: 11px; padding-left: 6px; }
+
+  /* POSTS table */
+  table.posts .title { font-family: 'Instrument Serif', serif; font-size: 22px; letter-spacing: -0.01em; }
+  table.posts .title em { font-style: italic; color: var(--sky-600); }
+  table.posts .star { color: var(--sky-600); font-family: var(--font-mono); font-size: 14px; width: 16px; }
+  table.posts .format { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--sky-700); padding: 2px 7px; border: 1px solid var(--rule); border-radius: 2px; display: inline-block; }
+
+  /* XP ledger */
+  ul.xp { list-style: none; margin: 0; padding: 0; }
+  ul.xp > li { display: grid; grid-template-columns: 64px 1fr 200px; gap: 24px; padding: 22px 0; border-bottom: 1px dashed var(--rule); align-items: start; transition: padding 0.3s ease, margin 0.3s ease, background 0.3s ease; }
+  ul.xp > li:hover { background: var(--sky-100); padding-left: 16px; padding-right: 16px; margin-left: -16px; margin-right: -16px; }
+  ul.xp .logo { width: 64px; height: 64px; display: flex; align-items: center; justify-content: center; background: #fff; border: 1px solid var(--rule); border-radius: 2px; }
+  ul.xp .logo img { width: 64px; height: 64px; object-fit: contain; padding: 14px; box-sizing: border-box; }
+  ul.xp .role { font-family: 'Instrument Serif', serif; font-size: 26px; line-height: 1.2; letter-spacing: -0.01em; }
+  ul.xp .role em { font-style: italic; color: var(--sky-600); }
+  ul.xp .org { font-family: 'Instrument Serif', serif; font-style: italic; font-size: 16px; color: var(--ink-soft); margin-top: 2px; }
+  ul.xp .when { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-soft); text-align: right; padding-top: 8px; }
+  ul.xp .bullets { list-style: none; margin: 8px 0 0; padding: 0; max-width: 64ch; }
+  ul.xp .bullets li { font-size: 15px; line-height: 1.6; color: var(--ink-soft); padding-left: 18px; position: relative; margin-bottom: 4px; }
+  ul.xp .bullets li::before { content: '—'; color: var(--sky-600); position: absolute; left: 0; top: 0; font-family: var(--font-mono); }
+
+  /* INTERESTS — card grid with 1px gap */
+  .interests { display: grid; grid-template-columns: repeat(5, 1fr); gap: 1px; background: var(--rule); border: 1px solid var(--rule); border-radius: 2px; overflow: hidden; }
+  .interests figure { margin: 0; aspect-ratio: 4 / 5; position: relative; background: var(--sky-200); overflow: hidden; }
+  .interests img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 1.2s ease; filter: saturate(0.92); }
+  .interests figure:hover img { transform: scale(1.04); }
+  .interests figcaption { position: absolute; bottom: 0; left: 0; right: 0; padding: 14px 14px; background: linear-gradient(to top, rgba(0,0,0,0.55), transparent); color: #fff; font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; }
+  .interests figcaption b { font-family: 'Instrument Serif', serif; font-style: italic; font-weight: 400; font-size: 18px; letter-spacing: 0; text-transform: none; display: block; margin-bottom: 2px; }
+
+  /* HORN */
+  .ornament { border: 0; text-align: center; font-family: 'Instrument Serif', serif; color: var(--ink-faint); font-size: 18px; margin: 36px 0; line-height: 1; }
+  .ornament::before { content: '❦'; }
+
+  /* HIRE CARD — the only floating card */
+  .hire-card { position: relative; max-width: 760px; margin: 0 auto; background: #fff; border: 1px solid var(--rule); border-radius: 16px; padding: 40px 44px 36px; box-shadow: 0 30px 60px -20px rgba(11, 79, 118, 0.18), 0 8px 18px -8px rgba(11, 79, 118, 0.10); overflow: hidden; }
+  .hire-card::before { content: ''; position: absolute; left: 0; right: 0; top: 0; height: 3px; background: linear-gradient(90deg, var(--sky-300), var(--sky-600), var(--sky-700)); }
+  .hire-card .eyebrow { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--sky-600); }
+  .hire-card h3 { font-family: 'Instrument Serif', serif; font-weight: 400; font-size: 44px; letter-spacing: -0.02em; line-height: 1.05; margin: 8px 0 14px; }
+  .hire-card h3 em { font-style: italic; color: var(--sky-600); }
+  .hire-card p.lede { font-size: 19px; max-width: 56ch; margin-bottom: 22px; }
+  .hire-card .actions { display: flex; gap: 12px; flex-wrap: wrap; }
+
+  /* BUTTONS */
+  .bb-btn { display: inline-flex; align-items: center; gap: 8px; padding: 12px 18px; border: 1px solid var(--sky-900); border-radius: 2px; font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; background: #fff; color: var(--sky-900); cursor: pointer; text-decoration: none; transition: background 0.15s ease, color 0.15s ease; }
+  .bb-btn--primary { background: var(--sky-900); color: #fff; }
+  .bb-btn--primary:hover { background: var(--ink); }
+  .bb-btn:hover { background: var(--sky-100); }
+  .bb-btn:focus-visible { outline: 2px solid oklch(0.55 0.13 38); outline-offset: 2px; }
+
+  /* INTAKE FORM */
+  .intake { max-width: 560px; margin: 0 auto; background: var(--paper-warm); border: 1px solid var(--rule); border-radius: 16px; padding: 32px 36px; }
+  .intake h3 { font-family: 'Instrument Serif', serif; font-weight: 400; font-size: 30px; letter-spacing: -0.02em; margin: 0 0 6px; }
+  .intake h3 em { font-style: italic; color: var(--sky-600); }
+  .intake .helper { color: var(--ink-soft); font-size: 14px; margin-bottom: 20px; }
+  .intake form { display: flex; flex-direction: column; gap: 16px; }
+  .intake label { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-soft); display: block; margin-bottom: 6px; }
+  .intake input, .intake textarea { font: inherit; font-family: var(--font-body); font-size: 16px; padding: 11px 12px; background: #fff; border: 1px solid var(--rule); border-radius: 2px; color: var(--ink); width: 100%; box-sizing: border-box; }
+  .intake input:focus, .intake textarea:focus { outline: 2px solid oklch(0.55 0.13 38); outline-offset: 2px; border-color: var(--ink-soft); }
+
+  /* CHIP ROW */
+  .chip-row { display: flex; flex-wrap: wrap; gap: 8px; }
+  .chip { display: inline-block; padding: 7px 12px; border: 1px solid var(--rule); border-radius: 999px; background: #fff; font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--sky-700); cursor: pointer; transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease; }
+  .chip:hover { background: var(--sky-100); }
+  .chip.is-on { background: var(--sky-100); border-color: var(--sky-300); color: var(--sky-700); }
+
+  /* FOOTER */
+  footer.chrome { background: var(--sky-700); color: #fff; padding: 56px 36px 24px; margin-top: 0; }
+  footer.chrome .row { max-width: 1400px; margin: 0 auto; display: grid; grid-template-columns: 1.4fr 1fr 1fr 1fr; gap: 32px; }
+  footer.chrome h4 { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; opacity: 0.7; margin: 0 0 12px; font-weight: 400; }
+  footer.chrome .ttl { font-family: 'Instrument Serif', serif; font-style: italic; font-size: 28px; letter-spacing: -0.01em; line-height: 1.1; margin: 0 0 12px; opacity: 0.96; }
+  footer.chrome a { color: #fff; text-decoration: none; opacity: 0.78; font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; display: block; padding: 4px 0; }
+  footer.chrome a:hover { opacity: 1; }
+  footer.chrome .legal { max-width: 1400px; margin: 32px auto 0; padding-top: 18px; border-top: 1px solid rgba(255,255,255,0.18); display: flex; justify-content: space-between; font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; opacity: 0.7; }
+
+  /* SECTION-LEVEL UTILITIES */
+  .gap-stack > * + * { margin-top: 28px; }
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 56px; align-items: start; }
+  .two-col-sm { display: grid; grid-template-columns: 280px 1fr; gap: 36px; align-items: start; }
+
+  /* COMPONENT GALLERY (UI Kit-only chrome) */
+  .gallery { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1px; background: var(--rule); border: 1px solid var(--rule); }
+  .gallery .demo { background: #fff; padding: 28px; }
+  .gallery .demo--paper { background: var(--paper); }
+  .gallery .demo h4 { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--sky-600); margin: 0 0 14px; font-weight: 400; }
+  .gallery .demo p.note { color: var(--ink-soft); font-size: 13px; line-height: 1.55; margin: 12px 0 0; }
+
+  /* KIT NAV */
+  .kit-toc { position: sticky; top: 128px; align-self: start; padding-right: 24px; }
+  .kit-toc h4 { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ink-soft); margin: 0 0 10px; font-weight: 400; }
+  .kit-toc a { display: block; padding: 6px 0; color: var(--ink); text-decoration: none; font-size: 14px; border-bottom: 1px dashed var(--rule); }
+  .kit-toc a:hover { color: var(--sky-700); }
+
+  /* PRINT-LIKE BANNER FOR THE TOP */
+  .kit-banner { background: var(--paper-warm); border: 1px solid var(--rule); border-top: 0; padding: 28px 36px; display: flex; gap: 28px; align-items: baseline; flex-wrap: wrap; }
+  .kit-banner .ttl { font-family: 'Instrument Serif', serif; font-size: 28px; letter-spacing: -0.01em; }
+  .kit-banner .ttl em { font-style: italic; color: var(--sky-600); }
+  .kit-banner .meta { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ink-soft); display: flex; gap: 22px; flex-wrap: wrap; }
+  .kit-banner .meta b { color: var(--ink); font-weight: 500; }
+
+  /* RESPONSIVE */
+  @media (max-width: 1100px) {
+    .hero { grid-template-columns: 1fr; }
+    .hero .meta-col { text-align: left; justify-self: start; }
+    .bio-grid { grid-template-columns: 1fr; }
+    .portrait { position: static; max-width: 360px; }
+    .interests { grid-template-columns: repeat(3, 1fr); }
+    .puddles-grid, .puddles-stats { grid-template-columns: repeat(2, 1fr); }
+    ul.xp > li { grid-template-columns: 56px 1fr; }
+    ul.xp .when { grid-column: 2; text-align: left; padding-top: 0; }
+    .gallery { grid-template-columns: 1fr; }
+    .two-col, .two-col-sm { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<header class="chrome">
+  <span class="brand">Bogdan &amp; Baciu</span>
+  <nav>
+    <a href="#hero" class="active">Home</a>
+    <a href="#bio">Content</a>
+    <a href="#writing">Evergreen</a>
+    <a href="#writing">Recent</a>
+    <a href="#interests">Collections</a>
+    <a href="#xp">Work</a>
+  </nav>
+  <span class="meta">last edited yesterday</span>
+</header>
+
+<div class="kit-banner">
+  <span class="ttl">UI Kit · <em>bogdanbaciu.com</em></span>
+  <div class="meta">
+    <span><b>Tokens</b> colors_and_type.css</span>
+    <span><b>Family</b> Instrument Serif · Geist · JetBrains Mono</span>
+    <span><b>Accent</b> sky-600</span>
+    <span><b>Surface</b> paper #F9F9FA</span>
+  </div>
+</div>
+
+<main>
+
+  <!-- ====================== HERO ====================== -->
+  <section class="hero grain" id="hero" data-screen-label="01 Hero">
+    <div>
+      <div class="hero-eyebrow">
+        <span>2 min overview</span>
+        <span class="availability">Open for short engagements</span>
+      </div>
+      <h1>Bogdan <em>&amp;</em><br>Baciu</h1>
+    </div>
+    <div class="meta-col">
+      <p>Finance × Technology, running on the BEAM.</p>
+      <p>I write about systems that quietly hold up other systems — and ship the artifacts to prove they work.</p>
+      <p><strong>Brooklyn, NY · since 2019</strong></p>
+    </div>
+  </section>
+
+  <!-- ====================== BIO + PORTRAIT ====================== -->
+  <section id="bio" data-screen-label="02 Bio">
+    <div class="section-head">
+      <h2>About <em>me</em></h2>
+      <span class="eyebrow">Section · 02 / 07</span>
+    </div>
+
+    <div class="bio-grid">
+      <figure class="portrait">
+        <div class="frame"><img src="../../assets/headshot.jpg" alt="Headshot"></div>
+        <figcaption><span>Brooklyn, NY</span><span>Apr 2025</span></figcaption>
+      </figure>
+
+      <div class="prose">
+        <p class="lede">A long lede sets the scene. It runs as italic display serif, justified with text-wrap pretty, sized for comfortable reading. This paragraph is about thirty-five words long and gives the rest of the column permission to breathe.</p>
+        <br>
+        <p>Body type lands at <a href="#">20px on a 1.78 line height</a>, capped at seventy-four characters because anything wider becomes uncomfortable to track. Soft hyphenation kicks in at ten characters, which keeps abbreviations and short words intact while letting compound words break and prevent rivers in justified prose<sup style="color: var(--sky-600); font-family: var(--font-mono); font-size: 10px;">1</sup>.</p>
+        <p>Links pick up the sky accent and a one-pixel underline. On hover they paint a sky-100 wash behind the text — same gesture the row tables use, so the whole site feels stitched from one fabric. The accent <em style="font-style: italic; color: var(--sky-600);">italic</em> inside body copy is the only place the brand color appears in prose.</p>
+
+        <hr class="ornament">
+
+        <p>This bio section uses <code style="font-family: var(--font-mono); font-size: 14px; background: var(--sky-100); padding: 1px 6px; border-radius: 2px; color: var(--sky-700);">position: sticky</code> on a 4:5 portrait at the left. The reading column flows past it; the portrait stays put until the section bottom catches it. Page padding is 36px horizontal — not 32, not 40.</p>
+
+        <div style="font-size: 13px; color: var(--ink-soft); border-top: 1px solid var(--rule); margin-top: 24px; padding-top: 12px; line-height: 1.55;">
+          <ol style="margin: 0; padding-left: 22px;">
+            <li><span style="font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.12em; color: var(--sky-600);">FN 1.</span> Hyphenation values are tuned in <code style="font-family: var(--font-mono); font-size: 12px;">flourishes.css §22</code> — adjust there, not inline.</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====================== PUDDLES GRID ====================== -->
+  <section id="puddles" data-screen-label="03 Puddles">
+    <div class="section-head">
+      <h2><em>Puddles</em>, the office manager</h2>
+      <span class="eyebrow">Section · 03 / 07</span>
+    </div>
+
+    <div class="puddles-grid">
+      <figure><img src="../../assets/puddles-bench.jpg" alt=""><figcaption>Bench · 2024</figcaption></figure>
+      <figure><img src="../../assets/puddles-couch.jpg" alt=""><figcaption>Couch · 2024</figcaption></figure>
+      <figure><img src="../../assets/puddles-chair.jpg" alt=""><figcaption>Chair · 2024</figcaption></figure>
+      <figure><img src="../../assets/puddles-portrait.jpg" alt=""><figcaption>Portrait · 2025</figcaption></figure>
+    </div>
+    <div class="puddles-stats">
+      <div class="stat"><div class="num">7yr</div><div class="lbl">in residence</div></div>
+      <div class="stat"><div class="num">42lb</div><div class="lbl">official weight</div></div>
+      <div class="stat"><div class="num">11</div><div class="lbl">napping spots</div></div>
+      <div class="stat"><div class="num">∞</div><div class="lbl">tail wags</div></div>
+    </div>
+  </section>
+
+  <!-- ====================== WRITING (POSTS TABLE) ====================== -->
+  <section id="writing" data-screen-label="04 Writing">
+    <div class="section-head">
+      <h2>Recent <em>writing</em></h2>
+      <span class="eyebrow">Section · 04 / 07</span>
+    </div>
+
+    <table class="bb posts">
+      <tbody>
+        <tr>
+          <td class="star">★</td>
+          <td class="title">Ledgers that <em>self-prove</em></td>
+          <td><span class="format">Essay</span></td>
+          <td class="when">Mar 2025</td>
+        </tr>
+        <tr>
+          <td class="star"></td>
+          <td class="title">A small note on <em>oldstyle figures</em></td>
+          <td><span class="format">Notes</span></td>
+          <td class="when">Feb 2025</td>
+        </tr>
+        <tr>
+          <td class="star">★</td>
+          <td class="title">Why finance is going to live on the <em>BEAM</em></td>
+          <td><span class="format">Essay</span></td>
+          <td class="when">Jan 2025</td>
+        </tr>
+        <tr>
+          <td class="star"></td>
+          <td class="title">Receipts, not dashboards</td>
+          <td><span class="format">Essay</span></td>
+          <td class="when">Dec 2024</td>
+        </tr>
+        <tr>
+          <td class="star"></td>
+          <td class="title">Two-tab <em>admin</em>: optimistic UI as a love language</td>
+          <td><span class="format">Notes</span></td>
+          <td class="when">Nov 2024</td>
+        </tr>
+        <tr>
+          <td class="star"></td>
+          <td class="title">On widening the container</td>
+          <td><span class="format">Notes</span></td>
+          <td class="when">Oct 2024</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div style="margin-top: 24px; display: flex; gap: 8px; flex-wrap: wrap;" class="chip-row">
+      <span class="chip is-on">All</span>
+      <span class="chip">Essays</span>
+      <span class="chip">Notes</span>
+      <span class="chip">Best of</span>
+      <span class="chip">2025</span>
+      <span class="chip">2024</span>
+      <span class="chip">2023</span>
+    </div>
+  </section>
+
+  <!-- ====================== PLACES LIVED ====================== -->
+  <section id="places" data-screen-label="05 Places">
+    <div class="section-head">
+      <h2>Places <em>lived</em></h2>
+      <span class="eyebrow">Section · 05 / 07</span>
+    </div>
+
+    <table class="bb places">
+      <tbody>
+        <tr class="row-city">
+          <td class="city">Bucharest</td>
+          <td class="city"><em>Cluj-Napoca</em></td>
+          <td class="city">Berlin</td>
+          <td class="city">London</td>
+          <td class="city"><em>New York</em></td>
+        </tr>
+        <tr>
+          <td class="when">2002 – 2010</td>
+          <td class="when">2010 – 2014</td>
+          <td class="when">2014 – 2017</td>
+          <td class="when">2017 – 2019</td>
+          <td class="when">2019 –</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- ====================== EXPERIENCE LEDGER ====================== -->
+  <section id="xp" data-screen-label="06 Experience">
+    <div class="section-head">
+      <h2>Where I've <em>worked</em></h2>
+      <span class="eyebrow">Section · 06 / 07</span>
+    </div>
+
+    <ul class="xp">
+      <li>
+        <div class="logo"><img src="../../assets/logos/databricks.svg" alt="Databricks"></div>
+        <div>
+          <div class="role">Staff <em>Finance Engineer</em></div>
+          <div class="org">Databricks — finance platform</div>
+          <ul class="bullets">
+            <li>Owned the close-the-books pipeline; cut close from 9 days to 3.</li>
+            <li>Designed an event-sourced ledger that reconciles itself, then the auditors.</li>
+            <li>Hired and grew a four-person engineering pod inside Finance Ops.</li>
+          </ul>
+        </div>
+        <div class="when">2022 – present</div>
+      </li>
+      <li>
+        <div class="logo"><img src="../../assets/logos/snowflake.svg" alt="Snowflake"></div>
+        <div>
+          <div class="role">Senior FP&amp;A — <em>Platform</em></div>
+          <div class="org">Snowflake — financial systems</div>
+          <ul class="bullets">
+            <li>Stood up the consumption-revenue forecast layer used by IR.</li>
+            <li>Wrote the playbook on driver-cell discipline (yellow fill, blue font).</li>
+          </ul>
+        </div>
+        <div class="when">2020 – 2022</div>
+      </li>
+      <li>
+        <div class="logo"><img src="../../assets/logos/google.svg" alt="Google"></div>
+        <div>
+          <div class="role">Finance Analyst — <em>Cloud</em></div>
+          <div class="org">Google — Cloud Office of the CFO</div>
+          <ul class="bullets">
+            <li>Reverse-engineered the unit economics for three GA products.</li>
+            <li>Built the first internal model that tied COGS to deployment regions.</li>
+          </ul>
+        </div>
+        <div class="when">2017 – 2020</div>
+      </li>
+      <li>
+        <div class="logo"><img src="../../assets/logos/meta.svg" alt="Meta"></div>
+        <div>
+          <div class="role">Finance — <em>Family of Apps</em></div>
+          <div class="org">Meta (then Facebook) — Reality Labs adjacent</div>
+        </div>
+        <div class="when">2014 – 2017</div>
+      </li>
+    </ul>
+  </section>
+
+  <!-- ====================== INTERESTS ====================== -->
+  <section id="interests" data-screen-label="07 Interests">
+    <div class="section-head">
+      <h2>Outside <em>work</em></h2>
+      <span class="eyebrow">Section · 07 / 07</span>
+    </div>
+
+    <div class="interests">
+      <figure><img src="../../assets/interests-f1.jpg" alt=""><figcaption><b>Formula 1</b>Spec races since 2012</figcaption></figure>
+      <figure><img src="../../assets/interests-nba.jpg" alt=""><figcaption><b>Basketball</b>Knicks, reluctantly</figcaption></figure>
+      <figure><img src="../../assets/interests-fitness.jpg" alt=""><figcaption><b>Lifting</b>5/3/1, slowly</figcaption></figure>
+      <figure><img src="../../assets/interests-toastmasters.jpg" alt=""><figcaption><b>Toastmasters</b>Club VP, 2024</figcaption></figure>
+      <figure><img src="../../assets/interests-travel.jpg" alt=""><figcaption><b>Travel</b>Long lunches, mostly</figcaption></figure>
+    </div>
+  </section>
+
+  <!-- ====================== HIRE CARD ====================== -->
+  <section id="hire" data-screen-label="08 Hire">
+    <div class="section-head">
+      <h2>Work <em>with me</em></h2>
+      <span class="eyebrow">/hire-me</span>
+    </div>
+
+    <div class="hire-card">
+      <span class="eyebrow">Open for short engagements</span>
+      <h3>Bring me a <em>thorny</em> finance system, and I'll bring receipts.</h3>
+      <p class="lede">Three to twelve weeks. Senior-IC engagements only — usually behind a Head of Finance Ops or a CFO sponsor. I write Phoenix LiveView and SQL, in that order. Yes I will look at your model. Yes it will hurt.</p>
+      <div class="actions">
+        <a class="bb-btn bb-btn--primary" href="#intake">Send a brief →</a>
+        <a class="bb-btn" href="#">Read the playbook</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====================== INTAKE ====================== -->
+  <section id="intake" data-screen-label="09 Intake">
+    <div class="section-head">
+      <h2><em>Intake</em></h2>
+      <span class="eyebrow">/hire-me · panel</span>
+    </div>
+
+    <div class="intake">
+      <h3>Send a <em>brief</em></h3>
+      <p class="helper">Used for the reply only. No list, ever.</p>
+      <form onsubmit="event.preventDefault();">
+        <div>
+          <label for="iName">Name</label>
+          <input id="iName" type="text" placeholder="Your name">
+        </div>
+        <div>
+          <label for="iEmail">Email</label>
+          <input id="iEmail" type="email" placeholder="you@studio.tld">
+        </div>
+        <div>
+          <label for="iBrief">Brief</label>
+          <textarea id="iBrief" rows="4" placeholder="A few sentences about what you're building."></textarea>
+        </div>
+        <div style="display: flex; gap: 12px;">
+          <button type="submit" class="bb-btn bb-btn--primary">Send brief</button>
+          <button type="reset" class="bb-btn">Clear</button>
+        </div>
+      </form>
+    </div>
+  </section>
+
+  <!-- ====================== COMPONENT GALLERY ====================== -->
+  <section id="gallery" data-screen-label="10 Component gallery">
+    <div class="section-head">
+      <h2>Component <em>gallery</em></h2>
+      <span class="eyebrow">UI kit · reference only</span>
+    </div>
+
+    <div class="gallery">
+      <div class="demo">
+        <h4>Buttons</h4>
+        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+          <button class="bb-btn bb-btn--primary">Primary</button>
+          <button class="bb-btn">Default</button>
+          <button class="bb-btn" style="border: 0;">Ghost</button>
+        </div>
+        <p class="note">Mono uppercase, 1px ink-900 border, sharp 2px corner. No shadow.</p>
+      </div>
+
+      <div class="demo demo--paper">
+        <h4>Chips · pills · availability</h4>
+        <div style="display: flex; gap: 8px; flex-wrap: wrap;" class="chip-row">
+          <span class="chip is-on">Recent</span>
+          <span class="chip">Evergreen</span>
+          <span class="chip">Collections</span>
+          <span class="hero-eyebrow" style="margin: 0;"><span class="availability">Open for short engagements</span></span>
+        </div>
+        <p class="note">Pill 999px · format-chip uses sharp 2px instead.</p>
+      </div>
+
+      <div class="demo">
+        <h4>Eyebrows &amp; labels</h4>
+        <div style="display: flex; flex-direction: column; gap: 8px;">
+          <span style="font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--sky-600);">Eyebrow accent</span>
+          <span style="font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-soft);">Eyebrow standard</span>
+          <span style="font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ink-soft);">Eyebrow · small</span>
+        </div>
+        <p class="note">JetBrains Mono · 10–11px · 0.12–0.16em · uppercase.</p>
+      </div>
+
+      <div class="demo demo--paper">
+        <h4>Form field</h4>
+        <label style="font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-soft); display: block; margin-bottom: 6px;">Email</label>
+        <input type="email" placeholder="you@studio.tld" style="font: inherit; font-family: var(--font-body); font-size: 16px; padding: 11px 12px; background: #fff; border: 1px solid var(--rule); border-radius: 2px; color: var(--ink); width: 100%; box-sizing: border-box;">
+        <p class="note">Focus ring is rust 2px outline + 2px offset.</p>
+      </div>
+
+      <div class="demo">
+        <h4>Cards</h4>
+        <div style="display: flex; flex-direction: column; gap: 10px;">
+          <div style="border: 1px solid var(--rule); padding: 12px 14px; border-radius: 2px;"><b style="font-family: 'Instrument Serif', serif; font-weight: 400; font-size: 18px;">bb-card</b> — base, 1px rule.</div>
+          <div style="background: var(--sky-100); padding: 12px 14px; border-radius: 2px;"><b style="font-family: 'Instrument Serif', serif; font-weight: 400; font-size: 18px;">bb-card--soft</b> — sky-100 fill.</div>
+        </div>
+        <p class="note">All flat. Borders carry hierarchy.</p>
+      </div>
+
+      <div class="demo demo--paper">
+        <h4>Section head</h4>
+        <div style="display: flex; justify-content: space-between; align-items: end; border-bottom: 2px solid var(--ink); padding-bottom: 12px; gap: 18px;">
+          <span style="font-family: 'Instrument Serif', serif; font-weight: 400; font-size: 32px; letter-spacing: -0.02em;">Recent <em style="color: var(--sky-600);">writing</em></span>
+          <span style="font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--sky-600);">04 / 07</span>
+        </div>
+        <p class="note">Italic accent on key noun · 2px ink rule.</p>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="chrome">
+  <div class="row">
+    <div>
+      <p class="ttl">Bogdan &amp; Baciu — <br>Brooklyn, NY</p>
+      <p style="font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; opacity: 0.7; margin: 0;">Finance × Technology · BEAM</p>
+    </div>
+    <div>
+      <h4>Read</h4>
+      <a href="#">Evergreen</a>
+      <a href="#">Recent</a>
+      <a href="#">Collections</a>
+    </div>
+    <div>
+      <h4>Around</h4>
+      <a href="#">Twitter / X</a>
+      <a href="#">GitHub</a>
+      <a href="#">LinkedIn</a>
+    </div>
+    <div>
+      <h4>Work</h4>
+      <a href="#">Hire me</a>
+      <a href="#">Templates</a>
+      <a href="#">Privacy</a>
+    </div>
+  </div>
+  <div class="legal">
+    <span>© 2025 Bogdan Baciu</span>
+    <span>last edited yesterday · v 0.42</span>
+  </div>
+</footer>
+
+</body>
+</html>

@@ -55,6 +55,10 @@ skills/
 ├─ parallel-dispatch/
 │  └─ SKILL.md
 ├─ skill-drift-scanner/
+├─ bogdan-baciu-design/
+│  ├─ SKILL.md
+│  ├─ references/brand-system.md
+│  └─ assets/design-system/      (tokens, fonts, images, previews, UI kit)
 ├─ pagecraft/                    (multi-skill plugin bundle)
 │  ├─ .claude-plugin/plugin.json
 │  └─ skills/
@@ -134,6 +138,7 @@ Use this checklist before publishing a skill:
 | `skill-drift-scanner` | Ready | Audits Codex and Claude skill deployment drift, autosync health, scheduler status, and reload requirements across machine-level skill installs. |
 | `excel-wow` | Draft | Placeholder for a future Excel/financial-modeling workflow skill. |
 | `blog-image-gen` | Ready | Generates editorial hero images for blog posts via OpenAI `gpt-image-2` (Responses API + thinking), with batch/ingest workflows. |
+| `bogdan-baciu-design` | Ready | Applies Bogdan Baciu's personal editorial design system to sites, prototypes, documents, slide decks, and scoped financial artifacts, bundling tokens, fonts, imagery, previews, and the brand reference. |
 
 ---
 

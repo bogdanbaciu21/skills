@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Spacing — global rhythm</title>
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  body { background: var(--paper); padding: 18px 22px; }
+  .scale { display: flex; align-items: end; gap: 12px; height: 60px; }
+  .step { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+  .bar { background: var(--sky-300); border: 1px solid var(--sky-600); border-bottom: 0; width: 16px; }
+  .lbl { font-family: var(--font-mono); font-size: 9.5px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-soft); }
+  .meta { margin-top: 14px; font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-faint); }
+</style>
+</head>
+<body>
+  <div class="scale">
+    <div class="step"><div class="bar" style="height: 6px;"></div><span class="lbl">1 · 6</span></div>
+    <div class="step"><div class="bar" style="height: 10px;"></div><span class="lbl">2 · 10</span></div>
+    <div class="step"><div class="bar" style="height: 14px;"></div><span class="lbl">3 · 14</span></div>
+    <div class="step"><div class="bar" style="height: 20px;"></div><span class="lbl">4 · 20</span></div>
+    <div class="step"><div class="bar" style="height: 28px;"></div><span class="lbl">5 · 28</span></div>
+    <div class="step"><div class="bar" style="height: 40px;"></div><span class="lbl">6 · 40</span></div>
+  </div>
+  <div class="meta">Editorial proportions · NOT a 4 / 8 px grid · .db-scope uses 4-base 4–128px</div>
+</body>
+</html>

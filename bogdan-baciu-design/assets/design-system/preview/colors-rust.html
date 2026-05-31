@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Rust accent (selection &amp; focus only)</title>
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  body { background: var(--paper); padding: 18px 22px; font-family: var(--font-body); color: var(--ink); }
+  .grid { display: grid; grid-template-columns: 0.9fr 1.4fr; gap: 18px; align-items: stretch; }
+  .swatches { display: grid; grid-template-rows: 1fr 1fr; border: 1px solid var(--rule); }
+  .sw { padding: 10px 12px; display: flex; flex-direction: column; justify-content: space-between; }
+  .sw + .sw { border-top: 1px solid var(--rule); }
+  .sw .label { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; }
+  .sw .hex { font-family: var(--font-mono); font-size: 10px; opacity: 0.9; }
+  .demo { padding: 14px 16px; background: #fff; border: 1px solid var(--rule); display: flex; flex-direction: column; gap: 10px; justify-content: center; }
+  .demo .lede { font-family: var(--font-display); font-style: italic; font-size: 19px; line-height: 1.4; color: var(--ink); margin: 0; }
+  .demo .pick { background: oklch(0.88 0.06 50); padding: 0 2px; }
+  .demo button { font: inherit; font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; background: #fff; border: 1px solid var(--rule); padding: 8px 10px; outline: 2px solid oklch(0.55 0.13 38); outline-offset: 2px; border-radius: 2px; align-self: flex-start; color: var(--ink); }
+  .note { font-family: var(--font-mono); font-size: 9.5px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-faint); }
+</style>
+</head>
+<body>
+  <div class="grid">
+    <div class="swatches">
+      <div class="sw" style="background: oklch(0.88 0.06 50); color: var(--ink);">
+        <span class="label">Selection rust</span>
+        <span class="hex">oklch(0.88 0.06 50)</span>
+      </div>
+      <div class="sw" style="background: oklch(0.55 0.13 38); color: #fff;">
+        <span class="label">Focus rust</span>
+        <span class="hex">oklch(0.55 0.13 38)</span>
+      </div>
+    </div>
+    <div class="demo">
+      <p class="lede">A long lede gets the <span class="pick">selection wash</span> in rust, never sky.</p>
+      <button type="button">Tab-stop ring</button>
+      <span class="note">Override the sky accent on purpose · flourishes.css §2/§3</span>
+    </div>
+  </div>
+</body>
+</html>

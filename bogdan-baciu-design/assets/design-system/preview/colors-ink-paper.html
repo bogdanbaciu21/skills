@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Ink &amp; surfaces</title>
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  body { background: var(--paper); padding: 18px 22px; }
+  .row { display: grid; grid-template-columns: repeat(6, 1fr); border: 1px solid var(--rule); }
+  .sw { aspect-ratio: 1.6 / 1; padding: 10px 12px; display: flex; flex-direction: column; justify-content: space-between; border-right: 1px solid var(--rule); }
+  .sw:last-child { border-right: 0; }
+  .sw .name { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; line-height: 1; }
+  .sw .hex { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.06em; opacity: 0.85; line-height: 1; }
+  .caption { margin-top: 8px; font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-faint); }
+</style>
+</head>
+<body>
+  <div class="row">
+    <div class="sw" style="background: var(--paper); color: var(--ink); outline: 1px solid var(--rule); outline-offset: -1px;"><span class="name">Paper</span><span class="hex">#F9F9FA</span></div>
+    <div class="sw" style="background: var(--paper-warm); color: var(--ink); outline: 1px solid var(--rule); outline-offset: -1px;"><span class="name">Paper warm</span><span class="hex">oklch 0.975</span></div>
+    <div class="sw" style="background: var(--rule); color: var(--ink);"><span class="name">Rule</span><span class="hex">#D8DADF</span></div>
+    <div class="sw" style="background: var(--ink-faint); color: #fff;"><span class="name">Ink faint</span><span class="hex">#A3A8B1</span></div>
+    <div class="sw" style="background: var(--ink-soft); color: #fff;"><span class="name">Ink soft</span><span class="hex">#646B78</span></div>
+    <div class="sw" style="background: var(--ink); color: #fff;"><span class="name">Ink</span><span class="hex">#262B34</span></div>
+  </div>
+  <div class="caption">Paper is whisper-warm, not pure white · ink stack reads on cream, not on white</div>
+</body>
+</html>

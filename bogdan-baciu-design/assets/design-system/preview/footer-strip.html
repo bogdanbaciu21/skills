@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Footer chrome strip</title>
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  body { background: var(--paper); padding: 22px 0; }
+  .strip { background: var(--sky-700); color: #fff; padding: 14px 28px; display: flex; justify-content: space-between; align-items: center; font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; }
+  .strip .left { display: flex; gap: 22px; opacity: 0.92; }
+  .strip a { color: #fff; text-decoration: none; opacity: 0.78; }
+  .strip a.active { opacity: 1; border-bottom: 1px solid #fff; padding-bottom: 1px; }
+  .strip .right { font-family: 'Instrument Serif', serif; font-style: italic; font-size: 14px; letter-spacing: 0; text-transform: none; opacity: 0.85; }
+  .meta { padding: 14px 28px 0; font-family: var(--font-mono); font-size: 9.5px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-faint); }
+</style>
+</head>
+<body>
+  <div class="strip">
+    <div class="left">
+      <a href="#" class="active">Home</a>
+      <a href="#">Content</a>
+      <a href="#">Evergreen</a>
+      <a href="#">Recent</a>
+      <a href="#">Collections</a>
+      <a href="#">Work</a>
+    </div>
+    <div class="right">© 2025 — last edited yesterday</div>
+  </div>
+  <div class="meta">Sky-700 strip · only place where ink-on-color appears · italic serif on the right is signature</div>
+</body>
+</html>

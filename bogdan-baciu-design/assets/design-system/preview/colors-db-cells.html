@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Macabacus cell colors</title>
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  body { background: #faf7f2; padding: 18px 22px; }
+  .grid { display: grid; grid-template-columns: 1.2fr 1fr; gap: 18px; align-items: start; }
+  .swatches { display: grid; grid-template-columns: repeat(3, 1fr); border: 1px solid #d6cfc1; }
+  .sw { padding: 10px 12px; border-right: 1px solid #d6cfc1; border-bottom: 1px solid #d6cfc1; min-height: 56px; display: flex; flex-direction: column; justify-content: space-between; background: #fffdf8; }
+  .sw:nth-child(3n) { border-right: 0; }
+  .sw:nth-last-child(-n+3) { border-bottom: 0; }
+  .sw .lab { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: #1a2330; }
+  .sw .hex { font-family: var(--font-mono); font-size: 10px; color: #4a5568; }
+  .chip { display: inline-block; width: 14px; height: 10px; border-radius: 2px; vertical-align: middle; margin-right: 6px; border: 1px solid rgba(0,0,0,0.18); }
+  /* driver pair */
+  .driver { background: #fffdf8; border: 1px solid #d6cfc1; padding: 14px 16px; font-family: var(--font-mono); font-size: 12px; color: #1a2330; }
+  .driver h4 { margin: 0 0 8px; font-family: 'Instrument Serif', serif; font-weight: 400; font-size: 18px; letter-spacing: -0.01em; color: #1a2330; }
+  .driver .cell { display: inline-block; padding: 6px 14px; background: #FFFFCC; color: #0000FF; font-family: var(--font-mono); font-size: 13px; letter-spacing: 0.02em; border: 1px solid #e0d8a0; border-radius: 2px; }
+  .driver p { margin: 8px 0 0; font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: #4a5568; }
+</style>
+</head>
+<body>
+  <div class="grid">
+    <div class="swatches">
+      <div class="sw"><span class="lab"><span class="chip" style="background:#0000FF;"></span>Input</span><span class="hex">#0000FF</span></div>
+      <div class="sw"><span class="lab"><span class="chip" style="background:#1a2330;"></span>Formula</span><span class="hex">#1A2330</span></div>
+      <div class="sw"><span class="lab"><span class="chip" style="background:#00B050;"></span>Link</span><span class="hex">#00B050</span></div>
+      <div class="sw"><span class="lab"><span class="chip" style="background:#a23934;"></span>Error</span><span class="hex">#A23934</span></div>
+      <div class="sw"><span class="lab"><span class="chip" style="background:#6b7280;"></span>Subtotal</span><span class="hex">#6B7280</span></div>
+      <div class="sw"><span class="lab"><span class="chip" style="background:#2c6e6e;"></span>Output</span><span class="hex">#2C6E6E</span></div>
+    </div>
+    <div class="driver">
+      <h4>Driver convention</h4>
+      <span class="cell">12.5%</span>
+      <p>Yellow fill #FFFFCC + blue font #0000FF · NEVER standalone</p>
+    </div>
+  </div>
+</body>
+</html>

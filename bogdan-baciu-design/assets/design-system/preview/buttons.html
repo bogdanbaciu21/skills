@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Buttons</title>
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  body { background: var(--paper); padding: 22px 28px; }
+  .row { display: flex; gap: 12px; flex-wrap: wrap; }
+  .bb-btn { display: inline-flex; align-items: center; gap: 8px; padding: 12px 18px; border: 1px solid var(--sky-900); border-radius: 2px; font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; background: #fff; color: var(--sky-900); cursor: pointer; }
+  .bb-btn--primary { background: var(--sky-900); color: #fff; }
+  .bb-btn--ghost { background: transparent; }
+  .bb-btn--danger { border-color: oklch(0.55 0.16 25); color: oklch(0.45 0.16 25); }
+  .meta { margin-top: 14px; font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-faint); }
+</style>
+</head>
+<body>
+  <div class="row">
+    <button class="bb-btn bb-btn--primary">Primary</button>
+    <button class="bb-btn">Default</button>
+    <button class="bb-btn bb-btn--ghost">Ghost</button>
+    <button class="bb-btn bb-btn--danger">Danger</button>
+  </div>
+  <div class="meta">JetBrains Mono uppercase · 1px ink-900 border · sharp 2px corner · no shadow</div>
+</body>
+</html>

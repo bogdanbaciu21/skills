@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Cards</title>
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  body { background: var(--paper); padding: 22px 28px; }
+  .row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; align-items: stretch; }
+  .bb-card { border: 1px solid var(--rule); background: #fff; border-radius: 2px; padding: 18px 20px; min-height: 110px; display: flex; flex-direction: column; gap: 8px; }
+  .bb-card--editorial { background: var(--paper); padding: 22px 24px; }
+  .bb-card--soft { background: var(--sky-100); padding: 20px; }
+  .bb-card .ey { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--sky-600); }
+  .bb-card h3 { font-family: 'Instrument Serif', serif; font-weight: 400; font-size: 22px; letter-spacing: -0.01em; margin: 0; color: var(--ink); }
+  .bb-card p { margin: 0; color: var(--ink-soft); font-size: 13px; line-height: 1.55; }
+  .meta { margin-top: 12px; font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-faint); }
+</style>
+</head>
+<body>
+  <div class="row">
+    <div class="bb-card">
+      <span class="ey">Base · bb-card</span>
+      <h3>White fill</h3>
+      <p>1px rule border, sharp 2px corner.</p>
+    </div>
+    <div class="bb-card bb-card--editorial">
+      <span class="ey">Editorial</span>
+      <h3>Paper fill</h3>
+      <p>Warmer surface, --space-5 padding.</p>
+    </div>
+    <div class="bb-card bb-card--soft">
+      <span class="ey">Soft</span>
+      <h3>Sky-100 fill</h3>
+      <p>Tinted surface, --space-4 padding.</p>
+    </div>
+  </div>
+  <div class="meta">All flat · borders carry hierarchy · radius sharp 2px</div>
+</body>
+</html>
