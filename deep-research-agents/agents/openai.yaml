@@ -1,0 +1,4 @@
+interface:
+  display_name: "Deep Research Agents"
+  short_description: "Use Claude, Gemini, and Parallel.ai research providers."
+  default_prompt: "Run or plan a deep-research fan-out with Claude Managed Agent, Gemini Deep Research, and Parallel.ai."
