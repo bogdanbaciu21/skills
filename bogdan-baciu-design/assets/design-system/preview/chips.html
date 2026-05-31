@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Chips &amp; pills</title>
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  body { background: var(--paper); padding: 22px 28px; display: flex; flex-direction: column; gap: 14px; }
+  .row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+  .chip { display: inline-block; padding: 7px 11px; border: 1px solid var(--rule); border-radius: 999px; background: #fff; font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--sky-700); }
+  .chip--ghost { color: var(--ink-soft); }
+  .chip--selected { background: var(--sky-100); border-color: var(--sky-300); color: var(--sky-700); }
+  .availability { display: inline-flex; align-items: center; gap: 8px; padding: 7px 12px; border: 1px solid var(--sky-400); border-radius: 999px; font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--sky-700); }
+  .availability::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: var(--sky-600); }
+  .format-chip { display: inline-block; padding: 2px 7px; border: 1px solid var(--rule); border-radius: 2px; color: var(--sky-700); background: #fff; font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; }
+  .meta { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-faint); }
+</style>
+</head>
+<body>
+  <div class="row">
+    <span class="chip">Evergreen</span>
+    <span class="chip chip--selected">Recent</span>
+    <span class="chip">Collections</span>
+    <span class="chip chip--ghost">Templates</span>
+    <span class="format-chip">Essay</span>
+    <span class="format-chip">Notes</span>
+  </div>
+  <div class="row">
+    <span class="availability">Open for short engagements</span>
+  </div>
+  <div class="meta">Pill chips · 999px radius · format-chip uses sharp 2px instead</div>
+</body>
+</html>
