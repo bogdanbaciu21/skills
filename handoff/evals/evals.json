@@ -29,6 +29,10 @@
     {
       "prompt": "Wrap up — what should the next Claude know to pick this up?",
       "reason": "Forward-looking summary for next agent."
+    },
+    {
+      "prompt": "Create a handoff I can use when switching from Codex to Claude or a VPS.",
+      "reason": "Explicit cross-environment handoff request."
     }
   ],
   "negative_triggers": [
@@ -58,12 +62,18 @@
     }
   ],
   "output_assertions": [
-    "Output is wrapped in a single fenced code block tagged ```markdown so the user can copy it in one click.",
+    "Output is wrapped in a single fenced code block tagged markdown so the user can copy it in one click; the fence is long enough to contain any nested code fences, defaulting to ````markdown when needed.",
     "Block contains a `## Session Handoff — <title>` heading.",
     "Block contains a `### What's Left` checklist with unchecked items, OR omits the section if nothing remains.",
+    "Block contains a `### Suggested Starting Point` section when there is a clear next action, file, command, skill, or tool.",
     "If `/tmp/.claude-session-issue-number` exists, the block contains a `### GitHub Issue` section with the issue number and URL.",
     "Empty sections are omitted rather than rendered as 'None'.",
     "File paths in `### Files Changed` come from `git diff --stat`, not invented from memory.",
-    "After the block, the assistant reminds the user to paste it as the first message in the new chat."
+    "Output includes a `### Environment & Transfer Notes` section with current environment, current working directory, saved artifact path or save failure reason, and a cross-environment portability note.",
+    "When filesystem writes are available, the same handoff content is saved as markdown, preferring `<repo-root>/.agent-handoffs/` before workspace-local `.agent-handoffs/` and OS temp.",
+    "If the saved artifact is in OS temp or the next session is on another machine/VPS, the assistant states that the chat block is the reliable portable copy unless the file is copied or committed there.",
+    "Saved handoff artifacts are not committed by default; if git transfer is proposed, the assistant confirms the file is sanitized or states that the chat block is safer.",
+    "The handoff redacts secrets and sensitive personal data; it may name env vars, secret managers, or config paths but never includes secret values.",
+    "After the block, the assistant reminds the user to paste it as the first message in the new chat or give the next session the saved markdown artifact."
   ]
 }
