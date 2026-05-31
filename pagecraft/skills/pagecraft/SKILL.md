@@ -49,6 +49,16 @@ python3 ../verify-text-wrap/runner.py --local --portal <static-html-root> \
 New repos: both strict from day one. Legacy repos: run once, normalize the
 obvious bad primitives, allowlist only confirmed non-defects, then ratchet.
 
+## Which subskill should I use?
+
+| Need | Use | Start here |
+|---|---|---|
+| Install the bundle or finish one static HTML surface | `pagecraft` | `install-pagecraft.sh`, then these references |
+| Prove wrap/container safety after CSS or deploy | `verify-text-wrap` | `../verify-text-wrap/SKILL.md` |
+| Normalize many ad hoc tables into one system | `table-system-migration` | `../table-system-migration/SKILL.md` |
+| Format financial numbers in HTML or Excel | `number-formats` | `../number-formats/SKILL.md` |
+| Apply an existing repo design system across pages | `reskin` | `../reskin/SKILL.md` |
+
 ## Key rules
 
 - **The keystone is the #1 wrap rule:** `* { min-width: 0 }` (shipped in
@@ -96,6 +106,20 @@ pagecraft/                          the plugin
 The probe and verifiers have a single canonical home in `verify-text-wrap/` —
 `install-pagecraft.sh` copies from there. Nothing is vendored or duplicated, so
 nothing can drift.
+
+Installed into a target repo, the default paths are:
+
+```
+assets/css/pagecraft.css              Pagecraft stylesheet
+assets/css/wrap-safe.css              minimal keystone reset
+assets/wrapcheck.js                   page-load/runtime probe copy
+scripts/wrapcheck.js                  verifier-local probe copy
+scripts/check-keystone.py             deterministic keystone guard
+scripts/runner.py                     browser verifier
+scripts/browserbase.py                optional Browserbase backend
+tests/pagecraft/wrap-lab/*.html       synthetic good/bad fixtures, if present
+tests/pagecraft/wrap-known-issues.json allowlist scaffold
+```
 
 ## Portability
 
