@@ -26,12 +26,7 @@ Examples:
 By default writes <file>-formatted.xlsx; pass --in-place to overwrite.
 """
 import argparse, json, os, re, sys
-
-try:
-    import openpyxl
-    from openpyxl.styles import Font, PatternFill
-except ImportError:
-    sys.exit("apply-number-formats.py needs openpyxl:  pip install openpyxl")
+from functools import lru_cache
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 SPEC = json.load(open(os.path.join(HERE, "formats.json")))
@@ -43,6 +38,24 @@ FORMAT_ALIAS = {
     "multiple": "multiple", "mult": "multiple", "x": "multiple",
     "yes-no": "toggle_yes_no", "y-n": "toggle_y_n", "on-off": "toggle_on_off",
 }
+
+
+@lru_cache(maxsize=1)
+def openpyxl_module():
+    try:
+        import openpyxl
+    except ImportError:
+        sys.exit("apply-number-formats.py needs openpyxl:  pip install openpyxl")
+    return openpyxl
+
+
+@lru_cache(maxsize=1)
+def openpyxl_styles():
+    try:
+        from openpyxl.styles import Font, PatternFill
+    except ImportError:
+        sys.exit("apply-number-formats.py needs openpyxl:  pip install openpyxl")
+    return Font, PatternFill
 
 
 def parse_ref(ref, default_sheet):
@@ -63,6 +76,7 @@ def cells_in(ws, rng):
 
 
 def _font(c, **kw):
+    Font, _ = openpyxl_styles()
     f = c.font
     base = dict(name=f.name, size=f.size, bold=f.bold, italic=f.italic, color=f.color)
     base.update(kw)
@@ -78,6 +92,7 @@ def apply_format(ws, rng, key):
 
 
 def apply_style(ws, rng, style):
+    _, PatternFill = openpyxl_styles()
     n = 0
     for c in cells_in(ws, rng):
         if style in ("input", "hardcode", "link", "error"):
@@ -121,7 +136,7 @@ def main():
     ap.add_argument("--in-place", action="store_true", help="overwrite the file instead of *-formatted.xlsx")
     args = ap.parse_args()
 
-    wb = openpyxl.load_workbook(args.file)
+    wb = openpyxl_module().load_workbook(args.file)
     default_sheet = args.sheet or wb.active.title
     did = []
 

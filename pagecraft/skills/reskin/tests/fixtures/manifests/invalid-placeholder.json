@@ -1,0 +1,14 @@
+{
+  "design_system": {
+    "source": "TBU",
+    "tokens_css": "colors_and_type.css",
+    "frame": "frame"
+  },
+  "served_root": "TBU - served dir",
+  "assets_target": "assets/brand",
+  "pages": [
+    {
+      "path": "TBU/page.html"
+    }
+  ]
+}

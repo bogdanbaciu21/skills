@@ -38,27 +38,36 @@ It checks:
 
 ## Workflow
 
-### Step 1 — Run the status command
+### Step 1 — Locate the scanner
 
-Use the environment's installed scanner command. On this machine:
+Use the environment's installed scanner command; do not assume a Linux/root home
+path. Prefer an explicit override, then `PATH`, then the user's local bin:
 
 ```bash
-/root/.local/bin/codex-skill-sync status
+scanner="${CODEX_SKILL_SYNC:-$(command -v codex-skill-sync || true)}"
+[ -n "$scanner" ] || scanner="$HOME/.local/bin/codex-skill-sync"
+[ -x "$scanner" ] || { echo "codex-skill-sync not found"; exit 127; }
+```
+
+### Step 2 — Run the status command
+
+```bash
+"$scanner" status
 ```
 
 This should print the current report without mutating anything.
 
-### Step 2 — If the user wants reconciliation, run sync
+### Step 3 — If the user wants reconciliation, run sync
 
-On this machine:
+Use the same resolved scanner path:
 
 ```bash
-/root/.local/bin/codex-skill-sync sync
+"$scanner" sync
 ```
 
 Use this when the user wants the machine brought back to source of truth, not just inspected.
 
-### Step 3 — Interpret results by tool
+### Step 4 — Interpret results by tool
 
 - **Missing Installed Skills** means the source repo has a skill that an install root does not.
 - **Content Drift** means the skill exists in both places but file content differs.
@@ -72,7 +81,7 @@ Return:
 
 1. The top-line status in one sentence
 2. The highest-signal per-tool sections from the report
-3. The exact reconcile command if drift exists
+3. The exact reconcile command if drift exists, using the resolved scanner path from Step 1
 
 If the user asks for the full report, point them to the local report path the scanner prints or to the state/report directory for that environment.
 

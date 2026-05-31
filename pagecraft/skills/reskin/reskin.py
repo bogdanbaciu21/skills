@@ -41,6 +41,71 @@ DEFAULT_STRIP = [
 DEFAULT_MARKER = 'class="brand-nav"'   # presence => already framed (idempotency)
 
 
+class ManifestError(ValueError):
+    """Raised when reskin.json is present but does not satisfy the contract."""
+
+
+def _is_tbu(value):
+    return isinstance(value, str) and value.strip().upper().startswith("TBU")
+
+
+def _string_errors(obj, key, label, *, required=False, allow_empty=False):
+    value = obj.get(key)
+    if value is None:
+        return [f"{label} is required"] if required else []
+    if not isinstance(value, str) or (not allow_empty and not value.strip()) or _is_tbu(value):
+        return [f"{label} must be a filled-in string"]
+    return []
+
+
+def validate_manifest(m):
+    """Validate the reskin.json contract before apply-time file operations."""
+    errors = []
+    if not isinstance(m, dict):
+        raise ManifestError("manifest must be a JSON object")
+
+    ds = m.get("design_system")
+    if not isinstance(ds, dict):
+        errors.append("design_system is required and must be an object")
+        ds = {}
+
+    errors.extend(_string_errors(ds, "source", "design_system.source", required=True))
+    for key in ("tokens_css", "assets", "frame"):
+        errors.extend(_string_errors(ds, key, f"design_system.{key}"))
+
+    apply_command = m.get("apply_command")
+    if apply_command is not None:
+        errors.extend(_string_errors(m, "apply_command", "apply_command"))
+    if not apply_command and not ds.get("frame"):
+        errors.append("manifest must define apply_command or design_system.frame")
+
+    errors.extend(_string_errors(m, "served_root", "served_root", required=True))
+    errors.extend(_string_errors(m, "assets_target", "assets_target", required=True))
+    errors.extend(_string_errors(m, "framed_marker", "framed_marker"))
+
+    pages = m.get("pages")
+    if pages is not None:
+        if not isinstance(pages, list):
+            errors.append("pages must be a list")
+        else:
+            for i, page in enumerate(pages):
+                if not isinstance(page, dict):
+                    errors.append(f"pages[{i}] must be an object")
+                    continue
+                errors.extend(_string_errors(page, "path", f"pages[{i}].path", required=True))
+                for key in ("eyebrow", "headline_pre", "headline_em", "subhead", "page_label"):
+                    errors.extend(_string_errors(page, key, f"pages[{i}].{key}", allow_empty=True))
+
+    strip_patterns = m.get("strip_patterns")
+    if strip_patterns is not None:
+        if not isinstance(strip_patterns, list) or not all(isinstance(p, str) and p for p in strip_patterns):
+            errors.append("strip_patterns must be a list of non-empty strings")
+
+    if errors:
+        raise ManifestError("; ".join(errors))
+    return m
+
+
 def _src_base(repo, ds):
     """Absolute dir that design-system relative paths resolve against."""
     s = ds.get("source")
@@ -105,7 +170,10 @@ def has_design_system(f):
 
 def load_manifest(repo):
     mf = os.path.join(repo, "reskin.json")
-    return json.load(open(mf)) if os.path.isfile(mf) else None
+    if not os.path.isfile(mf):
+        return None
+    with open(mf, encoding="utf-8") as f:
+        return json.load(f)
 
 
 def scaffold(f):
@@ -144,15 +212,22 @@ def generic_frame(repo, m, page, dry):
     if not frame_dir:
         return ("ERR", "no design_system.frame templates and no apply_command — nothing to inject")
     fdir = frame_dir if os.path.isabs(frame_dir) else os.path.join(_src_base(repo, ds), frame_dir)
-    parts = {n: (open(os.path.join(fdir, n + ".html")).read() if os.path.isfile(os.path.join(fdir, n + ".html")) else "")
-             for n in ("nav", "hero", "footer")}
+    parts = {}
+    for n in ("nav", "hero", "footer"):
+        part_path = os.path.join(fdir, n + ".html")
+        if os.path.isfile(part_path):
+            with open(part_path, encoding="utf-8") as f:
+                parts[n] = f.read()
+        else:
+            parts[n] = ""
     if not parts["nav"] and not parts["hero"]:
         return ("ERR", f"{frame_dir} has no nav.html / hero.html")
 
     path = os.path.join(repo, page["path"])
     if not os.path.isfile(path):
         return ("ERR", "page not found")
-    s = open(path).read()
+    with open(path, encoding="utf-8") as f:
+        s = f.read()
     if m.get("framed_marker", DEFAULT_MARKER) in s:
         return ("SKIP", "already framed")
     bm = re.search(r"(<body[^>]*>)", s)
@@ -167,7 +242,8 @@ def generic_frame(repo, m, page, dry):
     if parts["footer"]:
         body = re.sub(r"</body>", "\n" + _render(parts["footer"], page) + "\n\n</body>", body, count=1)
     if not dry:
-        open(path, "w").write(s[:cut] + body)
+        with open(path, "w", encoding="utf-8") as f:
+            f.write(s[:cut] + body)
     return ("FRAMED", "")
 
 
@@ -232,7 +308,8 @@ def cmd_init(repo, _a):
     f = detect(repo)
     if not has_design_system(f):
         print("No design system detected; nothing to scaffold."); return 1
-    open(os.path.join(repo, "reskin.json"), "w").write(json.dumps(scaffold(f), indent=2) + "\n")
+    with open(os.path.join(repo, "reskin.json"), "w", encoding="utf-8") as f:
+        f.write(json.dumps(scaffold(f), indent=2) + "\n")
     print("Wrote reskin.json (starter). Fill in served_root, assets_target, and pages[], then `reskin apply --dry-run`.")
     return 0
 
@@ -241,6 +318,11 @@ def cmd_apply(repo, a):
     m = load_manifest(repo)
     if not m:
         print("No reskin.json — run `reskin detect` then `reskin init`."); return 1
+    try:
+        validate_manifest(m)
+    except ManifestError as e:
+        print(f"Invalid reskin.json: {e}")
+        return 1
     bespoke = bool(m.get("apply_command"))
     pages = m.get("pages", [])
     if a.page:

@@ -27,7 +27,7 @@
       "reason": "Implicit cross-session continuity request."
     },
     {
-      "prompt": "Wrap up — what should the next Claude know to pick this up?",
+      "prompt": "Wrap up — what should the next agent know to pick this up?",
       "reason": "Forward-looking summary for next agent."
     },
     {
@@ -66,7 +66,7 @@
     "Block contains a `## Session Handoff — <title>` heading.",
     "Block contains a `### What's Left` checklist with unchecked items, OR omits the section if nothing remains.",
     "Block contains a `### Suggested Starting Point` section when there is a clear next action, file, command, skill, or tool.",
-    "If `/tmp/.claude-session-issue-number` exists, the block contains a `### GitHub Issue` section with the issue number and URL.",
+    "If a known session issue metadata source exists, such as `/tmp/.agent-session-issue-number`, `/tmp/.claude-session-issue-number`, or an explicit issue reference in the conversation, the block contains a `### GitHub Issue` section with the issue number and URL when available.",
     "Empty sections are omitted rather than rendered as 'None'.",
     "File paths in `### Files Changed` come from `git diff --stat`, not invented from memory.",
     "Output includes a `### Environment & Transfer Notes` section with current environment, current working directory, saved artifact path or save failure reason, and a cross-environment portability note.",

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Verify Text Wrap"
+  short_description: "Deterministic and browser validation for static HTML wrapping"
+  default_prompt: "Use $verify-text-wrap to run the deterministic keystone guard and browser validation across responsive viewports, then report any new text-wrap, right-edge, overflow, typography, or operational findings."
