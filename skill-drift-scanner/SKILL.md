@@ -25,7 +25,9 @@ Typical install layout:
 - source skills repo clone or mirror
 - optional local overlay skills
 - Codex user skills at `~/.codex/skills`
+- agent-compatible user skills at `~/.agents/skills`
 - Claude user skills at `~/.claude/skills`
+- repo-local project skill pairs at `.claude/skills` and `.agents/skills`
 - state and reports under a local state directory
 
 It checks:
@@ -33,8 +35,9 @@ It checks:
 1. Missing installed skills
 2. Content drift between source and installed copies
 3. Unmanaged custom skills in either install root
-4. Scheduler health for sync/report timers
-5. Whether the last sync changed skill content, which implies Codex may need restart while Claude may only need reload or a fresh skill scan
+4. Repo-local project skills that exist for Claude but not Codex-compatible agents, or the reverse
+5. Scheduler health for sync/report timers
+6. Whether the last sync changed skill content, which implies Codex may need restart while Claude may only need reload or a fresh skill scan
 
 ## Workflow
 
@@ -72,6 +75,7 @@ Use this when the user wants the machine brought back to source of truth, not ju
 - **Missing Installed Skills** means the source repo has a skill that an install root does not.
 - **Content Drift** means the skill exists in both places but file content differs.
 - **Unmanaged Custom Skills** means there are extra custom skills under an install root that the autosync subsystem does not own.
+- **Project Skill Parity** means each real repo's `.claude/skills/<name>` and `.agents/skills/<name>` copies are paired. Missing one side can be reconciled automatically; same-name content conflicts are reported for manual review.
 - **Codex restart recommended after last change: yes** means a background sync changed installed content and open Codex sessions may still have stale skill state.
 - Claude can hot-reload in some setups, but do not claim reload success unless verified on the installed Claude version.
 
@@ -81,7 +85,8 @@ Return:
 
 1. The top-line status in one sentence
 2. The highest-signal per-tool sections from the report
-3. The exact reconcile command if drift exists, using the resolved scanner path from Step 1
+3. The Project Skill Parity section if it reports any missing or drifted repo-local skills
+4. The exact reconcile command if drift exists, using the resolved scanner path from Step 1
 
 If the user asks for the full report, point them to the local report path the scanner prints or to the state/report directory for that environment.
 
