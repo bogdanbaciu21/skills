@@ -1,6 +1,6 @@
 ---
 name: handoff
-description: Summarize the current session's work into a structured handoff block and a saved markdown artifact that a fresh Claude Code chat or other coding-agent session can execute on. Use whenever the user says "handoff", "hand off", "pass to next session", "wrap up for handoff", "session summary for next chat", "continue in new chat", or anything about transferring context to a new conversation or environment. Also use when the user is about to end a session with unfinished work. Includes the GitHub issue reference if one exists. Do NOT use for PR descriptions, commit messages, or release notes — those summarize code changes for reviewers, not session state for the next agent. Do NOT use to dispatch parallel agents — that's `parallel-dispatch`.
+description: Summarize the current session's work into a structured handoff block and a saved markdown artifact that a fresh coding-agent session can execute on, including Codex, Claude Code, a VPS shell, or another local environment. Use whenever the user says "handoff", "hand off", "pass to next session", "wrap up for handoff", "session summary for next chat", "continue in new chat", or anything about transferring context to a new conversation or environment. Also use when the user is about to end a session with unfinished work. Includes the GitHub issue reference if one exists. Do NOT use for PR descriptions, commit messages, or release notes — those summarize code changes for reviewers, not session state for the next agent. Do NOT use to dispatch parallel agents — that's `parallel-dispatch`.
 argument-hint: "What should the next session do with this handoff? Mention the target environment if known: Codex, Claude, VPS, local shell, etc."
 ---
 
@@ -15,16 +15,16 @@ The goal is zero context loss between sessions and environments — the next cha
 
 ## Why this matters
 
-Claude Code sessions are stateless — each new chat starts fresh. CLAUDE.md and memory provide project-level context, but session-specific state (what you just tried, what failed, what decisions were made, what's half-done) is lost. A good handoff captures exactly that session-specific context.
+Coding-agent sessions are usually stateless across chats, tools, machines, and hosts. Project instructions and memory may provide durable context, but session-specific state (what you just tried, what failed, what decisions were made, what's half-done) is easily lost. A good handoff captures exactly that session-specific context in a form that works for Codex, Claude Code, local shells, and remote environments.
 
 ## Workflow
 
 ### Step 1 — Gather session context
 
-Collect these automatically (don't ask the user for them):
+Collect these automatically when available (don't ask the user for them):
 
-1. **GitHub issue**: Read `/tmp/.claude-session-issue-number`. If it exists, fetch the issue title and URL via `gh issue view <number> --json title,url`.
-2. **Git diff since session start**: Read `/tmp/.claude-session-start-commit`. If it exists, run `git log --oneline <start-commit>..HEAD` and `git diff --stat <start-commit>..HEAD` to see what changed.
+1. **GitHub issue**: Check known session metadata sources such as `/tmp/.agent-session-issue-number`, `/tmp/.claude-session-issue-number`, or an explicit issue reference in the conversation. If a number exists and `gh` is available, fetch the issue title and URL via `gh issue view <number> --json title,url`.
+2. **Git diff since session start**: Check known session metadata sources such as `/tmp/.agent-session-start-commit`, `/tmp/.claude-session-start-commit`, or an explicit start commit in the conversation. If a start commit exists, run `git log --oneline <start-commit>..HEAD` and `git diff --stat <start-commit>..HEAD` to see what changed.
 3. **Working tree state**: Run `git status --short` to catch uncommitted work.
 4. **Conversation review**: Review the full conversation history to extract:
    - The original task/request
@@ -50,7 +50,7 @@ Save the handoff as markdown when filesystem writes are available. Prefer locati
 
 1. **Repo-local durable path**: `<repo-root>/.agent-handoffs/YYYYMMDD-HHMMSS-brief-slug.md`
    - Use this when working in a repo or project folder.
-   - This is the safest path for switching between Codex and Claude on the same machine or when the workspace is synced.
+   - This is the safest path for switching between agent sessions on the same machine or when the workspace is synced.
 2. **Workspace-local durable path**: `<cwd>/.agent-handoffs/YYYYMMDD-HHMMSS-brief-slug.md`
    - Use this when there is no git repo but the working directory is meaningful.
 3. **OS temp fallback**: `${TMPDIR:-/tmp}/agent-handoffs/YYYYMMDD-HHMMSS-brief-slug.md`
@@ -116,7 +116,7 @@ Output the handoff inside a fenced code block so the user can copy it in one cli
 - **Include file paths and line numbers** where relevant so the next session can jump straight to the code.
 - **Include the exact error messages** if the session ended with a failing test or unresolved bug.
 - **Don't pad.** If a section is empty (e.g., no gotchas), omit it entirely rather than writing "None."
-- **The "What's Left" section is the most important part.** The next session's first action will be to read this list and start executing. Make it actionable — each item should be something Claude can do without further clarification.
+- **The "What's Left" section is the most important part.** The next session's first action will be to read this list and start executing. Make it actionable — each item should be something the next agent can do without further clarification.
 - **Include the GitHub issue** so the next session can pick it up rather than creating a duplicate tracking issue.
 - **Do not treat temp files as portable.** If the handoff is saved outside the repo/workspace, the final response must say that the chat block is the reliable cross-environment copy.
 - **Do not commit handoff artifacts by default.** If the user wants the saved file to travel through git, confirm it is sanitized first or state that the chat block is safer.

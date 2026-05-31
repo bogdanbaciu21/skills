@@ -25,17 +25,10 @@ import sys
 import threading
 import time
 
-try:
-    from playwright.sync_api import sync_playwright
-except ImportError:
-    print("[verify-text-wrap] playwright not installed. Run: pip install pytest-playwright && python3 -m playwright install chromium", file=sys.stderr)
-    sys.exit(2)
-
-# Optional Browserbase preference for --deployed mode
-try:
-    from browserbase import use_browserbase_if_available
-except ImportError:
-    use_browserbase_if_available = lambda *a, **kw: None
+PLAYWRIGHT_INSTALL_HINT = (
+    "[verify-text-wrap] playwright not installed. Run: "
+    "pip install pytest-playwright && python3 -m playwright install chromium"
+)
 
 # Default location of the wrap-safe probe. Prefer the local file bundled in this
 # skill so edits take effect immediately against deployed pages. Fall back to the
@@ -55,6 +48,27 @@ DEFAULT_VIEWPORTS = [
 
 # Right-edge spread that's just inline-box variance vs. a real cap mismatch.
 RIGHT_EDGE_TOLERANCE_PX = 24
+
+
+def _sync_playwright():
+    """Import Playwright only when a browser-backed validation actually runs."""
+    try:
+        from playwright.sync_api import sync_playwright
+    except ImportError:
+        print(PLAYWRIGHT_INSTALL_HINT, file=sys.stderr)
+        sys.exit(2)
+    return sync_playwright()
+
+
+def _use_browserbase_if_available():
+    """Import optional Browserbase support only for deployed validation."""
+    if not os.environ.get("BROWSERBASE_API_KEY"):
+        return None
+    try:
+        from browserbase import use_browserbase_if_available
+    except ImportError:
+        return None
+    return use_browserbase_if_available()
 
 
 # --------------------------------------------------------------- right-edge probe
@@ -319,7 +333,7 @@ def run_local(args):
     print(f"\n[verify-text-wrap] local mode · portal={portal} · pages={len(pages)} · viewports={_viewport_summary(viewports)}", flush=True)
     print(f"[verify-text-wrap] wrapcheck={wrapcheck_source}", flush=True)
 
-    with local_server(portal) as base_url, sync_playwright() as pw:
+    with local_server(portal) as base_url, _sync_playwright() as pw:
         browser = pw.chromium.launch()
         reports = []
         for viewport in viewports:
@@ -350,9 +364,9 @@ def run_deployed(args):
     print(f"[verify-text-wrap] wrapcheck={wrapcheck_source}", flush=True)
 
     # If Browserbase is wired up, prefer it; otherwise fall back to local Playwright.
-    bb_ctx = use_browserbase_if_available()
+    bb_ctx = _use_browserbase_if_available()
 
-    with sync_playwright() as pw:
+    with _sync_playwright() as pw:
         browser = pw.chromium.launch()
         reports = []
         for viewport in viewports:

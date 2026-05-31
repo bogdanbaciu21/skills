@@ -93,6 +93,12 @@ Writes `model-formatted.xlsx` by default; pass `--in-place` to overwrite. The
 exact codes live in `formats.json` — use it directly from any tool so nothing is
 re-transcribed (a stray `_` or `;` breaks an Excel format).
 
+Verify the workbook round trip with:
+
+```bash
+python3 evals/workbook_fixture_eval.py
+```
+
 ---
 
 ## The same standard, on the web

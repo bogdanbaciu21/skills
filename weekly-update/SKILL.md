@@ -1,6 +1,6 @@
 ---
 name: weekly-update
-description: Draft a weekly stakeholder update for any software project. Use when the user asks for a weekly update, Friday email, status report, sprint summary, or stakeholder progress report. Pulls commits and closed issues automatically from git and the project's issue tracker (GitHub Issues by default; tested with Linear, theoretically supports Jira), asks a short set of clarifying questions, and produces a draft markdown file in docs/weekly-updates/. Optionally renders an HTML email using a brand template if one is configured.
+description: Draft a weekly stakeholder update for any software project. Use when the user asks for a weekly update, Friday email, status report, sprint summary, or stakeholder progress report. Pulls commits from git and issue counts from the project's tracker (GitHub Issues by default; Linear or Jira when an MCP server, API token, or CLI is available), asks a short set of clarifying questions, and produces a draft markdown file in docs/weekly-updates/. Optionally renders an HTML email using a brand template if one is configured.
 ---
 
 # Weekly Update
@@ -50,7 +50,7 @@ Weeks are numbered sequentially from the start of the project. Default week-end 
 
 ### Step 2 — Pull Data Automatically
 
-Before asking anything, run the queries below and cache the results. Commit and line-change stats come from `git` regardless of issue tracker. Issue counts come from whichever tracker the project uses — the rest of the workflow is tracker-agnostic as long as you can answer "what closed this week?" and "what's the all-time open/closed split by milestone?"
+Before asking anything, run the queries below and cache the results. Commit and line-change stats come from `git` regardless of issue tracker. Issue counts come from whichever tracker the project uses. The rest of the workflow is tracker-agnostic as long as you can answer "what closed this week?" and "what's the all-time open/closed split by milestone, project, cycle, epic, or sprint?"
 
 #### Git (always)
 
@@ -79,29 +79,59 @@ gh issue list --state all --limit 2000 \
   --json number,state,milestone
 ```
 
-#### Linear (tested alternative)
+#### Linear (supported tracker)
 
-The same workflow runs against Linear: GitHub milestones map to Linear **projects** (long-lived workstreams) or **cycles** (sprint-shaped). Verified working in production.
+Use Linear when the project manages work there. Map GitHub milestones to Linear **projects** for long-lived workstreams or **cycles** for sprint-shaped reporting. Prefer the Linear MCP server if available; otherwise use the Linear GraphQL API, a local Linear CLI wrapper, or a CSV export with the fields below.
 
-```bash
-# Closed issues this week
-[your Linear closed-this-week query — fill in before pushing]
+Required data contract:
 
-# All-time issues by project/cycle
-[your Linear all-time query — fill in before pushing]
+| Dataset | Filter | Required fields | Grouping |
+|---|---|---|---|
+| Closed this week | `completedAt >= <last week-end YYYY-MM-DD 00:00>` | `identifier`, `title`, `completedAt`, `state.name`, `state.type`, `project.name`, `cycle.name` | `project.name`, then `cycle.name`, then `No project/cycle` |
+| All-time progress | Same team/project/cycle scope, no date filter | `identifier`, `state.name`, `state.type`, `project.name`, `project.targetDate`, `cycle.name`, `cycle.endsAt` | Same grouping as above |
+
+MCP flow:
+
+```text
+1. Inspect the available Linear tool schema.
+2. Fetch completed issues with the same project/team/cycle scope and completedAt on or after the start date.
+3. Fetch all issues in the same scope with no date filter.
+4. Paginate until exhausted; do not assume the first page is complete.
 ```
 
-If the project uses the Linear MCP server rather than the CLI, the equivalent calls are `list_issues` with a `completedAt`/`canceledAt` date filter and a project or cycle scope. Substitute the MCP call signature your harness exposes.
+GraphQL shape when no MCP tool exists:
 
-#### Jira (untested, theoretical)
+```graphql
+query WeeklyUpdateClosedIssues($teamId: ID!, $since: DateTime!, $after: String) {
+  issues(
+    first: 250
+    after: $after
+    filter: { team: { id: { eq: $teamId } }, completedAt: { gte: $since } }
+  ) {
+    nodes {
+      identifier
+      title
+      completedAt
+      state { name type }
+      project { name targetDate }
+      cycle { name endsAt }
+    }
+    pageInfo { hasNextPage endCursor }
+  }
+}
+```
 
-The same shape should work against Jira via JQL — substitute `jira` (the Atlassian CLI) or the Atlassian MCP server. **Untested in production.** Validate the closed-this-week query against a known week before relying on the numbers.
+For all-time progress, run the same query shape without the `completedAt` filter. Count `state.type = completed` as closed and active/backlog states as open. Do not blend canceled work into closed progress unless the stakeholder explicitly wants canceled scope reported as removed; if it matters, add a separate `Canceled` note below the table.
+
+#### Jira (best-effort via JQL)
+
+The same shape works against Jira when the session has the Atlassian MCP server, `jira` CLI, or another JQL-capable client. Validate the closed-this-week query against the Jira UI before relying on the numbers.
 
 ```bash
-# Closed issues this week — via JQL (untested)
+# Closed issues this week — via JQL
 jira issue list --jql "resolved >= -7d AND statusCategory = Done" --limit 500
 
-# All-time issues by epic/sprint — via JQL (untested)
+# All-time issues by epic/sprint — via JQL
 jira issue list --jql "project = <KEY>" --limit 2000
 ```
 
