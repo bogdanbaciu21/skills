@@ -16,6 +16,7 @@ skill_dir=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
 vtw_dir=$(CDPATH= cd -- "$skill_dir/../verify-text-wrap" && pwd)
 target=${1:-$(pwd)}
 static_root=${2:-"$target"}
+pagecraft_version=$(git -C "$skill_dir" rev-parse --short HEAD 2>/dev/null || printf '%s' "0.1.0")
 
 mkdir -p "$target/scripts" "$target/tests/pagecraft" "$target/assets/css"
 
@@ -45,9 +46,34 @@ if [ ! -f "$target/tests/pagecraft/wrap-known-issues.json" ]; then
   printf '%s\n' '{"known":[]}' > "$target/tests/pagecraft/wrap-known-issues.json"
 fi
 
+cat > "$target/tests/pagecraft/pagecraft-install.json" <<JSON
+{
+  "pagecraft_version": "$pagecraft_version",
+  "version_source": "git-commit-or-local-fallback",
+  "installed_assets": [
+    "assets/css/pagecraft.css",
+    "assets/css/wrap-safe.css",
+    "assets/wrapcheck.js",
+    "scripts/wrapcheck.js",
+    "scripts/check-keystone.py",
+    "scripts/runner.py",
+    "scripts/browserbase.py"
+  ],
+  "self_test": "python3 scripts/check-keystone.py --css assets/css/pagecraft.css --quiet"
+}
+JSON
+
+echo "Running Pagecraft install self-test..."
+if command -v python3 >/dev/null 2>&1; then
+  (cd "$target" && python3 scripts/check-keystone.py --css assets/css/pagecraft.css --quiet)
+else
+  echo "  ! python3 not found; skipping check-keystone self-test" >&2
+fi
+
 cat <<MSG
 Pagecraft bundle installed into: $target
 
+  Manifest       tests/pagecraft/pagecraft-install.json
   CSS            assets/css/pagecraft.css   — add to the app's HTML/CSS entrypoint
   Keystone guard python3 scripts/check-keystone.py --portal "$static_root"
                  (deterministic, no browser — wire into pre-commit + CI)

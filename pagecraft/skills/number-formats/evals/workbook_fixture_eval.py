@@ -51,6 +51,8 @@ def run_help_without_site_packages():
         print(result.stdout, end="")
         print(result.stderr, end="", file=sys.stderr)
         sys.exit("formatter --help should not require openpyxl/site packages")
+    if "--profile" not in result.stdout or "--used-range-format" not in result.stdout:
+        sys.exit("formatter --help should expose whole-sheet helpers")
 
 
 def build_fixture(path):
@@ -90,6 +92,19 @@ def main():
         workbook = Path(tmp) / "number-format-fixture.xlsx"
         build_fixture(workbook)
 
+        used_range_workbook = Path(tmp) / "used-range-fixture.xlsx"
+        build_fixture(used_range_workbook)
+        run_formatter(used_range_workbook, "--sheet", "Model", "--used-range-format", "number")
+        used_range = openpyxl.load_workbook(used_range_workbook, data_only=False)["Model"]
+        used_range_errors = []
+        for address in ("B2", "C2", "D2", "B7", "B8", "B9"):
+            expect(used_range_errors, f"{address} used-range format", used_range[address].number_format, number_formats["number"])
+        if used_range_errors:
+            print("number-formats used-range CLI eval failed:", file=sys.stderr)
+            for error in used_range_errors:
+                print(f"- {error}", file=sys.stderr)
+            sys.exit(1)
+
         run_formatter(workbook, "--range", "Model!B2:D2", "--format", "number")
         run_formatter(workbook, "--range", "Model!B3:D3", "--format", "percent")
         run_formatter(workbook, "--range", "Model!B4:D4", "--format", "multiple")
@@ -119,6 +134,10 @@ def main():
         expect(errors, "total style bold", ws["B10"].font.bold, True)
         expect(errors, "margin style italic", ws["B11"].font.italic, True)
         expect(errors, "margin style color", font_rgb(ws["B11"]), rows["margin"]["font_argb"])
+
+        run_formatter(workbook, "--sheet", "Model", "--profile", "operating-model")
+        profiled = openpyxl.load_workbook(workbook, data_only=False)["Model"]
+        expect(errors, "profile keeps numeric format", profiled["B2"].number_format, number_formats["number"])
 
         if errors:
             print("number-formats workbook eval failed:", file=sys.stderr)

@@ -132,6 +132,8 @@ Use this checklist before publishing a skill:
 | `grill-me` | Ready | Runs a one-question-at-a-time pressure-test interview for plans/decisions. |
 | `parallel-dispatch` | Ready | Generates multi-agent prompts and coordinator playbook from a parallel work plan. |
 | `quiz-me` | Ready | Active-recall quiz on a topic, doc, codebase area, or interview prep — one question at a time, adaptive difficulty. |
+| `chat-analysis` | Ready | Analyzes Codex or Claude Code session transcripts for friction patterns, redacts sensitive text, and proposes reviewed agent-instruction improvements. |
+| `weekly-update` | Ready | Drafts evidence-driven stakeholder updates from git plus issue-tracker data, with GitHub, Linear, and Jira data contracts. |
 | `pagecraft` | Ready | Multi-skill **plugin bundle** for HTML formatting + visual safety. Contains the four skills below; `pagecraft/skills/pagecraft` is the overview + installer. |
 | `pagecraft » verify-text-wrap` | Ready | Verifies static HTML portals for caterpillar text, narrow containers, and right-edge layout drift. Canonical home of the `wrap-safe` runtime library (`wrap-safe.css` reset + `wrapcheck.js` probe) it drives. |
 | `pagecraft » table-system-migration` | Ready | Audits, migrates, and regression-tests messy HTML table systems with a public-safe scrub gate. |
@@ -139,8 +141,9 @@ Use this checklist before publishing a skill:
 | `pagecraft » reskin` | Ready | Detects a repo's design system (a `*-design`/`*-brand` skill, tokens stylesheet, or `reskin.json`) and applies its brand frame (nav/hero/footer + tokens + assets) across the site. Hybrid: runs the repo's bespoke applier if present, else a built-in frame injector. Idempotent + dry-run-able. |
 | `skill-drift-scanner` | Ready | Audits Codex and Claude skill deployment drift, autosync health, scheduler status, and reload requirements across machine-level skill installs. |
 | `excel-wow` | Draft | Placeholder for a future Excel/financial-modeling workflow skill. |
-| `blog-image-gen` | Ready | Generates editorial hero images for blog posts via OpenAI `gpt-image-2` (Responses API + thinking), with batch/ingest workflows. |
+| `blog-image-gen` | Ready | Generates editorial hero images for blog posts through the blog repo's OpenAI image scripts, with current-doc verification, batch/ingest workflows, and thumbnail review. |
 | `bogdan-baciu-design` | Ready | Applies Bogdan Baciu's personal editorial design system to sites, prototypes, documents, slide decks, and scoped financial artifacts, bundling tokens, fonts, imagery, previews, and the brand reference. |
+| `deep-research-agents` | Ready | Treats Claude Managed Agent, Gemini Deep Research, and Parallel.ai as one deep-research capability with repo-specific harness guidance. |
 
 ---
 

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Blog Image Generation"
+  short_description: "Generate, ingest, and review editorial blog hero images."
+  default_prompt: "Use $blog-image-gen to list missing blog hero images, verify current OpenAI image docs, run dry-run prompt extraction, generate or ingest images, and review thumbnails before batching."

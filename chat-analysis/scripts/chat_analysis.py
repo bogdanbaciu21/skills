@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """
-Claude chat transcript analyzer — recursive self-improvement pipeline.
+Coding-agent transcript analyzer — recursive self-improvement pipeline.
 
 Four-stage pipeline:
-  1. Parse   — read JSONL session files from ~/.claude/projects/<project>/
+  1. Parse   — read JSONL session files from Claude or Codex transcript roots
   2. Filter  — regex pre-filter, drop sessions with no friction signals
   3. Label   — send survivors to Sonnet with strict JSON schema
   4. Compile — aggregate into top failure modes, high-cost patterns, rule candidates
@@ -11,7 +11,8 @@ Four-stage pipeline:
 Usage:
     python3 scripts/chat_analysis.py                      # current project, last 50
     python3 scripts/chat_analysis.py --n 100              # last 100 sessions
-    python3 scripts/chat_analysis.py --all                # every project under ~/.claude/projects/
+    python3 scripts/chat_analysis.py --source codex       # current Codex project sessions
+    python3 scripts/chat_analysis.py --all                # every project/session root for the source
     python3 scripts/chat_analysis.py --dry-run            # filter only, no API calls
     python3 scripts/chat_analysis.py --output review.md   # custom output path
     python3 scripts/chat_analysis.py --project /path/to/project
@@ -38,9 +39,13 @@ from typing import Any
 
 ROOT = Path(__file__).resolve().parent.parent
 CLAUDE_PROJECTS = Path.home() / ".claude" / "projects"
+CODEX_SESSION_ROOTS = [
+    Path.home() / ".codex" / "sessions",
+    Path.home() / ".codex" / "archived_sessions",
+]
 DEFAULT_N = 50
 DEFAULT_OUTPUT = "chat-analysis-review.md"
-DEFAULT_MODEL = "claude-sonnet-4-6"
+DEFAULT_MODEL = os.environ.get("CHAT_ANALYSIS_MODEL", "claude-sonnet-4-6")
 SLEEP_BETWEEN_CALLS = 1.0  # seconds between API calls
 
 # ---------------------------------------------------------------------------
@@ -112,7 +117,7 @@ LABEL_SCHEMA = """\
 }"""
 
 LABEL_PROMPT = """\
-You are analyzing a Claude Code session transcript for failure patterns and friction signals.
+You are analyzing a coding-agent session transcript for failure patterns and friction signals.
 
 Your job: produce a structured JSON label for this session so it can be aggregated
 across hundreds of sessions to identify systemic improvement opportunities.
@@ -135,8 +140,11 @@ Respond with a single JSON object only. No prose, no explanation, no code fences
 # Stage 1 — Parse
 # ---------------------------------------------------------------------------
 
-def detect_project_dir(cwd: Path) -> Path | None:
+def detect_project_dir(cwd: Path, source: str) -> Path | None:
     """Map a filesystem path to its ~/.claude/projects/<hashed> directory."""
+    if source == "codex":
+        roots = [p for p in CODEX_SESSION_ROOTS if p.exists()]
+        return roots[0] if roots else None
     if not CLAUDE_PROJECTS.exists():
         return None
     # Claude hashes the project path by replacing / with - (leading slash dropped)
@@ -150,7 +158,9 @@ def detect_project_dir(cwd: Path) -> Path | None:
     return None
 
 
-def list_project_dirs() -> list[Path]:
+def list_project_dirs(source: str) -> list[Path]:
+    if source == "codex":
+        return [p for p in CODEX_SESSION_ROOTS if p.exists()]
     if not CLAUDE_PROJECTS.exists():
         return []
     return sorted(p for p in CLAUDE_PROJECTS.iterdir() if p.is_dir())
@@ -177,7 +187,7 @@ def extract_text(content: Any) -> str:
     return ""
 
 
-def parse_session(path: Path) -> dict:
+def parse_claude_session(path: Path) -> dict:
     """Parse a single .jsonl session file into a structured session dict."""
     turns: list[dict] = []
     first_ts = last_ts = None
@@ -232,6 +242,7 @@ def parse_session(path: Path) -> dict:
                 })
 
     return {
+        "source": "claude",
         "session_id": path.stem,
         "path": str(path),
         "first_ts": first_ts,
@@ -242,14 +253,93 @@ def parse_session(path: Path) -> dict:
     }
 
 
-def load_sessions(project_dir: Path, n: int) -> list[dict]:
+def extract_codex_message_text(content: Any) -> str:
+    """Pull text out of Codex response_item message content blocks."""
+    if isinstance(content, str):
+        return content
+    if not isinstance(content, list):
+        return ""
+    parts = []
+    for block in content:
+        if not isinstance(block, dict):
+            continue
+        for key in ("text", "input_text", "output_text"):
+            if block.get(key):
+                parts.append(str(block[key]))
+                break
+    return "\n".join(parts)
+
+
+def parse_codex_session(path: Path) -> dict:
+    """Parse a Codex rollout/session JSONL file into the shared session shape."""
+    turns: list[dict] = []
+    first_ts = last_ts = None
+    session_id = path.stem
+    cwd = None
+
+    for raw_line in path.read_text(errors="replace").splitlines():
+        raw_line = raw_line.strip()
+        if not raw_line:
+            continue
+        try:
+            obj = json.loads(raw_line)
+        except json.JSONDecodeError:
+            continue
+
+        ts_str = obj.get("timestamp")
+        if ts_str:
+            if first_ts is None:
+                first_ts = ts_str
+            last_ts = ts_str
+
+        if obj.get("type") == "session_meta":
+            payload = obj.get("payload", {})
+            session_id = payload.get("id") or session_id
+            cwd = payload.get("cwd") or cwd
+            continue
+
+        if obj.get("type") != "response_item":
+            continue
+        payload = obj.get("payload", {})
+        if payload.get("type") != "message":
+            continue
+
+        role = payload.get("role")
+        if role not in {"user", "assistant"}:
+            continue
+        text = extract_codex_message_text(payload.get("content", "")).strip()
+        if text:
+            turns.append({"role": role, "text": text, "ts": ts_str})
+
+    return {
+        "source": "codex",
+        "session_id": session_id,
+        "path": str(path),
+        "cwd": cwd,
+        "first_ts": first_ts,
+        "last_ts": last_ts,
+        "turns": turns,
+        "user_turns": [t for t in turns if t["role"] == "user"],
+        "assistant_turns": [t for t in turns if t["role"] == "assistant"],
+    }
+
+
+def parse_session(path: Path, source: str) -> dict:
+    return parse_codex_session(path) if source == "codex" else parse_claude_session(path)
+
+
+def load_sessions(project_dir: Path, n: int, source: str, cwd_filter: Path | None = None) -> list[dict]:
     """Load the most recent N sessions from a project directory."""
     jsonl_files = sorted(project_dir.glob("*.jsonl"), key=lambda p: p.stat().st_mtime)
     selected = jsonl_files[-n:]
     sessions = []
     for p in selected:
         try:
-            s = parse_session(p)
+            s = parse_session(p, source)
+            if cwd_filter and source == "codex":
+                scwd = s.get("cwd")
+                if not scwd or Path(scwd).resolve() != cwd_filter.resolve():
+                    continue
             if s["turns"]:
                 sessions.append(s)
         except Exception as e:
@@ -429,7 +519,7 @@ def write_report(
         f"# Chat Analysis Review — {now}",
         "",
         "> **Review required.** This file was generated by `scripts/chat_analysis.py`.",
-        "> Accept, reject, or edit each proposed delta before touching `CLAUDE.md`.",
+        "> Accept, reject, or edit each proposed delta before touching agent instructions.",
         "",
         "---",
         "",
@@ -502,7 +592,7 @@ def write_report(
         cnt = ac.get(aw, 0)
         lines.append(f"| {aw} | {cnt} | {100*cnt//total_labeled}% |")
 
-    lines += ["", "---", "", "## Proposed CLAUDE.md Deltas", ""]
+    lines += ["", "---", "", "## Proposed Agent-Instruction Deltas", ""]
     lines.append(
         "> These are *candidates* based on the analysis above.\n"
         "> Each one needs a human decision: accept / reject / reword.\n"
@@ -515,7 +605,7 @@ def write_report(
             candidates.append(f"- [ ] **{rc}** ({cnt} sessions) — add or sharpen a rule targeting this failure mode.")
     for ap, cnt in agg["antipatterns"][:3]:
         if cnt >= 3:
-            candidates.append(f"- [ ] **{ap}** ({cnt} sessions) — add an anti-pattern rule to CLAUDE.md.")
+            candidates.append(f"- [ ] **{ap}** ({cnt} sessions) — add an anti-pattern rule to the relevant agent instructions.")
     for rv, cnt in agg["rule_violations"][:3]:
         if cnt >= 2:
             candidates.append(f"- [ ] **{rv}** ({cnt} violations) — review whether the existing rule is clear enough or needs strengthening.")
@@ -563,10 +653,12 @@ def main() -> int:
         description=__doc__,
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
+    ap.add_argument("--source", choices=("claude", "codex"), default="claude",
+                    help="Transcript source to parse (default: claude)")
     ap.add_argument("--project", metavar="PATH",
-                    help="Path to the Claude project directory (auto-detected from CWD if omitted)")
+                    help="Path to a source-specific transcript directory (auto-detected from CWD if omitted)")
     ap.add_argument("--all", action="store_true",
-                    help="Analyze every project under ~/.claude/projects/")
+                    help="Analyze every project/session root for the selected source")
     ap.add_argument("--n", type=int, default=DEFAULT_N, metavar="N",
                     help=f"Last N sessions per project (default: {DEFAULT_N})")
     ap.add_argument("--output", metavar="FILE", default=DEFAULT_OUTPUT,
@@ -576,31 +668,34 @@ def main() -> int:
     ap.add_argument("--no-label", action="store_true",
                     help="Skip the LLM labeling step entirely. Produces a heuristic-only report with no data leaving the machine.")
     ap.add_argument("--model", default=DEFAULT_MODEL,
-                    help=f"Anthropic model for labeling (default: {DEFAULT_MODEL})")
+                    help=f"Anthropic model for labeling (default: CHAT_ANALYSIS_MODEL or {DEFAULT_MODEL})")
     args = ap.parse_args()
 
     # Resolve project dirs
     if args.all:
-        project_dirs = list_project_dirs()
+        project_dirs = list_project_dirs(args.source)
         if not project_dirs:
-            print(f"error: no project dirs found under {CLAUDE_PROJECTS}", file=sys.stderr)
+            print(f"error: no transcript dirs found for source={args.source}", file=sys.stderr)
             return 2
+        cwd_filter = None
     elif args.project:
         project_dirs = [Path(args.project)]
+        cwd_filter = None
     else:
-        detected = detect_project_dir(ROOT)
+        cwd = Path.cwd()
+        detected = detect_project_dir(cwd, args.source)
         if not detected:
             # Fallback: let user know
-            print("Could not auto-detect project dir. Specify --project or --all.", file=sys.stderr)
-            print(f"Expected something under {CLAUDE_PROJECTS}", file=sys.stderr)
+            print("Could not auto-detect transcript dir. Specify --project or --all.", file=sys.stderr)
             return 2
         project_dirs = [detected]
+        cwd_filter = cwd if args.source == "codex" else None
 
     # Load sessions
     all_sessions: list[dict] = []
     for pdir in project_dirs:
         print(f"Loading sessions from {pdir.name}…")
-        sessions = load_sessions(pdir, args.n)
+        sessions = load_sessions(pdir, args.n, args.source, cwd_filter=cwd_filter)
         print(f"  {len(sessions)} sessions loaded")
         all_sessions.extend(sessions)
 

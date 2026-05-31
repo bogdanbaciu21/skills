@@ -22,6 +22,8 @@ Examples:
   # Auto-color by provenance across a sheet (hardcoded number -> blue input;
   # cross-sheet formula -> green link; other formulas left as default ink):
   python3 apply-number-formats.py model.xlsx --sheet "Operating Model" --auto-color
+  python3 apply-number-formats.py model.xlsx --sheet "Operating Model" --used-range-format number
+  python3 apply-number-formats.py model.xlsx --sheet "Operating Model" --profile operating-model
 
 By default writes <file>-formatted.xlsx; pass --in-place to overwrite.
 """
@@ -58,6 +60,15 @@ def openpyxl_styles():
     return Font, PatternFill
 
 
+@lru_cache(maxsize=1)
+def openpyxl_utils():
+    try:
+        from openpyxl.utils import get_column_letter
+    except ImportError:
+        sys.exit("apply-number-formats.py needs openpyxl:  pip install openpyxl")
+    return get_column_letter
+
+
 def parse_ref(ref, default_sheet):
     if "!" in ref:
         sheet, rng = ref.split("!", 1)
@@ -88,6 +99,20 @@ def apply_format(ws, rng, key):
     for c in cells_in(ws, rng):
         c.number_format = NF[key]
         n += 1
+    return n
+
+
+def is_numeric_or_formula(value):
+    return isinstance(value, (int, float)) or (isinstance(value, str) and value.startswith("="))
+
+
+def apply_used_range_format(ws, key):
+    n = 0
+    for row in ws.iter_rows():
+        for c in row:
+            if is_numeric_or_formula(c.value):
+                c.number_format = NF[key]
+                n += 1
     return n
 
 
@@ -125,6 +150,31 @@ def auto_color(ws):
     return inputs, links
 
 
+def apply_profile(ws, profile):
+    if profile != "operating-model":
+        sys.exit(f"unknown --profile '{profile}' (supported: operating-model)")
+
+    formatted = apply_used_range_format(ws, "number")
+    inputs, links = auto_color(ws)
+    totals = margins = 0
+
+    for row in ws.iter_rows():
+        label = str(row[0].value or "").strip().lower()
+        populated = [c for c in row if c.value is not None]
+        if not populated:
+            continue
+        rng = f"{populated[0].coordinate}:{populated[-1].coordinate}"
+        if "margin" in label or label.endswith("%"):
+            for c in populated[1:]:
+                if is_numeric_or_formula(c.value):
+                    c.number_format = NF["percent"]
+            margins += apply_style(ws, rng, "margin")
+        if "total" in label or label in {"ebitda", "fcf", "free cash flow"}:
+            totals += apply_style(ws, rng, "total")
+
+    return formatted, inputs, links, totals, margins
+
+
 def main():
     ap = argparse.ArgumentParser(description="Apply the Macabacus number-format standard.")
     ap.add_argument("file")
@@ -133,6 +183,8 @@ def main():
     ap.add_argument("--style", help="input | hardcode | link | error | total | margin")
     ap.add_argument("--sheet", help="default sheet name (else the active sheet)")
     ap.add_argument("--auto-color", action="store_true", help="color cells by provenance")
+    ap.add_argument("--used-range-format", help="apply a number format to every numeric/formula cell on --sheet")
+    ap.add_argument("--profile", help="whole-sheet profile: operating-model")
     ap.add_argument("--in-place", action="store_true", help="overwrite the file instead of *-formatted.xlsx")
     args = ap.parse_args()
 
@@ -144,6 +196,19 @@ def main():
         ws = wb[default_sheet]
         i, l = auto_color(ws)
         did.append(f"auto-color '{ws.title}': {i} inputs -> blue, {l} cross-sheet links -> green")
+    if args.used_range_format:
+        key = FORMAT_ALIAS.get(args.used_range_format.lower())
+        if not key:
+            sys.exit(f"unknown --used-range-format '{args.used_range_format}'")
+        ws = wb[default_sheet]
+        did.append(f"used-range format {key}: '{ws.title}' ({apply_used_range_format(ws, key)} cells)")
+    if args.profile:
+        ws = wb[default_sheet]
+        formatted, inputs, links, totals, margins = apply_profile(ws, args.profile)
+        did.append(
+            f"profile {args.profile}: '{ws.title}' "
+            f"({formatted} formatted, {inputs} inputs, {links} links, {totals} total-style cells, {margins} margin-style cells)"
+        )
     if args.range and args.fmt:
         sheet, rng = parse_ref(args.range, default_sheet)
         key = FORMAT_ALIAS.get(args.fmt.lower())

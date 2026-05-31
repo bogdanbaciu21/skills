@@ -1,0 +1,4 @@
+interface:
+  display_name: "Skill Drift Scanner"
+  short_description: "Audit installed skill drift and sync health"
+  default_prompt: "Use $skill-drift-scanner to inspect whether local Codex and Claude skill installs are synced with the source skills repo, then report drift and the exact reconcile command."

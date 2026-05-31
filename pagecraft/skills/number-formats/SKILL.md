@@ -87,16 +87,25 @@ python3 apply-number-formats.py model.xlsx --range "Sheet1!F21:J21" --style marg
 # Auto-color by provenance across a sheet
 # (hardcoded number -> blue input; cross-sheet formula -> green link; other formulas left as-is):
 python3 apply-number-formats.py model.xlsx --sheet "Operating Model" --auto-color
+
+# Whole-sheet helpers:
+python3 apply-number-formats.py model.xlsx --sheet "Operating Model" --used-range-format number
+python3 apply-number-formats.py model.xlsx --sheet "Operating Model" --profile operating-model
 ```
 
 Writes `model-formatted.xlsx` by default; pass `--in-place` to overwrite. The
 exact codes live in `formats.json` — use it directly from any tool so nothing is
 re-transcribed (a stray `_` or `;` breaks an Excel format).
 
+For the `operating-model` profile's exact row and provenance rules, load
+`references/operating-model-profile.md`.
+
 Verify the workbook round trip with:
 
 ```bash
-python3 evals/workbook_fixture_eval.py
+PYTHONDONTWRITEBYTECODE=1 python3 evals/workbook_fixture_eval.py
+PYTHONDONTWRITEBYTECODE=1 python3 evals/html_fixture_eval.py
+PYTHONDONTWRITEBYTECODE=1 python3 evals/html_visual_fixture_eval.py
 ```
 
 ---
@@ -119,6 +128,8 @@ tr.tot td       { font-weight:700; }              /* bold totals */
 - Zero → render the literal `–` (en-dash), not `0`.
 - Negative → `(340.0)`, wrapped with `.aff-l`/`.aff-r` on positives to align.
 - `$` on the first row + total only; scale once in the caption.
+- Use `fixtures/html-table-parity.html` as the static proof fixture for web
+  parity with the Excel convention.
 
 ---
 

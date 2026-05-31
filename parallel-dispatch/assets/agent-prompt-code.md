@@ -1,4 +1,4 @@
-Read `CLAUDE.md` and `AGENTS.md` first — they contain hard rules you must follow. This is [Track Name] of a parallel workflow.
+Read the repo's agent instructions first (`AGENTS.md`, `CLAUDE.md`, or equivalent if present) — they contain hard rules you must follow. This is [Track Name] of a parallel workflow.
 
 Goal / evidence: [self-contained goal, failing tests/errors, expected behavior, and acceptance checks].
 

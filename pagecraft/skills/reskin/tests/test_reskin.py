@@ -3,6 +3,7 @@ import contextlib
 import io
 import json
 import shutil
+import sys
 import tempfile
 import unittest
 from pathlib import Path
@@ -57,6 +58,46 @@ class ApplyCommandTests(unittest.TestCase):
             self.assertEqual(1, rc)
             self.assertIn("Invalid reskin.json:", out.getvalue())
             self.assertIn("apply_command or design_system.frame", out.getvalue())
+
+    def test_cmd_validate_checks_manifest_and_referenced_files(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            repo = Path(tmp) / "generic-site"
+            shutil.copytree(FIXTURES / "generic-site", repo)
+            out = io.StringIO()
+
+            with contextlib.redirect_stdout(out):
+                rc = reskin.cmd_validate(str(repo), SimpleNamespace())
+
+            self.assertEqual(0, rc, out.getvalue())
+            self.assertIn("reskin.json valid", out.getvalue())
+
+    def test_bespoke_apply_command_does_not_use_a_shell(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            repo = Path(tmp)
+            page = repo / "index.html"
+            page.write_text("<body>ok</body>", encoding="utf-8")
+            apply_script = repo / "apply.py"
+            apply_script.write_text(
+                "from pathlib import Path\n"
+                "Path('applied.txt').write_text('ran', encoding='utf-8')\n",
+                encoding="utf-8",
+            )
+            manifest = {
+                "apply_command": f"{sys.executable} apply.py {{page}} ; touch injected.txt",
+            }
+
+            status, note = reskin.bespoke_frame(str(repo), manifest, {"path": "index.html"}, dry=False)
+
+            self.assertEqual("RAN", status, note)
+            self.assertTrue((repo / "applied.txt").is_file())
+            self.assertFalse((repo / "injected.txt").exists())
+
+    def test_screenshot_diff_fixture_declares_visual_contract(self):
+        fixture = load_json(FIXTURES / "screenshot-diff" / "expected-geometry.json")
+
+        self.assertGreaterEqual(len(fixture["viewports"]), 2)
+        self.assertEqual("brand-nav", fixture["selectors"][0]["name"])
+        self.assertLessEqual(fixture["max_delta_px"], 2)
 
 
 class GenericInjectorTests(unittest.TestCase):

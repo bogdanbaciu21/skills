@@ -560,6 +560,7 @@ def _emit(reports, args):
 def _write_json_report(path, reports):
     os.makedirs(os.path.dirname(os.path.abspath(path)), exist_ok=True)
     payload = {
+        "schema_version": 1,
         "ts": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
         "summary": {
             "checks": len(reports),
