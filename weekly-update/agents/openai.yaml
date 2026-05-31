@@ -1,0 +1,4 @@
+interface:
+  display_name: "Weekly Update"
+  short_description: "Draft evidence-driven stakeholder weekly updates."
+  default_prompt: "Use $weekly-update to pull git/tracker evidence, ask the four judgment questions, and draft a concise markdown stakeholder update."

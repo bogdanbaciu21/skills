@@ -20,6 +20,14 @@ and dense but readable financial exhibits.
 - Copy imagery, favicons, logos, previews, or UI kits from
   `assets/design-system/assets/`, `preview/`, and `ui_kits/` only when the
   artifact actually needs them.
+- Use `fixtures/brand-regression/*.html` as visual regression fixtures when
+  checking that the global brand and `.db-scope` financial-artifact styling
+  still render separately.
+- Use `fixtures/brand-regression/screenshot-contract.json` as the browser
+  screenshot checklist for those fixtures; it stays public-safe and stores
+  selectors/expectations instead of private screenshots.
+- Use `reskin.example.json` as the compatibility example when wiring this brand
+  into the `reskin` skill.
 
 ## Provenance
 
@@ -53,6 +61,10 @@ and dense but readable financial exhibits.
    check text wrapping, confirm assets load, and confirm `.db-scope` stays
    scoped. For decks/docs, inspect rendered output rather than trusting source
    formatting alone.
+8. Before final delivery, scan for unresolved `TBU` placeholders in the output
+   artifact. `TBU` is acceptable while drafting missing owner-authored copy; it
+   must be reported explicitly and should not remain in a final publishable file
+   unless the user approves the gap.
 
 ## Core rules
 
@@ -77,7 +89,21 @@ When applying this skill, report:
 - which source files/assets were used
 - any token, font, image, or icon substitutions
 - whether `.db-scope` was used
+- any unresolved `TBU` placeholders and why they remain
 - which checks were run or which rendered surfaces were inspected
+
+## Skill maintenance checks
+
+When editing packaged tokens, fixtures, or the reskin example, run:
+
+```bash
+PYTHONDONTWRITEBYTECODE=1 python3 scripts/check_token_integrity.py
+PYTHONDONTWRITEBYTECODE=1 python3 -m unittest tests/test_brand_fixtures.py
+```
+
+The token checker protects the core palette/type/font contract; the fixture test
+protects the public-safe screenshot contract and the `reskin.example.json`
+manifest shape.
 
 ## What this skill does not do
 

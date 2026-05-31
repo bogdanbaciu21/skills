@@ -101,6 +101,33 @@ python3 <skill-dir>/runner.py --local --portal portal \
   --json-report /tmp/verify-text-wrap-report.json
 ```
 
+The JSON report schema is versioned with `schema_version: 1`; downstream CI
+annotations should key off that field before assuming report shape.
+
+### CI examples
+
+Local static build gate:
+
+```yaml
+- name: Verify text wrap locally
+  run: |
+    python3 pagecraft/skills/verify-text-wrap/check-keystone.py --portal dist
+    python3 pagecraft/skills/verify-text-wrap/runner.py --local --portal dist \
+      --screenshot-dir '' \
+      --json-report /tmp/verify-text-wrap-local.json
+```
+
+Post-deploy smoke gate:
+
+```yaml
+- name: Verify deployed text wrap
+  run: |
+    python3 pagecraft/skills/verify-text-wrap/runner.py \
+      --deployed "$DEPLOY_URL" \
+      --screenshot-dir /tmp/verify-text-wrap \
+      --json-report /tmp/verify-text-wrap-deployed.json
+```
+
 If Browserbase MCP is configured (`BROWSERBASE_API_KEY` + `BROWSERBASE_PROJECT_ID` + an LLM provider key for Stagehand), deployed mode opens a Browserbase session in parallel as additional incremental check coverage. Falls back transparently to local Playwright if any Browserbase step fails. See `browserbase.py` for graceful-degradation details.
 
 ## The magician's divider check (right-edge alignment)
@@ -156,6 +183,14 @@ Exit code: 0 if all pages pass (or only known-issue matches), 1 if any new findi
 - Does NOT run during `pytest` unless the consuming repo wires it in — the consuming repo's own `tests/test_wrap.py` is the CI-time check. This skill is the interactive-and-post-deploy check.
 - Does NOT diagnose bugs unrelated to text wrap / container width (color contrast, JS errors, accessibility, etc.).
 - Does NOT bake in any project-specific URLs, gate keys, or passwords. All consumer-specific values come from CLI args.
+
+## Skill maintenance
+
+When editing the runner CLI, viewport parsing, or JSON report shape, run:
+
+```bash
+PYTHONDONTWRITEBYTECODE=1 python3 -m unittest tests/test_runner.py
+```
 
 ## The bundled wrap-safe library
 

@@ -14,24 +14,42 @@ provider harness or the repo-specific surface instead.
 
 ## Canonical Harness
 
-Prefer `/root/dans-brain` when you need a repo-neutral research run:
+Prefer the local `dans-brain` checkout when you need a repo-neutral research
+run. Do not assume a Linux/root home path; resolve the project root explicitly:
 
 ```bash
-cd /root/dans-brain && uv run python bin/deep_research.py --list-providers
-cd /root/dans-brain && uv run python bin/deep_research.py "research question" --dry-run
-cd /root/dans-brain && uv run python bin/deep_research.py "research question"
+DANS_BRAIN_ROOT="${DANS_BRAIN_ROOT:-$HOME/Desktop/dans-brain}"
+test -f "$DANS_BRAIN_ROOT/bin/deep_research.py"
+cd "$DANS_BRAIN_ROOT" && uv run python bin/deep_research.py --list-providers
+cd "$DANS_BRAIN_ROOT" && uv run python bin/deep_research.py "research question" --dry-run
 ```
 
 The harness writes provider outputs to `state/deep-research/<timestamp>-<slug>/`
 with one markdown file per provider plus `combined.md` and `manifest.json`.
 `state/` is git-ignored runtime data.
 
+Before any live provider call, check local provider availability:
+
+```bash
+python3 /Users/danb/Desktop/skills/deep-research-agents/scripts/check_provider_env.py
+```
+
+Then run a no-cost harness check:
+
+```bash
+cd "$DANS_BRAIN_ROOT" && uv run python bin/deep_research.py "research question" --dry-run
+```
+
+Only run the paid call after the user confirms the provider count and expected
+call count. ChatGPT, Claude, Gemini, or Parallel subscriptions do not imply API
+credits for these harness calls.
+
 For multi-angle research, use repeated `--angle` flags. The harness requires
 `--allow-many` when the plan exceeds three upstream runs because five angles
 times three providers is fifteen paid calls:
 
 ```bash
-cd /root/dans-brain && uv run python bin/deep_research.py "overall question" \
+cd "$DANS_BRAIN_ROOT" && uv run python bin/deep_research.py "overall question" \
   --angle "market map" \
   --angle "technical feasibility" \
   --angle "risks and counter-evidence" \
@@ -53,6 +71,9 @@ cd /root/dans-brain && uv run python bin/deep_research.py "overall question" \
 
 - Keep secrets local: `ANTHROPIC_API_KEY`, `GEMINI_API_KEY`, and
   `PARALLEL_API_KEY` belong in untracked env/config, never in repo files.
+- Confirm paid-call scope before execution: provider set, angle count, total
+  upstream calls, and whether `--allow-many` is required. If the user has not
+  confirmed cost exposure, stop at `--dry-run`.
 - Treat provider reports as source material, not verified final truth. Synthesize
   conflicts explicitly and verify important, time-sensitive, legal, medical, or
   financial claims with current primary sources.

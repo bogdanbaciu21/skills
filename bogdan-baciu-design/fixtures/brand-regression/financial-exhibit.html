@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Bogdan Brand Fixture - Financial Exhibit</title>
+  <link rel="stylesheet" href="../../assets/design-system/colors_and_type.css">
+  <style>
+    body {
+      margin: 0;
+      background: var(--paper, #f9f9fa);
+      color: var(--ink, #262b34);
+      font-family: var(--font-body, system-ui, sans-serif);
+    }
+    main {
+      width: min(1180px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 48px 0;
+    }
+    h1 {
+      font-family: var(--font-display, Georgia, serif);
+      font-weight: 400;
+      font-size: 52px;
+      margin: 0 0 20px;
+    }
+    .db-scope {
+      margin-top: 28px;
+      padding: 24px;
+      border: 1px solid var(--db-rule, #d6cfc1);
+      background: var(--db-paper, #faf7f2);
+    }
+    .bbt-wrap {
+      overflow-x: auto;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-variant-numeric: tabular-nums;
+    }
+    th, td {
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--db-rule, #d6cfc1);
+    }
+    th {
+      text-align: left;
+      background: var(--sky-900, #152234);
+      color: white;
+      text-transform: uppercase;
+      font-size: 12px;
+      letter-spacing: .06em;
+    }
+    td.num {
+      text-align: right;
+      white-space: nowrap;
+    }
+    .cell-input {
+      color: #0000ff;
+      background: #ffffcc;
+    }
+    .cell-link {
+      color: #00b050;
+    }
+    tr.total td {
+      font-weight: 700;
+      border-top: 2px solid var(--sky-900, #152234);
+    }
+  </style>
+</head>
+<body>
+  <main data-brand="bogdan-baciu">
+    <h1>Financial exhibit scope check</h1>
+    <p>This page verifies that dense financial artifacts can sit inside the editorial brand without leaking model colors into the global surface.</p>
+    <section class="db-scope" aria-label="Financial model exhibit">
+      <div class="bbt-wrap">
+        <table class="bbt">
+          <caption>Illustrative operating bridge, $ in 000s</caption>
+          <thead>
+            <tr>
+              <th>Metric</th>
+              <th>FY24A</th>
+              <th>FY25E</th>
+              <th>FY26E</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Revenue</td>
+              <td class="num cell-link">1,240.0</td>
+              <td class="num cell-input">1,550.0</td>
+              <td class="num">1,890.0</td>
+            </tr>
+            <tr>
+              <td>EBITDA</td>
+              <td class="num">310.0</td>
+              <td class="num">402.5</td>
+              <td class="num">510.3</td>
+            </tr>
+            <tr class="total">
+              <td>FCF</td>
+              <td class="num">185.0</td>
+              <td class="num">(42.0)</td>
+              <td class="num">278.4</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

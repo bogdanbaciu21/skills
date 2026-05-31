@@ -1,0 +1,9 @@
+slug: ai-finance-operating-leverage
+status: DRY RUN
+
+FINAL PROMPT:
+```text
+Editorial hero image for an essay about FP&A operating leverage and AI-assisted financial services. Show a clean analyst desk with a compact operating model, source documents, and a quiet automation layer; no fake UI text, no logos, no unreadable charts.
+```
+
+output: priv/static/images/posts/ai-finance-operating-leverage/hero.png

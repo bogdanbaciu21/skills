@@ -19,6 +19,17 @@ Coding-agent sessions are usually stateless across chats, tools, machines, and h
 
 ## Workflow
 
+### Step 0 — Optional skill eval
+
+When editing this skill, run:
+
+```bash
+PYTHONDONTWRITEBYTECODE=1 python3 evals/run_evals.py
+```
+
+This validates trigger fixture structure and the artifact path priority for
+repo-local, workspace-local, and OS-temp handoff saves.
+
 ### Step 1 — Gather session context
 
 Collect these automatically when available (don't ask the user for them):

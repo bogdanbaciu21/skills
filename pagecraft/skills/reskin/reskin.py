@@ -16,12 +16,13 @@ In reskin.json, `tokens_css`, `assets`, and `frame` are all relative to
 `design_system.source` (the dir holding the brand). See SKILL.md.
 
 Commands:
-  reskin detect [--repo .]                          what design system + applier exists here?
-  reskin init   [--repo .]                          scaffold a reskin.json from what's detected
-  reskin apply  [--repo .] [--page P ...] [--dry-run]
-  reskin verify [--repo .]                          pagecraft keystone + brand-asset checks
+  reskin detect   [--repo .]                        what design system + applier exists here?
+  reskin init     [--repo .]                        scaffold a reskin.json from what's detected
+  reskin validate [--repo .]                        validate manifest + referenced files
+  reskin apply    [--repo .] [--page P ...] [--dry-run]
+  reskin verify   [--repo .]                        pagecraft keystone + brand-asset checks
 """
-import argparse, glob, json, os, re, shutil, subprocess, sys
+import argparse, glob, json, os, re, shlex, shutil, subprocess, sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 
@@ -247,15 +248,27 @@ def generic_frame(repo, m, page, dry):
     return ("FRAMED", "")
 
 
-def bespoke_frame(repo, m, page, dry):
+def render_apply_command(repo, m, page):
     rendered = m["apply_command"].format(
         page=os.path.join(repo, page["path"]),
         eyebrow=page.get("eyebrow", ""), headline_pre=page.get("headline_pre", ""),
         headline_em=page.get("headline_em", ""), subhead=page.get("subhead", ""),
         page_label=page.get("page_label", ""))
+    return rendered
+
+
+def apply_command_argv(repo, m, page):
+    return shlex.split(render_apply_command(repo, m, page))
+
+
+def bespoke_frame(repo, m, page, dry):
+    rendered = render_apply_command(repo, m, page)
     if dry:
         return ("WOULD-RUN", rendered)
-    r = subprocess.run(rendered, shell=True, cwd=repo, capture_output=True, text=True)
+    argv = apply_command_argv(repo, m, page)
+    if not argv:
+        return ("FAIL", "apply_command rendered to an empty command")
+    r = subprocess.run(argv, cwd=repo, capture_output=True, text=True)
     return (("RAN" if r.returncode == 0 else "FAIL"), (r.stdout + r.stderr).strip()[:200])
 
 
@@ -314,6 +327,64 @@ def cmd_init(repo, _a):
     return 0
 
 
+def cmd_validate(repo, _a):
+    m = load_manifest(repo)
+    if not m:
+        print("No reskin.json — run `reskin detect` then `reskin init`.")
+        return 1
+
+    errors = []
+    try:
+        validate_manifest(m)
+    except ManifestError as e:
+        errors.extend(str(e).split("; "))
+        m = m if isinstance(m, dict) else {}
+
+    ds = m.get("design_system") if isinstance(m.get("design_system"), dict) else {}
+    source = ds.get("source")
+    if source and not _is_tbu(source):
+        base = _src_base(repo, ds)
+        if not os.path.isdir(base):
+            errors.append(f"design_system.source not found: {source}")
+        for key in ("tokens_css", "assets", "frame"):
+            rel = ds.get(key)
+            if not rel or _is_tbu(rel):
+                continue
+            path = os.path.join(base, rel)
+            exists = os.path.isdir(path) if key in {"assets", "frame"} else os.path.isfile(path)
+            if not exists:
+                errors.append(f"design_system.{key} not found: {rel}")
+        if ds.get("frame") and not _is_tbu(ds.get("frame")):
+            frame_dir = os.path.join(base, ds["frame"])
+            if os.path.isdir(frame_dir) and not (
+                os.path.isfile(os.path.join(frame_dir, "nav.html"))
+                or os.path.isfile(os.path.join(frame_dir, "hero.html"))
+            ):
+                errors.append("design_system.frame must contain nav.html or hero.html")
+
+    for page in m.get("pages", []) if isinstance(m.get("pages"), list) else []:
+        page_path = page.get("path") if isinstance(page, dict) else None
+        if page_path and not _is_tbu(page_path) and not os.path.isfile(os.path.join(repo, page_path)):
+            errors.append(f"page not found: {page_path}")
+
+    if m.get("apply_command") and isinstance(m.get("pages"), list) and m["pages"]:
+        try:
+            argv = apply_command_argv(repo, m, m["pages"][0])
+        except ValueError as e:
+            errors.append(f"apply_command cannot be parsed: {e}")
+        else:
+            if not argv:
+                errors.append("apply_command renders to an empty command")
+
+    if errors:
+        print("Invalid reskin.json:")
+        for error in errors:
+            print(f"  - {error}")
+        return 1
+    print("reskin.json valid")
+    return 0
+
+
 def cmd_apply(repo, a):
     m = load_manifest(repo)
     if not m:
@@ -360,7 +431,7 @@ def cmd_verify(repo, _a):
 def main():
     ap = argparse.ArgumentParser(description="Apply a repo's design system across its pages.")
     sub = ap.add_subparsers(dest="cmd", required=True)
-    for name in ("detect", "init", "apply", "verify"):
+    for name in ("detect", "init", "validate", "apply", "verify"):
         s = sub.add_parser(name)
         s.add_argument("--repo", default=".")
         if name == "apply":
@@ -368,7 +439,7 @@ def main():
             s.add_argument("--dry-run", action="store_true")
     a = ap.parse_args()
     repo = os.path.abspath(a.repo)
-    return {"detect": cmd_detect, "init": cmd_init, "apply": cmd_apply, "verify": cmd_verify}[a.cmd](repo, a)
+    return {"detect": cmd_detect, "init": cmd_init, "validate": cmd_validate, "apply": cmd_apply, "verify": cmd_verify}[a.cmd](repo, a)
 
 
 if __name__ == "__main__":

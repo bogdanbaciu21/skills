@@ -1,4 +1,4 @@
-Read `CLAUDE.md` and `AGENTS.md` first. This is [Track Name] of a parallel workflow.
+Read the repo's agent instructions first (`AGENTS.md`, `CLAUDE.md`, or equivalent if present). This is [Track Name] of a parallel workflow.
 
 Goal / evidence: [self-contained question, concrete files/data/errors to inspect, expected output, and acceptance checks].
 

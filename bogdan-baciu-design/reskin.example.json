@@ -1,0 +1,20 @@
+{
+  "design_system": {
+    "source": ".claude/skills/bogdan-baciu-design/assets/design-system",
+    "tokens_css": "colors_and_type.css",
+    "assets": "assets"
+  },
+  "served_root": ".",
+  "assets_target": "assets/bogdan-brand",
+  "framed_marker": "data-brand=\"bogdan-baciu\"",
+  "pages": [
+    {
+      "path": "index.html",
+      "eyebrow": "personal site",
+      "headline_pre": "Finance, systems,",
+      "headline_em": "and useful artifacts",
+      "subhead": "A compact editorial surface for operator-grade work.",
+      "page_label": "Home"
+    }
+  ]
+}

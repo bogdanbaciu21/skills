@@ -1,6 +1,6 @@
 ---
 name: parallel-dispatch
-description: Generate copy-paste agent prompts and a coordinator playbook from a pre-built parallel work plan. Use when the user has decomposed a large task into independent, conflict-free parallel tracks and needs formatted prompts for multiple Claude Code sessions. Triggers on "parallel dispatch", "parallel agents", "dispatch tracks", "multi-agent", "generate agent prompts". Do NOT use to invent a decomposition from scratch, to author handover documents, or to launch/monitor agents. Do NOT use for single-session sub-agent delegation via the Agent tool — this is for spinning up separate Claude Code sessions.
+description: Generate copy-paste agent prompts and a coordinator playbook from a pre-built parallel work plan. Use when the user has decomposed a large task into independent, conflict-free parallel tracks and needs formatted prompts for multiple coding-agent sessions. Triggers on "parallel dispatch", "parallel agents", "dispatch tracks", "multi-agent", "generate agent prompts". Do NOT use to invent a decomposition from scratch, to author handover documents, or to launch/monitor agents. Do NOT use for single-session sub-agent delegation via the Agent tool — this is for spinning up separate coding-agent sessions.
 ---
 
 # Parallel Dispatch
@@ -48,9 +48,21 @@ Before generating prompts, check for file overlap between tracks:
    > "Tracks A and D both claim `netlify/functions/firm-comp.mts`. This will cause merge conflicts. Either split the file scope or add a dependency so they run sequentially."
 3. Analysis tracks (read-only) are exempt from overlap checks — they don't edit files
 
+If the plan is available as JSON or YAML, run the bundled validator first:
+
+```bash
+python3 scripts/validate_tracks.py path/to/parallel-plan.json
+python3 scripts/validate_tracks.py path/to/parallel-plan.yaml
+```
+
+It rejects missing goal/evidence, code tracks with no `can_touch` scope,
+overlapping edit scopes without dependencies, and explicitly shared state
+without dependencies. YAML support uses PyYAML when available and a narrow
+track-plan parser when it is not, so simple `tracks:` files remain portable.
+
 ### Step 3 — Generate agent prompts
 
-For each track, produce a fenced code block (```markdown) the user can copy-paste into a new Claude Code session. Use the template that matches the track type:
+For each track, produce a fenced code block (```markdown) the user can copy-paste into a new coding-agent session. Use the template that matches the track type:
 
 - Code track: [`assets/agent-prompt-code.md`](assets/agent-prompt-code.md)
 - Analysis track: [`assets/agent-prompt-analysis.md`](assets/agent-prompt-analysis.md)
@@ -124,5 +136,13 @@ Parallel dispatch is counterproductive when failures are symptoms of one underly
 - **Invent parallelism** — this skill validates the user's tracks and flags unsafe plans, but does not manufacture a work split from vague input
 - **Create handover documents** — the user writes those
 - **Create GitHub issues** — the user has those already
-- **Launch agents** — the user copy-pastes prompts into separate Claude Code sessions
+- **Launch agents** — the user copy-pastes prompts into separate coding-agent sessions
 - **Monitor agents** — the user coordinates manually
+
+## Skill Maintenance
+
+When editing the validator or dispatch rules, run:
+
+```bash
+PYTHONDONTWRITEBYTECODE=1 python3 evals/run_evals.py
+```

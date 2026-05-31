@@ -1,12 +1,13 @@
 ---
 name: chat-analysis
-description: Analyze Claude Code session transcripts for failure patterns and propose CLAUDE.md improvements. Runs the four-stage pipeline (parse → filter → label → compile) via scripts/chat_analysis.py. Use when the user says "analyze my chats", "run chat analysis", "review my sessions", "what am I doing wrong", "chat analysis", or "/chat-analysis".
+description: Analyze Codex or Claude Code session transcripts for failure patterns and propose agent-instruction improvements. Runs the four-stage pipeline (parse → filter → label → compile) via scripts/chat_analysis.py. Use when the user says "analyze my chats", "run chat analysis", "review my sessions", "what am I doing wrong", "chat analysis", or "/chat-analysis".
 ---
 
 # Chat Analysis — Recursive Self-Improvement
 
-Analyze session transcripts from `~/.claude/projects/` to surface failure
-patterns, rule violations, and candidate improvements to `CLAUDE.md`.
+Analyze session transcripts from Claude (`~/.claude/projects/`) or Codex
+(`~/.codex/sessions`, `~/.codex/archived_sessions`) to surface failure
+patterns, rule violations, and candidate improvements to agent instructions.
 
 The pipeline:
 1. **Parse** — read `.jsonl` session files
@@ -17,8 +18,8 @@ The pipeline:
 ## When to use
 
 - "Analyze my chats" / "run chat analysis"
-- "What patterns are in my Claude sessions?"
-- "What rules should I add to CLAUDE.md?"
+- "What patterns are in my Claude/Codex sessions?"
+- "What rules should I add to my agent instructions?"
 - "How many sessions had verification failures?"
 - Weekly improvement cadence: run on the last 50–100 sessions
 
@@ -51,16 +52,20 @@ sessions look clean.
 
 ### Step 2 — Cost check
 
-Estimate cost before running. Each surviving session is one API call to
-`claude-sonnet-4-6`. At current pricing, 50 labeled sessions ≈ $0.05–0.15.
-For the default run (last 50 sessions), this is always in-budget — no need
-to ask. For `--all` or `--n` values above 200, confirm with the user first.
+Estimate cost before running. Each surviving session is one labeling API call.
+The model is configurable with `--model` or `CHAT_ANALYSIS_MODEL`; check current
+provider pricing before quoting a dollar estimate. For the default run (last 50
+sessions), proceed unless the user has flagged the project as sensitive or
+cost-constrained. For `--all` or `--n` values above 200, confirm with the user first.
 
 ### Step 3 — Run the analysis
 
 ```bash
 # Default: current project, last 50 sessions
 python3 scripts/chat_analysis.py
+
+# Codex sessions for the current working directory
+python3 scripts/chat_analysis.py --source codex
 
 # Last 100 sessions
 python3 scripts/chat_analysis.py --n 100
@@ -92,13 +97,13 @@ Tell the user:
 - The #1 failure mode by count
 - The highest-cost failure mode (most rework cycles per incident)
 - The most-violated rule (if any)
-- How many candidate CLAUDE.md deltas are in the review file
+- How many candidate instruction deltas are in the review file
 
 ### Step 5 — Review deltas (user decision)
 
-The review file has a `## Proposed CLAUDE.md Deltas` section with checkbox
+The review file has a `## Proposed Agent-Instruction Deltas` section with checkbox
 items. Walk the user through them one at a time if they want, or point them
-to the file. **Never auto-apply any delta to CLAUDE.md** — the user decides.
+to the file. **Never auto-apply any delta to agent instructions** — the user decides.
 
 If the user says "accept all" or "apply them", ask them to confirm which
 specific items they want and make only those edits. The model does not edit
@@ -113,7 +118,7 @@ its own operating rules autonomously.
 - Highest-cost failure modes by avg rework cycles
 - Communication antipatterns
 - Rule violation rankings
-- Proposed CLAUDE.md deltas (checkbox list, user must decide)
+- Proposed agent-instruction deltas (checkbox list, user must decide)
 - Sample corrections and positive signals
 - Per-session detail table
 
@@ -163,12 +168,17 @@ or extend `REDACTION_RULES` first.
 ## Troubleshooting
 
 **"Could not auto-detect project dir"**
-The script maps CWD → `~/.claude/projects/` by hashing the path. If it
+For Claude, the script maps CWD → `~/.claude/projects/` by hashing the path. If it
 fails, pass the path explicitly:
 ```bash
 ls ~/.claude/projects/     # find the right directory name
 python3 scripts/chat_analysis.py --project ~/.claude/projects/<dir>
 ```
+
+For Codex, auto-detection reads recent sessions from `~/.codex/sessions` and
+`~/.codex/archived_sessions`, then filters by the session `cwd`. If the session
+is older than the default window, use `--source codex --all --n <larger N>` or
+pass a specific transcript directory with `--project`.
 
 **"ANTHROPIC_API_KEY not set"**
 ```bash

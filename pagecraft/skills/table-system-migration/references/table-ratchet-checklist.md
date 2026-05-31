@@ -46,8 +46,55 @@ python3 pagecraft/skills/table-system-migration/table-ratchet.py \
   --allow-unwrapped-table-class admin-grid
 ```
 
-The check should fail only when a file exceeds its baseline count or a new file
-introduces table debt.
+### npm script
+
+```json
+{
+  "scripts": {
+    "test:tables": "python3 pagecraft/skills/table-system-migration/table-ratchet.py --root . --canonical-table-class content-table --canonical-wrapper-class table-scroll"
+  }
+}
+```
+
+### pytest wrapper
+
+```python
+import subprocess
+
+
+def test_table_ratchet():
+    result = subprocess.run(
+        [
+            "python3",
+            "pagecraft/skills/table-system-migration/table-ratchet.py",
+            "--root",
+            ".",
+            "--canonical-table-class",
+            "content-table",
+            "--canonical-wrapper-class",
+            "table-scroll",
+        ],
+        text=True,
+        capture_output=True,
+    )
+    assert result.returncode == 0, result.stdout + result.stderr
+```
+
+### GitHub Actions
+
+```yaml
+name: table-ratchet
+on: [pull_request]
+jobs:
+  table-ratchet:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+      - run: python3 pagecraft/skills/table-system-migration/table-ratchet.py --root . --canonical-table-class content-table --canonical-wrapper-class table-scroll
+```
 
 ## 4. Acceptance Checks
 

@@ -28,6 +28,7 @@ Either way: `reskin apply`.
 python3 reskin.py detect --repo .          # what design system + applier exists here?
 python3 reskin.py init   --repo .          # scaffold a reskin.json from what's detected
 #   …fill in served_root, assets_target, and the pages[] list…
+python3 reskin.py validate --repo .        # validate manifest shape + referenced files
 python3 reskin.py apply  --repo . --dry-run    # preview every reframe + asset sync, write nothing
 python3 reskin.py apply  --repo .              # do it (idempotent — already-framed pages are skipped)
 python3 reskin.py verify --repo .              # pagecraft keystone guard + brand-asset presence
@@ -68,6 +69,10 @@ that already contains the `framed_marker` is skipped.
 found), and a `pages[]` stub; you fill in `served_root`, `assets_target`, and the
 per-page copy.
 
+`apply_command` is parsed into argv and run without a shell, so manifest strings
+cannot execute shell metacharacters like `;` or `&&`. Keep commands simple:
+executable, script path, page path, and one quoted metadata payload.
+
 ## Frame templates (generic path)
 
 When there's no bespoke applier, put three files in `design_system.frame/`:
@@ -87,3 +92,15 @@ before `</body>` — exactly the v3 mechanism, generalized.
 - It does **not** restructure page *content* — only the surrounding frame +
   synced assets. Verify with `reskin verify` (the bundled pagecraft keystone guard)
   and the full `runner.py` wrap probe after a reskin.
+
+## Skill maintenance
+
+When editing the manifest contract or apply path, run:
+
+```bash
+PYTHONDONTWRITEBYTECODE=1 python3 -m unittest tests/test_reskin.py
+```
+
+The test fixtures include a public-safe screenshot-diff contract under
+`tests/fixtures/screenshot-diff/` so browser checks can compare selector geometry
+without storing private page screenshots.

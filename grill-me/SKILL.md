@@ -35,6 +35,10 @@ Identify the branches that need resolution. Not all apply every time — include
 
 For non-engineering subjects (life decisions, business decisions, hiring, financial choices), substitute relevant branches: tradeoffs, downside scenarios, exit conditions, who pays the cost, what evidence would change the answer.
 
+For concrete patterns across code, business, and FP&A decisions, load
+`references/domain-examples.md`. Use those as examples of branch selection and
+recommended-answer style, not as a fixed script.
+
 ### Step 3 — Show the map before drilling
 
 Before asking the first question, show the user the branches you intend to walk. Format as a short bulleted list. Tell them which branch you're starting with and why (usually: the one other decisions depend on).
@@ -73,6 +77,7 @@ Small, well-scoped tasks don't warrant a decision tree. Heuristic:
 - Task crosses UI, data, and workflow boundaries → grill first.
 - Hard part is choosing → grill first.
 - Hard part is sequencing → plan mode is enough.
+- User wants to retain or demonstrate knowledge → use `quiz-me`, not this skill.
 
 ## Output format
 
@@ -82,3 +87,11 @@ Plain prose. No code blocks for the questions themselves. Number the questions a
 
 - Matt Pocock, [`grill-me` skill](https://www.aihero.dev/my-grill-me-skill-has-gone-viral) — the three-line original and the rubber-ducking-inside-out framing.
 - [`mattpocock/skills/grill-me/SKILL.md`](https://github.com/mattpocock/skills/blob/main/grill-me/SKILL.md) — upstream source.
+
+## Skill maintenance
+
+When editing trigger wording or examples, run:
+
+```bash
+PYTHONDONTWRITEBYTECODE=1 python3 evals/run_evals.py
+```

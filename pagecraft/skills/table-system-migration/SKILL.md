@@ -54,10 +54,24 @@ Make narrow, reviewable passes.
 
 Add a deterministic check that blocks new table debt without requiring a full historical cleanup.
 
-- Start from the bundled `table-ratchet.py` script and `table-ratchet-checklist.md` artifact when the target repo does not already have a table-debt gate.
+- Start from the bundled `table-ratchet.py` script and
+  `references/table-ratchet-checklist.md` when the target repo does not already
+  have a table-debt gate. The checklist lives under `references/` because it is
+  implementation guidance; the executable script stays at the skill root so it
+  can be copied or invoked directly.
 - Configure the canonical table class, canonical wrapper class, generated-folder excludes, and any narrow legacy/admin table allowlists before creating the baseline.
 - Scan content/templates for new unsanctioned table classes, new per-page table CSS, and new unwrapped tables.
 - Store a baseline when legacy debt already exists.
+- Refresh the baseline only after reviewing current debt and confirming the
+  new counts are intentional:
+
+```bash
+python3 table-ratchet.py --root <repo> \
+  --canonical-table-class <class> \
+  --canonical-wrapper-class <wrapper> \
+  --write-baseline
+```
+
 - Fail only when a file exceeds the baseline or a new file introduces debt.
 - Print actionable remediation text: which file regressed, what count increased, and which canonical classes to use.
 
@@ -96,3 +110,11 @@ When reporting status, distinguish these clearly:
 - "Use `$table-system-migration` to migrate this blog's tables to one canonical component and add a no-new-violations check."
 - "Use `$table-system-migration` after this table CSS change; I want proof that admin grids did not collapse."
 - "Use `$table-system-migration` to turn this private table cleanup into a public-safe skill without leaking project details."
+
+## Skill Maintenance
+
+When editing the ratchet script, run:
+
+```bash
+PYTHONDONTWRITEBYTECODE=1 python3 -m unittest tests/test_table_ratchet.py
+```
