@@ -23,6 +23,9 @@ Ask for only the missing preferences, then proceed:
 - Question count: default to 5, then offer to continue.
 - Style: default to open-ended for retention; allow multiple choice or mixed if the user asks or speed matters.
 - Difficulty: default to medium with one stretch question; allow easy, medium, hard, or mixed.
+- Mode: infer `finance`, `code`, or `interview` when obvious; otherwise use the
+  general question mix. Load `references/modes.md` for the mode-specific
+  question patterns.
 
 If the user already implies these choices, do not ask. Start the quiz.
 
@@ -31,6 +34,8 @@ If the user already implies these choices, do not ask. Start the quiz.
 - Ask one question, then wait for the user's answer.
 - Never dump all questions upfront.
 - Track score, current question number, correct/partial/incorrect count, streaks, and weak concepts internally.
+- Keep a weak-concept retry queue. Add concepts after partial/incorrect answers;
+  clear a concept only after the user answers a follow-up correctly.
 - Accept "I don't know" as an answer, then teach the answer before moving on.
 
 ### Step 4 — Design strong questions
@@ -109,3 +114,11 @@ Next: another round, harder round, or focus round?
 ## Tone
 
 Be direct, encouraging, and calibrated. Act like a tough but fair tutor: matter-of-fact when the user is wrong, brief when they are right, and always oriented toward retention.
+
+## Skill maintenance
+
+When editing modes or the weak-concept retry contract, run:
+
+```bash
+PYTHONDONTWRITEBYTECODE=1 python3 evals/run_evals.py
+```
