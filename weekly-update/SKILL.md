@@ -66,87 +66,12 @@ git log --since="<last Sunday>" --shortstat --pretty=format:"" | \
 git rev-list --count HEAD
 ```
 
-<<<<<<< HEAD
-#### GitHub Issues (default tracker)
-
-```bash
-# Closed issues by milestone (this week)
-gh issue list --state closed \
-  --search "closed:>=<last Sunday YYYY-MM-DD>" \
-  --limit 500 --json number,title,milestone,closedAt
-
-# Open + closed issues by milestone (all time) — for the cumulative table
-gh issue list --state all --limit 2000 \
-  --json number,state,milestone
-```
-
-#### Linear (supported tracker)
-
-Use Linear when the project manages work there. Map GitHub milestones to Linear **projects** for long-lived workstreams or **cycles** for sprint-shaped reporting. Prefer the Linear MCP server if available; otherwise use the Linear GraphQL API, a local Linear CLI wrapper, or a CSV export with the fields below.
-
-Required data contract:
-
-| Dataset | Filter | Required fields | Grouping |
-|---|---|---|---|
-| Closed this week | `completedAt >= <last week-end YYYY-MM-DD 00:00>` | `identifier`, `title`, `completedAt`, `state.name`, `state.type`, `project.name`, `cycle.name` | `project.name`, then `cycle.name`, then `No project/cycle` |
-| All-time progress | Same team/project/cycle scope, no date filter | `identifier`, `state.name`, `state.type`, `project.name`, `project.targetDate`, `cycle.name`, `cycle.endsAt` | Same grouping as above |
-
-MCP flow:
-
-```text
-1. Inspect the available Linear tool schema.
-2. Fetch completed issues with the same project/team/cycle scope and completedAt on or after the start date.
-3. Fetch all issues in the same scope with no date filter.
-4. Paginate until exhausted; do not assume the first page is complete.
-```
-
-GraphQL shape when no MCP tool exists:
-
-```graphql
-query WeeklyUpdateClosedIssues($teamId: ID!, $since: DateTime!, $after: String) {
-  issues(
-    first: 250
-    after: $after
-    filter: { team: { id: { eq: $teamId } }, completedAt: { gte: $since } }
-  ) {
-    nodes {
-      identifier
-      title
-      completedAt
-      state { name type }
-      project { name targetDate }
-      cycle { name endsAt }
-    }
-    pageInfo { hasNextPage endCursor }
-  }
-}
-```
-
-For all-time progress, run the same query shape without the `completedAt` filter. Count `state.type = completed` as closed and active/backlog states as open. Do not blend canceled work into closed progress unless the stakeholder explicitly wants canceled scope reported as removed; if it matters, add a separate `Canceled` note below the table.
-
-#### Jira (best-effort via JQL)
-
-The same shape works against Jira when the session has the Atlassian MCP server, `jira` CLI, or another JQL-capable client. Validate the closed-this-week query against the Jira UI before relying on the numbers.
-
-```bash
-# Closed issues this week — via JQL
-jira issue list --jql "resolved >= -7d AND statusCategory = Done" --limit 500
-
-# All-time issues by epic/sprint — via JQL
-jira issue list --jql "project = <KEY>" --limit 2000
-```
-
-#### Common rule
-
-Aggregate the raw output into the tables the skill renders. If the tracker is rate-limited or errors out, degrade gracefully: ask for the numbers manually rather than fabricating them.
-=======
 #### Issue Trackers
 
 Load `references/tracker-providers.md` for GitHub, Linear, Jira, and degraded
 manual-mode data contracts. Aggregate raw tracker output into the tables this
 skill renders. If the tracker is rate-limited or errors out, degrade gracefully:
 ask for the numbers manually rather than fabricating them.
->>>>>>> e34b4928187db09389c1c79013a08b160ab4ece1
 
 ### Step 3 — Ask the Four Questions
 
@@ -389,8 +314,6 @@ Common email template tokens to support:
 ## Invocation
 
 Invoke by asking for the "weekly update," "Friday email," "status report," or "stakeholder update." The skill acknowledges, pulls data, asks the four questions, drafts the file, and reports the filename back.
-<<<<<<< HEAD
-=======
 
 ## Skill maintenance
 
@@ -399,4 +322,3 @@ When editing tracker aggregation or provider references, run:
 ```bash
 PYTHONDONTWRITEBYTECODE=1 python3 evals/run_evals.py
 ```
->>>>>>> e34b4928187db09389c1c79013a08b160ab4ece1
