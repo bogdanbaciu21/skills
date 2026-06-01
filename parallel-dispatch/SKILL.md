@@ -48,28 +48,17 @@ Before generating prompts, check for file overlap between tracks:
    > "Tracks A and D both claim `netlify/functions/firm-comp.mts`. This will cause merge conflicts. Either split the file scope or add a dependency so they run sequentially."
 3. Analysis tracks (read-only) are exempt from overlap checks — they don't edit files
 
-<<<<<<< HEAD
-If the plan is available as JSON, run the bundled validator first:
-
-```bash
-python3 scripts/validate_tracks.py path/to/parallel-plan.json
-=======
 If the plan is available as JSON or YAML, run the bundled validator first:
 
 ```bash
 python3 scripts/validate_tracks.py path/to/parallel-plan.json
 python3 scripts/validate_tracks.py path/to/parallel-plan.yaml
->>>>>>> e34b4928187db09389c1c79013a08b160ab4ece1
 ```
 
 It rejects missing goal/evidence, code tracks with no `can_touch` scope,
 overlapping edit scopes without dependencies, and explicitly shared state
-<<<<<<< HEAD
-without dependencies.
-=======
 without dependencies. YAML support uses PyYAML when available and a narrow
 track-plan parser when it is not, so simple `tracks:` files remain portable.
->>>>>>> e34b4928187db09389c1c79013a08b160ab4ece1
 
 ### Step 3 — Generate agent prompts
 
