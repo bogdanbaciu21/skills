@@ -1,0 +1,4 @@
+interface:
+  display_name: "Parallel Dispatch"
+  short_description: "Split large work into safe independent agent tracks."
+  default_prompt: "Use $parallel-dispatch to convert this work into independent agent prompts plus a coordinator playbook with evidence, file scopes, dependencies, and merge order."

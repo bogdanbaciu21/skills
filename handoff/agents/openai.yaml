@@ -1,0 +1,4 @@
+interface:
+  display_name: "Handoff"
+  short_description: "Portable session handoff blocks and saved artifacts"
+  default_prompt: "Use $handoff to produce a copy-pasteable session handoff and save a markdown artifact that the next coding-agent session can execute from."
