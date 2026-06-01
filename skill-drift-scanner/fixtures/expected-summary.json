@@ -1,0 +1,7 @@
+{
+  "codex_restart_recommended": true,
+  "content_drift": 1,
+  "missing_installed_skills": 2,
+  "report_path": "/Users/example/.local/state/codex-skill-sync/report.md",
+  "unmanaged_custom_skills": 1
+}

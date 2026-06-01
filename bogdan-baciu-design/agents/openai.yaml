@@ -1,0 +1,4 @@
+interface:
+  display_name: "Bogdan Baciu Design"
+  short_description: "Apply Bogdan brand rules to artifacts and exhibits."
+  default_prompt: "Apply the Bogdan Baciu design system to this artifact while preserving the content and reporting any token, font, image, or icon substitutions."

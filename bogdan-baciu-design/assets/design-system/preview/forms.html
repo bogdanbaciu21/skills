@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Forms — single field</title>
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  body { background: var(--paper); padding: 22px 28px; font-family: var(--font-body); }
+  form { max-width: 460px; display: flex; flex-direction: column; gap: 14px; }
+  .field { display: flex; flex-direction: column; gap: 6px; }
+  label { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-soft); }
+  input, textarea { font: inherit; font-family: var(--font-body); font-size: 16px; padding: 10px 12px; background: #fff; border: 1px solid var(--rule); border-radius: 2px; color: var(--ink); }
+  input:focus, textarea:focus { outline: 2px solid oklch(0.55 0.13 38); outline-offset: 2px; border-color: var(--ink-soft); }
+  .help { font-family: var(--font-body); font-size: 13px; color: var(--ink-soft); }
+  .err { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: oklch(0.5 0.16 25); }
+  .row { display: flex; gap: 12px; }
+  .submit { font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; padding: 12px 18px; border: 1px solid var(--sky-900); background: var(--sky-900); color: #fff; border-radius: 2px; cursor: pointer; }
+</style>
+</head>
+<body>
+  <form onsubmit="event.preventDefault();">
+    <div class="field">
+      <label for="email">Email</label>
+      <input id="email" type="email" placeholder="you@studio.tld">
+      <span class="help">Used for the reply only · no list, ever.</span>
+    </div>
+    <div class="field">
+      <label for="brief">Brief</label>
+      <textarea id="brief" rows="3" placeholder="A few sentences about what you're building."></textarea>
+      <span class="err">Required · keep it short.</span>
+    </div>
+    <div class="row">
+      <button type="submit" class="submit">Send brief</button>
+    </div>
+  </form>
+</body>
+</html>

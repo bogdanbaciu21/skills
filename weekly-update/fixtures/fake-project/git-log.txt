@@ -1,0 +1,3 @@
+abc1234 Fix variance bridge rounding
+def5678 Add stakeholder update template
+fed9876 Tighten issue aggregation

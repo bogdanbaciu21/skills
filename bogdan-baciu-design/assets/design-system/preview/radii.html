@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Radii — three values, no more</title>
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  body { background: var(--paper); padding: 18px 22px; }
+  .row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+  .ex { display: flex; flex-direction: column; gap: 10px; align-items: flex-start; }
+  .ex .swatch { width: 100%; height: 64px; background: var(--sky-100); border: 1px solid var(--sky-600); }
+  .ex .pill-swatch { display: inline-block; padding: 8px 14px; background: #fff; border: 1px solid var(--rule); font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--sky-700); border-radius: 999px; }
+  .lbl { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-soft); }
+  .lbl b { color: var(--ink); font-weight: 500; }
+  .meta { margin-top: 14px; font-family: var(--font-mono); font-size: 9.5px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-faint); }
+</style>
+</head>
+<body>
+  <div class="row">
+    <div class="ex">
+      <div class="swatch" style="border-radius: 2px;"></div>
+      <span class="lbl"><b>Sharp · 2px</b> · default · buttons / cards / focus / image crop</span>
+    </div>
+    <div class="ex">
+      <div class="swatch" style="border-radius: 16px;"></div>
+      <span class="lbl"><b>Card · 16px</b> · rare · elevated surfaces only (hire-card, intake panel)</span>
+    </div>
+    <div class="ex">
+      <span class="pill-swatch">Available</span>
+      <span class="lbl"><b>Pill · 999px</b> · chips and the availability status pill only</span>
+    </div>
+  </div>
+  <div class="meta">Inside .db-scope, --radius-card is overridden to 3px (softer print feel)</div>
+</body>
+</html>

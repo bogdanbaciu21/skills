@@ -1,0 +1,13 @@
+canonical : /Users/example/Desktop/skills
+targets   : /Users/example/.codex/skills /Users/example/.claude/skills
+skills    : handoff pagecraft quiz-me
+(dry-run — no changes written)
+
+==> /Users/example/.codex/skills/handoff
+==> /Users/example/.codex/skills/pagecraft
+==> /Users/example/.codex/skills/quiz-me
+==> /Users/example/.claude/skills/handoff
+==> /Users/example/.claude/skills/pagecraft
+==> /Users/example/.claude/skills/quiz-me
+
+[dry-run] sync complete

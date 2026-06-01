@@ -1,0 +1,555 @@
+/* =========================================================
+   Bogdan Baciu Design System
+   Colors + Type — single source of truth for design work.
+
+   Two scoped palettes coexist:
+   - Global "Puddles" (sky-blue on warm cream) — everywhere outside .db-scope
+   - .db-scope (paper-cream + Macabacus cell colors) — embedded financial-model artifacts only
+
+   OKLCH values are canonical for the global palette (taken from
+   assets/css/app.css :root in the source repo). The hex values are
+   approximate sRGB conversions for tooling.
+   ========================================================= */
+
+/* ---------- Self-hosted variable fonts ------------------- */
+
+@font-face {
+  font-family: "Geist";
+  font-style: normal;
+  font-weight: 300 700;
+  font-display: swap;
+  src: url("./fonts/geist-latin.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: "Geist";
+  font-style: normal;
+  font-weight: 300 700;
+  font-display: swap;
+  src: url("./fonts/geist-latin-ext.woff2") format("woff2");
+  unicode-range: U+0100-02AF, U+1E00-1E9F, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: "Instrument Serif";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("./fonts/instrument-serif-regular-latin.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2212, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: "Instrument Serif";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("./fonts/instrument-serif-regular-latin-ext.woff2") format("woff2");
+  unicode-range: U+0100-02AF, U+1E00-1E9F, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: "Instrument Serif";
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: url("./fonts/instrument-serif-italic-latin.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2212, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: "Instrument Serif";
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: url("./fonts/instrument-serif-italic-latin-ext.woff2") format("woff2");
+  unicode-range: U+0100-02AF, U+1E00-1E9F, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: "JetBrains Mono";
+  font-style: normal;
+  font-weight: 300 700;
+  font-display: swap;
+  src: url("./fonts/jetbrains-mono-latin.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2212, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: "JetBrains Mono";
+  font-style: normal;
+  font-weight: 300 700;
+  font-display: swap;
+  src: url("./fonts/jetbrains-mono-latin-ext.woff2") format("woff2");
+  unicode-range: U+0100-02AF, U+1E00-1E9F, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+/* ---------- Global ("Puddles") tokens -------------------- */
+
+:root {
+  /* Sky scale — single accent. OKLCH canonical, hex approximate. */
+  --sky-100: oklch(0.97 0.015 235);   /* #ecf3f7  softest fill, hover row tint */
+  --sky-200: oklch(0.93 0.04 235);
+  --sky-300: oklch(0.88 0.06 235);    /* #aacde0  fill-accent, portrait bg */
+  --sky-400: oklch(0.78 0.09 235);
+  --sky-500: oklch(0.65 0.12 235);
+  --sky-600: oklch(0.55 0.13 235);    /* #0a6e9a  PRIMARY accent + link color */
+  --sky-700: oklch(0.42 0.11 238);    /* #0b4f76  chrome bar, footer */
+  --sky-900: oklch(0.22 0.06 240);    /* #152234  primary button fill, ink-dark */
+
+  /* Surfaces */
+  --paper:      oklch(0.985 0.004 240); /* #f9f9fa  page background */
+  --paper-warm: oklch(0.975 0.008 85);  /* hire-card gradient floor */
+  --paper-w:    #fbf8f1;                 /* .bbt zebra row */
+  --paper-m:    #f5efdf;                 /* .bbt total row */
+  --paper-deep: #f3ecd8;                 /* .bbt methodology fill */
+
+  /* Ink */
+  --ink:       oklch(0.2 0.015 240);  /* #262b34  primary text */
+  --ink-soft:  oklch(0.45 0.015 240); /* #646b78  secondary text, captions */
+  --ink-faint: oklch(0.7 0.01 240);   /* #a3a8b1  tertiary text, sidenote */
+  --ink-mid:   var(--ink-soft);
+  --rule:      oklch(0.9 0.01 240);   /* #d8dadf  borders, hairlines */
+  --navy:      #1a2330;                /* .bbt header + total rule */
+  --muted:     var(--ink-soft);
+  --green:     #137a4c;
+
+  /* Selection + focus override the sky accent — they're rust on purpose. */
+  --rust-selection:    oklch(0.88 0.06 50);
+  --rust-focus:        oklch(0.55 0.13 38);
+
+  /* Aliases */
+  --text-muted:    var(--ink-soft);
+  --text-faint:    var(--ink-faint);
+  --border-subtle: var(--rule);
+  --fill-soft:     var(--sky-100);
+  --fill-accent:   var(--sky-300);
+
+  /* Layout */
+  --chrome-height: 104px;
+  --space-1: 6px;
+  --space-2: 10px;
+  --space-3: 14px;
+  --space-4: 20px;
+  --space-5: 28px;
+  --space-6: 40px;
+
+  /* Radii — only three exist. Default is sharp 2px, NOT 8px. */
+  --radius-sharp: 2px;
+  --radius-card:  16px;
+  --radius-pill:  999px;
+
+  /* Reading column caps */
+  --col-reading:   65ch;
+  --col-prose:     74ch;
+  --col-wide:      80ch;
+  --col-shell:     1400px;
+
+  /* Type families */
+  --font-display: 'Instrument Serif', 'Times New Roman', serif;
+  --font-body:    'Geist', ui-sans-serif, system-ui, sans-serif;
+  --font-mono:    'JetBrains Mono', ui-monospace, monospace;
+
+  /* Semantic type tokens — use these in components.
+     Sizes are clamp() ranges where the spec mandates fluid scaling. */
+  --type-name-size:         clamp(56px, 9vw, 168px);
+  --type-name-lh:           0.92;
+  --type-name-tracking:     -0.03em;
+
+  --type-section-size:      clamp(48px, 6vw, 96px);
+  --type-section-lh:        1;
+  --type-section-tracking:  -0.02em;
+
+  --type-display-size:      clamp(46px, 7vw, 110px);   /* hire-page display */
+  --type-display-lh:        0.94;
+  --type-display-tracking:  -0.025em;
+
+  --type-h2-size:           30px;       /* page h2 (in-body) */
+  --type-h3-size:           28px;       /* card titles */
+
+  --type-lede-size:         clamp(20px, 2vw, 26px);
+  --type-lede-lh:           1.4;
+
+  --type-body-size:         20px;       /* prose-bogdan */
+  --type-body-lh:           1.78;
+
+  --type-ui-size:           15px;       /* form, card body */
+  --type-caption-size:      13px;
+
+  --type-eyebrow-size:      11px;
+  --type-eyebrow-tracking:  0.14em;
+  --type-eyebrow-small-size:10px;
+  --type-eyebrow-small-tracking: 0.16em;
+
+  --type-chip-size:         10px;
+  --type-chip-tracking:     0.12em;
+
+  --type-chrome-size:       11px;
+  --type-chrome-tracking:   0.12em;
+
+  --type-bbt-header-size:   12px;
+  --type-bbt-header-track:  0.06em;
+  --type-bbt-body-size:     14px;
+  --type-bbt-body-lh:       1.5;
+  --type-bbt-cap-eb-size:   10px;
+  --type-bbt-cap-eb-track:  0.14em;
+  --type-bbt-cap-title:     22px;
+  --type-bbt-source-size:   13px;
+}
+
+/* ---------- Element defaults (semantic) ----------------- */
+
+html, body { margin: 0; padding: 0; }
+body {
+  font-family: var(--font-body);
+  color: var(--ink);
+  background: var(--paper);
+  font-size: 16px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+  font-feature-settings: 'ss01', 'cv11';
+}
+
+/* Display + ledes */
+.serif { font-family: var(--font-display); font-weight: 400; letter-spacing: -0.01em; }
+.mono  { font-family: var(--font-mono); letter-spacing: -0.01em; }
+
+.name {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: var(--type-name-size);
+  line-height: var(--type-name-lh);
+  letter-spacing: var(--type-name-tracking);
+  color: var(--ink);
+  margin: 0;
+}
+.name em, .name .amp { font-style: italic; color: var(--sky-600); }
+
+.section-head h2,
+h2.section-head {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: var(--type-section-size);
+  line-height: var(--type-section-lh);
+  letter-spacing: var(--type-section-tracking);
+  margin: 0;
+}
+
+.display {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: var(--type-display-size);
+  line-height: var(--type-display-lh);
+  letter-spacing: var(--type-display-tracking);
+  margin: 0;
+}
+.display em { color: var(--sky-600); font-style: italic; }
+
+.lede {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: var(--type-lede-size);
+  line-height: var(--type-lede-lh);
+  color: var(--ink-soft);
+  /* Long ledes: justify + pretty. NEVER balance — gives up on long text. */
+  text-align: justify;
+  text-wrap: pretty;
+  hyphens: manual;
+}
+
+/* Body prose — justified with soft hyphens (non-negotiable) */
+.prose-bogdan p,
+.prose-bogdan li,
+article p,
+article li {
+  font-family: var(--font-body);
+  font-size: var(--type-body-size);
+  line-height: var(--type-body-lh);
+  color: var(--ink);
+  max-width: var(--col-prose);
+  text-align: justify;
+  hyphens: auto;
+  -webkit-hyphens: auto;
+  hyphenate-limit-chars: 10 4 4;
+  hanging-punctuation: first allow-end last;
+  font-variant-numeric: oldstyle-nums proportional-nums;
+}
+
+/* Headings get balance — single-liners ignore it. */
+h1, h2, h3, h4 { text-wrap: balance; }
+
+/* Eyebrows + chips + chrome (mono uppercase) */
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: var(--type-eyebrow-size);
+  letter-spacing: var(--type-eyebrow-tracking);
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+.eyebrow--accent { color: var(--sky-600); }
+.eyebrow--small {
+  font-size: var(--type-eyebrow-small-size);
+  letter-spacing: var(--type-eyebrow-small-tracking);
+}
+
+/* Tables use tabular lining figures. The v6 .bbt system explicitly
+   avoids slashed zero; round 0 is the editorial standard. */
+table { font-variant-numeric: tabular-nums lining-nums; }
+
+/* Canonical v6 table system. Mirrors bogdanbaciu.com flourishes.css §31. */
+.bbt-cap {
+  margin-bottom: 14px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--rule);
+}
+.bbt-cap .eb {
+  display: block;
+  font-family: 'Inter', sans-serif;
+  font-size: var(--type-bbt-cap-eb-size);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: var(--type-bbt-cap-eb-track);
+  color: var(--sky-600);
+  margin-bottom: 4px;
+}
+.bbt-cap .ti {
+  display: block;
+  font-family: 'EB Garamond', serif;
+  font-size: var(--type-bbt-cap-title);
+  font-weight: 500;
+  line-height: 1.2;
+  color: var(--ink);
+}
+.bbt-wrap {
+  position: relative;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+.bbt-wrap::after {
+  content: "";
+  position: absolute;
+  top: 0; bottom: 0; right: 0;
+  width: 24px;
+  background: linear-gradient(to right, transparent, var(--paper));
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity .2s;
+}
+.bbt-wrap.has-overflow::after { opacity: 1; }
+table.bbt {
+  width: 100%;
+  table-layout: fixed;
+  border-collapse: collapse;
+  font-family: 'Inter', sans-serif;
+  font-size: var(--type-bbt-body-size);
+  line-height: var(--type-bbt-body-lh);
+  color: var(--ink);
+  margin: 0;
+}
+table.bbt col.c-label { width: 60%; }
+table.bbt col.c-num { width: 20%; }
+table.bbt thead th {
+  background: var(--navy);
+  color: #fff;
+  font-family: 'Inter', sans-serif;
+  font-size: var(--type-bbt-header-size);
+  font-weight: 700;
+  letter-spacing: var(--type-bbt-header-track);
+  text-transform: uppercase;
+  text-align: left;
+  padding: 8px;
+  vertical-align: bottom;
+  white-space: nowrap;
+  border: none;
+}
+table.bbt thead th.num { text-align: right; }
+table.bbt tbody td {
+  padding: 8px;
+  border-top: 1px solid var(--rule);
+  vertical-align: top;
+  font-size: var(--type-bbt-body-size);
+  line-height: var(--type-bbt-body-lh);
+}
+table.bbt tbody tr:first-child td { border-top: none; }
+table.bbt tbody tr:nth-child(even) td { background: var(--paper-w); }
+table.bbt tbody tr:last-child:not(.tot) td { border-bottom: 1px solid var(--rule); }
+table.bbt tbody td.num {
+  text-align: right;
+  font-variant-numeric: tabular-nums lining-nums;
+  font-feature-settings: "tnum", "lnum";
+  white-space: nowrap;
+}
+table.bbt tbody tr.tot td {
+  background: var(--paper-m);
+  color: var(--navy);
+  font-weight: 700;
+  border-top: 2px solid var(--navy);
+  border-bottom: none;
+  padding-top: 8px;
+  padding-bottom: 8px;
+}
+table.bbt tbody tr:hover td {
+  background: rgba(26, 35, 48, 0.09);
+  transition: background .1s ease;
+}
+table.bbt tbody tr.tot:hover td { background: #e7debf; }
+.bbt-source {
+  margin: 12px 0 0;
+  font-size: var(--type-bbt-source-size);
+  color: var(--muted);
+  font-family: 'EB Garamond', serif;
+}
+.bbt-source .src-label { font-style: normal; font-weight: 500; color: var(--ink-soft); }
+.bbt-source .src-body { font-style: italic; }
+.bbt-fn {
+  font-style: italic;
+  font-size: 10.5px;
+  color: var(--sky-600);
+  vertical-align: super;
+  line-height: 0;
+  margin-left: 2px;
+  font-family: 'EB Garamond', serif;
+  font-weight: 500;
+}
+ol.bbt-footnotes {
+  margin: 16px 0 0;
+  padding-left: 22px;
+  color: var(--ink-soft);
+  font-size: 13.5px;
+  line-height: 1.6;
+}
+.aff-l, .aff-r { visibility: hidden; }
+table.bbt thead tr.grp-row th.grp { text-align: center; position: relative; }
+table.bbt.bbt--attr tbody tr.par td:first-child { font-weight: 700; color: var(--navy); }
+table.bbt.bbt--attr tbody tr.par td { background: var(--paper-w); }
+table.bbt.bbt--attr tbody tr.leaf td:first-child { padding-left: 22px; color: var(--ink-mid); font-weight: 400; }
+table.bbt.bbt--attr tbody td.pp { color: var(--green); }
+table.bbt.bbt--attr tbody td.pn { color: var(--sky-600); }
+table.bbt.bbt--attr tbody tr.par:hover td,
+table.bbt.bbt--attr tbody tr.leaf:hover td { background: rgba(26, 35, 48, 0.12); }
+.bbt-drawer-toggle {
+  margin: 14px 0 0;
+  background: none;
+  border: 1px solid var(--rule);
+  color: var(--ink-soft);
+  font: inherit;
+  font-size: 12.5px;
+  padding: 7px 14px;
+  border-radius: 999px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.bbt-drawer { max-height: 0; overflow: hidden; transition: max-height .3s ease, margin-top .3s ease; }
+.bbt-drawer.open { max-height: 600px; margin-top: 14px; }
+.bbt-drawer-inner {
+  padding: 18px 22px;
+  background: #fff;
+  border: 1px solid var(--rule);
+  border-radius: 8px;
+}
+.bbt-methodology {
+  margin-top: 16px;
+  padding: 14px 18px;
+  background: var(--paper-deep);
+  border-left: 3px solid var(--sky-600);
+  border-radius: 0 6px 6px 0;
+  color: var(--ink-soft);
+  font-size: 14px;
+  line-height: 1.7;
+}
+.bbt-methodology .label {
+  display: block;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--sky-600);
+  margin-bottom: 5px;
+}
+
+/* Inline code — kill backtick pseudo-elements (Tailwind Typography injects them). */
+code::before, code::after { content: none !important; }
+code {
+  font-family: var(--font-mono);
+  font-size: 0.92em;
+  background: var(--sky-100);
+  padding: 1px 6px;
+  border-radius: var(--radius-sharp);
+  color: var(--ink);
+}
+
+/* Selection + focus — RUST, not sky. */
+::selection { background: var(--rust-selection); color: var(--ink); }
+:focus-visible {
+  outline: 2px solid var(--rust-focus);
+  outline-offset: 2px;
+  border-radius: var(--radius-sharp);
+}
+
+a { color: inherit; text-decoration: none; }
+.prose-bogdan a, article a {
+  color: var(--sky-700);
+  border-bottom: 1px solid var(--sky-700);
+}
+.prose-bogdan a:hover { color: var(--sky-900); border-color: var(--sky-900); }
+
+
+/* =========================================================
+   .db-scope — financial-model artifact subsystem.
+   PAPER-CREAM SURFACES + MACABACUS CELL COLORS.
+   Stays inside .db-scope — never bleeds into the global page.
+   ========================================================= */
+
+.db-scope {
+  /* Surfaces */
+  --db-paper:        #faf7f2;
+  --db-panel:        #fffdf8;
+  --db-paper-edge:   #f3ede2;
+  --db-panel-edge:   #e7dfce;
+
+  /* Ink */
+  --db-ink:        #1a2330;
+  --db-ink-soft:   #4a5568;
+  --db-ink-faint:  #8b95a3;
+  --db-rule:       #d6cfc1;
+
+  /* Editorial accents */
+  --db-accent-rust: #b85e3a;
+  --db-accent-teal: #2c6e6e;
+
+  /* Macabacus cell colors */
+  --cell-input:        #0000FF; /* hardcoded input */
+  --cell-formula:      #1a2330; /* primary ink */
+  --cell-link:         #00B050; /* cross-sheet link */
+  --cell-error:        #a23934;
+  --cell-subtle:       #6b7280; /* subtotal */
+  --cell-output:       #2c6e6e;
+  --cell-driver-fill:  #FFFFCC; /* PAIRS WITH blue font; NEVER standalone. */
+
+  /* Highlights */
+  --db-period-wash:    #e8f0ee;
+  --db-callout-insight:#fef6e8;
+  --db-callout-warning:#fbeae3;
+  --db-callout-rule:   #ebf2ee;
+
+  /* Spacing — 4px base (denser than global 6/10/14/20/28/40). */
+  --space-1:  4px;
+  --space-2:  8px;
+  --space-3:  12px;
+  --space-4:  16px;
+  --space-5:  24px;
+  --space-6:  32px;
+  --space-7:  48px;
+  --space-8:  64px;
+  --space-9:  96px;
+  --space-10: 128px;
+
+  --radius-card: 3px;  /* SOFTER than global default 16px — print-feel hairline */
+
+  /* Shadows ONLY exist inside .db-scope. Global page is shadow-free. */
+  --shadow-soft: 0 1px 2px rgba(26,35,48,0.04), 0 4px 12px rgba(26,35,48,0.04);
+  --shadow-card: 0 2px 6px rgba(26,35,48,0.06);
+
+  /* Body type swap: Source Serif 4. (Falls back to system serif here.) */
+  --font-body: 'Source Serif 4', 'Iowan Old Style', 'Charter', 'Georgia', serif;
+
+  background: var(--db-paper);
+  color: var(--db-ink);
+  font-family: var(--font-body);
+}

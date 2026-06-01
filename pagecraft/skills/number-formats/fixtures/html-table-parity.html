@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Number Formats HTML Parity Fixture</title>
+  <style>
+    body { font-family: system-ui, sans-serif; margin: 32px; }
+    .bbt { border-collapse: collapse; width: min(760px, 100%); }
+    .bbt caption { text-align: left; font-weight: 700; margin-bottom: 8px; }
+    .bbt th, .bbt td { border-bottom: 1px solid #d8dadf; padding: 8px 10px; }
+    .bbt th { background: #152234; color: #fff; text-transform: uppercase; font-size: 12px; }
+    .num { text-align: right; font-variant-numeric: tabular-nums lining-nums; white-space: nowrap; }
+    .aff-l, .aff-r { visibility: hidden; }
+    .cell-input { color: #0000ff; }
+    .cell-input.fill { background: #ffffcc; }
+    .cell-link { color: #00b050; }
+    .cell-error { color: #ff0000; }
+    tr.tot td { font-weight: 700; border-top: 2px solid #152234; }
+    .margin { color: #808080; font-style: italic; }
+  </style>
+</head>
+<body>
+  <table class="bbt">
+    <caption>HTML parity fixture, $ in 000s</caption>
+    <thead>
+      <tr>
+        <th>Metric</th>
+        <th>Positive</th>
+        <th>Zero</th>
+        <th>Negative</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Revenue</td>
+        <td class="num cell-link"><span class="aff-l">(</span>1,240.0<span class="aff-r">)</span></td>
+        <td class="num">–</td>
+        <td class="num">(1,240.0)</td>
+      </tr>
+      <tr class="margin">
+        <td>EBITDA margin</td>
+        <td class="num"><span class="aff-l">(</span>25.0%<span class="aff-r">)</span></td>
+        <td class="num">–</td>
+        <td class="num">(25.0%)</td>
+      </tr>
+      <tr>
+        <td>Driver input</td>
+        <td class="num cell-input fill"><span class="aff-l">(</span>3.0<span class="aff-r">)</span></td>
+        <td class="num">–</td>
+        <td class="num cell-error">ERROR</td>
+      </tr>
+      <tr class="tot">
+        <td>Free cash flow</td>
+        <td class="num"><span class="aff-l">(</span>500.0<span class="aff-r">)</span></td>
+        <td class="num">–</td>
+        <td class="num">(42.0)</td>
+      </tr>
+    </tbody>
+  </table>
+</body>
+</html>

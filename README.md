@@ -45,6 +45,10 @@ skills/
 ├─ CODE_OF_CONDUCT.md
 ├─ SECURITY.md
 ├─ .gitignore
+<<<<<<< HEAD
+=======
+├─ sync-skills.sh    (propagate canonical skills → machine skill dirs)
+>>>>>>> e34b4928187db09389c1c79013a08b160ab4ece1
 ├─ agent-coordination/
 │  └─ SKILL.md
 ├─ handoff/
@@ -53,11 +57,51 @@ skills/
 │  └─ SKILL.md
 ├─ parallel-dispatch/
 │  └─ SKILL.md
+<<<<<<< HEAD
+=======
+├─ skill-drift-scanner/
+├─ bogdan-baciu-design/
+│  ├─ SKILL.md
+│  ├─ references/brand-system.md
+│  └─ assets/design-system/      (tokens, fonts, images, previews, UI kit)
+├─ pagecraft/                    (multi-skill plugin bundle)
+│  ├─ .claude-plugin/plugin.json
+│  └─ skills/
+│     ├─ pagecraft/              (overview + installer + shared design assets)
+│     │  ├─ SKILL.md
+│     │  ├─ install-pagecraft.sh
+│     │  ├─ assets/css/pagecraft.css
+│     │  ├─ assets/wrap-lab/     (good/bad wrap fixtures)
+│     │  └─ references/          (tables, headers, text-wrap, number-formats, …)
+│     ├─ verify-text-wrap/       (canonical home of the wrap probe + verifiers)
+│     │  ├─ SKILL.md
+│     │  ├─ runner.py · check-keystone.py · browserbase.py
+│     │  └─ wrap-safe.css · wrapcheck.js   (wrap-safe runtime library)
+│     ├─ table-system-migration/
+│     │  ├─ SKILL.md
+│     │  ├─ table-ratchet.py       (baseline ratchet for no-new table debt)
+│     │  └─ table-ratchet-checklist.md
+│     ├─ number-formats/
+│     │  ├─ SKILL.md
+│     │  ├─ formats.json         (byte-exact Excel format codes)
+│     │  └─ apply-number-formats.py
+│     └─ reskin/
+│        ├─ SKILL.md
+│        ├─ reskin.py            (detect → sync → reframe; hybrid bespoke/generic)
+│        └─ reskin.example.json
+>>>>>>> e34b4928187db09389c1c79013a08b160ab4ece1
 ├─ excel-wow/
 │  └─ SKILL.md
 └─ blog-image-gen/
    └─ SKILL.md
 ```
+
+> **Bundles vs. loose skills.** Most folders are single skills (one `SKILL.md`).
+> `pagecraft` is a multi-skill **plugin bundle**: its members live under
+> `pagecraft/skills/` and stay self-contained (each owns its own tools, nothing
+> vendored or duplicated). `sync-skills.sh` *flattens* bundle members on export,
+> so each still installs as a top-level loose skill (`~/.tool/skills/<name>/`)
+> invokable by its bare name.
 
 **Conventions**
 
@@ -94,8 +138,23 @@ Use this checklist before publishing a skill:
 | `grill-me` | Ready | Runs a one-question-at-a-time pressure-test interview for plans/decisions. |
 | `parallel-dispatch` | Ready | Generates multi-agent prompts and coordinator playbook from a parallel work plan. |
 | `quiz-me` | Ready | Active-recall quiz on a topic, doc, codebase area, or interview prep — one question at a time, adaptive difficulty. |
+<<<<<<< HEAD
 | `excel-wow` | Draft | Placeholder for a future Excel/financial-modeling workflow skill. |
 | `blog-image-gen` | Ready | Generates editorial hero images for blog posts via OpenAI `gpt-image-2` (Responses API + thinking), with batch/ingest workflows. |
+=======
+| `chat-analysis` | Ready | Analyzes Codex or Claude Code session transcripts for friction patterns, redacts sensitive text, and proposes reviewed agent-instruction improvements. |
+| `weekly-update` | Ready | Drafts evidence-driven stakeholder updates from git plus issue-tracker data, with GitHub, Linear, and Jira data contracts. |
+| `pagecraft` | Ready | Multi-skill **plugin bundle** for HTML formatting + visual safety. Contains the four skills below; `pagecraft/skills/pagecraft` is the overview + installer. |
+| `pagecraft » verify-text-wrap` | Ready | Verifies static HTML portals for caterpillar text, narrow containers, and right-edge layout drift. Canonical home of the `wrap-safe` runtime library (`wrap-safe.css` reset + `wrapcheck.js` probe) it drives. |
+| `pagecraft » table-system-migration` | Ready | Audits, migrates, and regression-tests messy HTML table systems with a public-safe scrub gate. |
+| `pagecraft » number-formats` | Ready | Applies the Macabacus financial number-format standard (en-dash zeros, aligned parenthesized negatives, blue inputs, green links, grey-italic margins, bold totals) to Excel models and HTML tables. Byte-exact codes + openpyxl applicator. |
+| `pagecraft » reskin` | Ready | Detects a repo's design system (a `*-design`/`*-brand` skill, tokens stylesheet, or `reskin.json`) and applies its brand frame (nav/hero/footer + tokens + assets) across the site. Hybrid: runs the repo's bespoke applier if present, else a built-in frame injector. Idempotent + dry-run-able. |
+| `skill-drift-scanner` | Ready | Audits Codex and Claude skill deployment drift, autosync health, scheduler status, and reload requirements across machine-level skill installs. |
+| `excel-wow` | Draft | Placeholder for a future Excel/financial-modeling workflow skill. |
+| `blog-image-gen` | Ready | Generates editorial hero images for blog posts through the blog repo's OpenAI image scripts, with current-doc verification, batch/ingest workflows, and thumbnail review. |
+| `bogdan-baciu-design` | Ready | Applies Bogdan Baciu's personal editorial design system to sites, prototypes, documents, slide decks, and scoped financial artifacts, bundling tokens, fonts, imagery, previews, and the brand reference. |
+| `deep-research-agents` | Ready | Treats Claude Managed Agent, Gemini Deep Research, and Parallel.ai as one deep-research capability with repo-specific harness guidance. |
+>>>>>>> e34b4928187db09389c1c79013a08b160ab4ece1
 
 ---
 

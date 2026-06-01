@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Pagecraft Bad Grid Fixture</title>
+<style>
+  body { margin: 0; font: 16px/1.5 system-ui, sans-serif; color: #172033; }
+  main { width: min(980px, 94vw); margin: 40px auto; }
+  .bad-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+  .card { border: 1px solid #d8d0c4; padding: 12px; }
+  .label { font-weight: 700; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Bad grid fixture</h1>
+  <p>This fixture intentionally uses a fixed four-column minmax(0, 1fr) grid. The policy checker should fail it.</p>
+  <div class="bad-grid">
+    <div class="card"><p class="label">Working capital normalization detail</p></div>
+    <div class="card"><p class="label">Quality of earnings bridge</p></div>
+    <div class="card"><p class="label">Deferred revenue adjustment</p></div>
+    <div class="card"><p class="label">Customer concentration review</p></div>
+  </div>
+</main>
+</body>
+</html>
