@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Pagecraft Table And Header Fixture</title>
+<link rel="stylesheet" href="../css/pagecraft.css">
+<style>
+  body { margin: 0; background: #f6f1e6; font: 16px/1.5 system-ui, sans-serif; color: #172033; }
+  main { width: min(1080px, 94vw); margin: 40px auto; background: #fffdf8; padding: 28px; }
+</style>
+</head>
+<body>
+<main class="pc-prose">
+  <p class="pc-eyebrow">Demo fixture</p>
+  <h1>Table and header treatment</h1>
+  <hr class="pc-title-rule">
+
+  <section class="pc-section-break pc-section-break--first">
+    <p class="pc-section-label">Part I</p>
+    <h2 class="pc-section-title">Model output</h2>
+    <p class="pc-section-deck">The section break carries label, title, and deck without creating a decorative card.</p>
+  </section>
+
+  <figure class="pc-table-figure">
+    <figcaption class="pc-table-cap">
+      <span class="pc-table-eb">Exhibit 01</span>
+      <span class="pc-table-ti">Scenario output</span>
+      <span class="pc-table-sub">Dollars in thousands unless noted.</span>
+    </figcaption>
+    <div class="pc-table-wrap">
+      <table class="pc-table">
+        <thead>
+          <tr><th>Scenario</th><th class="num">Revenue</th><th class="num">EBITDA</th><th class="num">Margin</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Downside</td><td class="num">$8,420</td><td class="num">$1,020</td><td class="num">12.1%</td></tr>
+          <tr><td>Base</td><td class="num">$10,500</td><td class="num">$1,890</td><td class="num">18.0%</td></tr>
+          <tr class="tot"><td>Upside</td><td class="num">$12,740</td><td class="num">$2,670</td><td class="num">21.0%</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="pc-table-source"><span>Source:</span> Synthetic Pagecraft fixture.</p>
+  </figure>
+</main>
+</body>
+</html>

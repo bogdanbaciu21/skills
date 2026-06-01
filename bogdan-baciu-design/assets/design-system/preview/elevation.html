@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Elevation — flat by default</title>
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  body { background: var(--paper); padding: 22px 28px; }
+  .row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; align-items: stretch; }
+  .card { background: #fff; padding: 18px 20px; min-height: 110px; display: flex; flex-direction: column; justify-content: space-between; }
+  .card .lbl { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-soft); margin-bottom: 8px; }
+  .card .ttl { font-family: 'Instrument Serif', serif; font-size: 22px; line-height: 1.1; color: var(--ink); }
+  .card .note { font-family: var(--font-mono); font-size: 9.5px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-faint); margin-top: 6px; }
+  .flat { border: 1px solid var(--rule); border-radius: 2px; }
+  .db-soft { background: #fffdf8; border: 1px solid #d6cfc1; border-radius: 3px; box-shadow: 0 1px 2px rgba(26,35,48,0.04), 0 4px 12px rgba(26,35,48,0.04); }
+  .db-card { background: #fffdf8; border: 1px solid #d6cfc1; border-radius: 3px; box-shadow: 0 2px 6px rgba(26,35,48,0.06); }
+</style>
+</head>
+<body>
+  <div class="row">
+    <div class="card flat">
+      <span class="lbl">Global default · flat</span>
+      <span class="ttl">Borders, not shadows</span>
+      <span class="note">No box-shadow tokens at global scope</span>
+    </div>
+    <div class="card db-soft">
+      <span class="lbl">.db-scope · shadow-soft</span>
+      <span class="ttl">Floating exhibit panel</span>
+      <span class="note">0 1px 2 / 0 4px 12 · 4% black</span>
+    </div>
+    <div class="card db-card">
+      <span class="lbl">.db-scope · shadow-card</span>
+      <span class="ttl">Raised exhibit card</span>
+      <span class="note">0 2px 6 · 6% black</span>
+    </div>
+  </div>
+</body>
+</html>

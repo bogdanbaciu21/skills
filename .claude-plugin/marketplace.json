@@ -33,6 +33,24 @@
       "name": "quiz-me",
       "source": "./quiz-me",
       "description": "Active-recall quiz on a topic, document, codebase area, or interview prep. One question at a time, adaptive difficulty."
+<<<<<<< HEAD
+=======
+    },
+    {
+      "name": "pagecraft",
+      "source": "./pagecraft",
+      "description": "Portable HTML formatting and visual-safety bundle (multi-skill plugin). Contains verify-text-wrap (caterpillar/right-edge probe + the wrap-safe runtime library), table-system-migration, number-formats (Macabacus financial format standard), reskin (detect a repo's design system and apply its brand frame across the site), and a pagecraft overview/installer — robust tables, financial number formats, headers/section dividers, design-system reskinning, and text-wrap prevention as patterns plus installable deterministic checks."
+    },
+    {
+      "name": "skill-drift-scanner",
+      "source": "./skill-drift-scanner",
+      "description": "Audits Codex and Claude skill deployment drift, autosync health, scheduler status, and reload requirements across machine-level skill installs."
+    },
+    {
+      "name": "bogdan-baciu-design",
+      "source": "./bogdan-baciu-design",
+      "description": "Applies Bogdan Baciu's personal editorial design system to websites, static HTML, prototypes, documents, slide decks, and scoped financial-model artifacts. Bundles the Puddles sky-blue on warm-cream palette, Instrument Serif + Geist + JetBrains Mono typography, flat editorial layout rules, fonts, imagery, previews, and the .db-scope artifact styling."
+>>>>>>> e34b4928187db09389c1c79013a08b160ab4ece1
     }
   ]
 }

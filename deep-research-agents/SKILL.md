@@ -1,0 +1,86 @@
+---
+name: deep-research-agents
+description: "Use Dan's three paid deep-research providers as one capability: Claude Managed Agent, Gemini Deep Research, and Parallel.ai. Trigger when the user asks for deep research, a research harness, multi-angle research fan-out, five angles, Workflow tool unavailable, Gemini API deep research, Claude managed agent research, Parallel.ai research, or wants the same research methodology to work across repos such as dans-brain, bogdanbaciu-dot-com, and LJB."
+---
+
+# Deep Research Agents
+
+## Overview
+
+Dan has three research backends that should be treated as one shared capability:
+Claude Managed Agent, Gemini Deep Research, and Parallel.ai. If a requested
+methodology expects a missing `Workflow` tool, do not stop there; use the local
+provider harness or the repo-specific surface instead.
+
+## Canonical Harness
+
+Prefer the local `dans-brain` checkout when you need a repo-neutral research
+run. Do not assume a Linux/root home path; resolve the project root explicitly:
+
+```bash
+DANS_BRAIN_ROOT="${DANS_BRAIN_ROOT:-$HOME/Desktop/dans-brain}"
+test -f "$DANS_BRAIN_ROOT/bin/deep_research.py"
+cd "$DANS_BRAIN_ROOT" && uv run python bin/deep_research.py --list-providers
+cd "$DANS_BRAIN_ROOT" && uv run python bin/deep_research.py "research question" --dry-run
+```
+
+The harness writes provider outputs to `state/deep-research/<timestamp>-<slug>/`
+with one markdown file per provider plus `combined.md` and `manifest.json`.
+`state/` is git-ignored runtime data.
+
+Before any live provider call, check local provider availability:
+
+```bash
+python3 /Users/danb/Desktop/skills/deep-research-agents/scripts/check_provider_env.py
+```
+
+Then run a no-cost harness check:
+
+```bash
+cd "$DANS_BRAIN_ROOT" && uv run python bin/deep_research.py "research question" --dry-run
+```
+
+Only run the paid call after the user confirms the provider count and expected
+call count. ChatGPT, Claude, Gemini, or Parallel subscriptions do not imply API
+credits for these harness calls.
+
+For multi-angle research, use repeated `--angle` flags. The harness requires
+`--allow-many` when the plan exceeds three upstream runs because five angles
+times three providers is fifteen paid calls:
+
+```bash
+cd "$DANS_BRAIN_ROOT" && uv run python bin/deep_research.py "overall question" \
+  --angle "market map" \
+  --angle "technical feasibility" \
+  --angle "risks and counter-evidence" \
+  --allow-many
+```
+
+## Repo Surfaces
+
+- `dans-brain`: `bin/deep_research.py` and provider plumbing in
+  `bin/deep_research_agents.py`; `bin/discover_sources.py` reuses that provider
+  layer and defaults to all three engines. Use `--plan-only` for a no-API check.
+- `bogdanbaciu-dot-com`: Phoenix modules under `lib/bogdan/research/` and the
+  admin `/admin/research` surface.
+- `ljb`: Jan portal research functions under
+  `brian-portal/netlify/functions/jan-*`, with provider `"all"` fanning out to
+  Claude, Gemini, and Parallel.ai.
+
+## Operating Rules
+
+- Keep secrets local: `ANTHROPIC_API_KEY`, `GEMINI_API_KEY`, and
+  `PARALLEL_API_KEY` belong in untracked env/config, never in repo files.
+- Confirm paid-call scope before execution: provider set, angle count, total
+  upstream calls, and whether `--allow-many` is required. If the user has not
+  confirmed cost exposure, stop at `--dry-run`.
+- Treat provider reports as source material, not verified final truth. Synthesize
+  conflicts explicitly and verify important, time-sensitive, legal, medical, or
+  financial claims with current primary sources.
+- Use Gemini for broad landscape/source discovery, Parallel.ai for heavily cited
+  source coverage, and Claude Managed Agent for synthesis, skeptical review, and
+  contradiction checks.
+- If running in `dans-brain`, check
+  `docs/capabilities/deep-research-agents.md` and
+  `config/capabilities.json` before inventing a new harness or searching old
+  transcripts for setup details.

@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Bogdan Brand Fixture - Editorial Surface</title>
+  <link rel="stylesheet" href="../../assets/design-system/colors_and_type.css">
+  <style>
+    body {
+      margin: 0;
+      background: var(--paper, #f9f9fa);
+      color: var(--ink, #262b34);
+      font-family: var(--font-body, system-ui, sans-serif);
+    }
+    main {
+      width: min(1120px, calc(100% - 40px));
+      margin: 0 auto;
+      padding: 64px 0;
+    }
+    .fixture-eyebrow {
+      font-family: var(--font-mono, ui-monospace, monospace);
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      color: var(--sky-700, #0b4f76);
+      font-size: 12px;
+    }
+    h1 {
+      max-width: 760px;
+      font-family: var(--font-display, Georgia, serif);
+      font-size: clamp(44px, 7vw, 92px);
+      line-height: .95;
+      margin: 16px 0 24px;
+      font-weight: 400;
+    }
+    h1 em {
+      color: var(--sky-600, #0a6e9a);
+      font-style: italic;
+    }
+    .lede {
+      max-width: 68ch;
+      font-size: 20px;
+      line-height: 1.55;
+    }
+    .rule {
+      border-top: 1px solid var(--rule, #d8dadf);
+      margin: 40px 0;
+    }
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+    }
+    .card {
+      border: 1px solid var(--rule, #d8dadf);
+      border-radius: 2px;
+      padding: 20px;
+      background: color-mix(in srgb, var(--paper, #f9f9fa) 88%, white);
+    }
+  </style>
+</head>
+<body>
+  <main data-brand="bogdan-baciu">
+    <div class="fixture-eyebrow">Brand regression fixture</div>
+    <h1>Editorial finance surfaces with <em>one clear accent</em>.</h1>
+    <p class="lede">This page verifies the global brand layer: warm paper, ink text, Instrument Serif display moments, restrained mono labels, flat rules, and Puddles sky-blue as the single active accent.</p>
+    <div class="rule"></div>
+    <section class="cards" aria-label="Fixture cards">
+      <article class="card">
+        <div class="fixture-eyebrow">Signal</div>
+        <p>Cards should stay flat, bordered, and readable without decorative shadows or gradients.</p>
+      </article>
+      <article class="card">
+        <div class="fixture-eyebrow">Typography</div>
+        <p>Display serif carries hierarchy; sans-serif body copy carries repeated reading.</p>
+      </article>
+      <article class="card">
+        <div class="fixture-eyebrow">Accent</div>
+        <p>Sky-blue is the active accent. Rust should not become a general CTA color.</p>
+      </article>
+    </section>
+  </main>
+</body>
+</html>

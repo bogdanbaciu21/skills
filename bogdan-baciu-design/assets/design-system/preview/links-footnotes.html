@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Links &amp; footnotes</title>
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  body { background: var(--paper); padding: 22px 28px; font-family: var(--font-body); color: var(--ink); }
+  .col { max-width: 600px; }
+  .col p { font-size: 16px; line-height: 1.7; margin: 0 0 14px; text-align: justify; hyphens: auto; }
+  a.bb-link { color: var(--sky-600); text-decoration: none; border-bottom: 1px solid currentColor; padding-bottom: 1px; }
+  a.bb-link:hover { color: var(--sky-700); background: oklch(0.93 0.02 245); }
+  sup.fn { color: var(--sky-600); font-family: var(--font-mono); font-size: 10px; padding-left: 2px; }
+  .footnotes { border-top: 1px solid var(--rule); margin-top: 14px; padding-top: 10px; font-family: var(--font-body); font-size: 13px; color: var(--ink-soft); line-height: 1.55; }
+  .footnotes ol { margin: 0; padding-left: 18px; }
+  .footnotes li { margin-bottom: 4px; }
+  .footnotes li::marker { font-family: var(--font-mono); font-size: 10px; color: var(--sky-600); }
+  .meta { margin-top: 12px; font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-faint); }
+</style>
+</head>
+<body>
+  <div class="col">
+    <p>Body links use <a class="bb-link" href="#">sky-600 with a 1px underline</a>, never an offset rule. Footnotes<sup class="fn">1</sup> sit at the end of the entry, marked by a small superscript in the same accent color.</p>
+    <div class="footnotes">
+      <ol>
+        <li>Numbered list with monospace markers in sky-600 — same family as eyebrows so they read as voice, not chrome.</li>
+      </ol>
+    </div>
+    <div class="meta">Underline 1px · hover paints a sky-100 wash · :focus-visible adds 2px rust outline</div>
+  </div>
+</body>
+</html>

@@ -13,3 +13,10 @@ chat-analysis/chat-analysis-review.md
 # macOS metadata
 .DS_Store
 **/.DS_Store
+<<<<<<< HEAD
+=======
+
+# Python bytecode cache (e.g. verify-text-wrap runner)
+__pycache__/
+*.pyc
+>>>>>>> e34b4928187db09389c1c79013a08b160ab4ece1

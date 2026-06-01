@@ -1,0 +1,19 @@
+{
+  "description": "Browser screenshot contract for the two public-safe Bogdan brand regression fixtures.",
+  "viewports": [
+    {"name": "desktop", "width": 1280, "height": 900},
+    {"name": "mobile", "width": 390, "height": 844}
+  ],
+  "fixtures": [
+    {
+      "file": "editorial-surface.html",
+      "must_contain": ["data-brand=\"bogdan-baciu\"", "fixture-eyebrow"],
+      "must_not_contain": ["db-scope"]
+    },
+    {
+      "file": "financial-exhibit.html",
+      "must_contain": ["db-scope", "bbt-wrap", "cell-input", "cell-link"],
+      "must_not_contain": ["box-shadow"]
+    }
+  ]
+}

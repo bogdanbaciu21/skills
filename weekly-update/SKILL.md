@@ -66,6 +66,7 @@ git log --since="<last Sunday>" --shortstat --pretty=format:"" | \
 git rev-list --count HEAD
 ```
 
+<<<<<<< HEAD
 #### GitHub Issues (default tracker)
 
 ```bash
@@ -138,6 +139,14 @@ jira issue list --jql "project = <KEY>" --limit 2000
 #### Common rule
 
 Aggregate the raw output into the tables the skill renders. If the tracker is rate-limited or errors out, degrade gracefully: ask for the numbers manually rather than fabricating them.
+=======
+#### Issue Trackers
+
+Load `references/tracker-providers.md` for GitHub, Linear, Jira, and degraded
+manual-mode data contracts. Aggregate raw tracker output into the tables this
+skill renders. If the tracker is rate-limited or errors out, degrade gracefully:
+ask for the numbers manually rather than fabricating them.
+>>>>>>> e34b4928187db09389c1c79013a08b160ab4ece1
 
 ### Step 3 — Ask the Four Questions
 
@@ -380,3 +389,14 @@ Common email template tokens to support:
 ## Invocation
 
 Invoke by asking for the "weekly update," "Friday email," "status report," or "stakeholder update." The skill acknowledges, pulls data, asks the four questions, drafts the file, and reports the filename back.
+<<<<<<< HEAD
+=======
+
+## Skill maintenance
+
+When editing tracker aggregation or provider references, run:
+
+```bash
+PYTHONDONTWRITEBYTECODE=1 python3 evals/run_evals.py
+```
+>>>>>>> e34b4928187db09389c1c79013a08b160ab4ece1

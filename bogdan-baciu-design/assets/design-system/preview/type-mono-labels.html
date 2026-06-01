@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Type — Mono labels</title>
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  body { background: var(--paper); padding: 18px 22px; display: flex; flex-direction: column; gap: 14px; font-family: var(--font-body); }
+  .row { display: flex; gap: 18px; align-items: baseline; flex-wrap: wrap; }
+  .lbl { display: inline-flex; align-items: center; }
+  .eyebrow { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-soft); }
+  .eyebrow--accent { color: var(--sky-600); }
+  .eyebrow--small { font-size: 10px; letter-spacing: 0.16em; }
+  .chip { display: inline-block; padding: 6px 10px; border: 1px solid var(--rule); border-radius: 999px; background: #fff; font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--sky-700); }
+  .chrome-strip { background: var(--sky-700); color: #fff; padding: 10px 14px; font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; display: flex; gap: 18px; }
+  .chrome-strip span { opacity: 0.82; }
+  .chrome-strip span:first-child { opacity: 1; }
+  .meta { font-family: var(--font-mono); font-size: 9.5px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-faint); }
+</style>
+</head>
+<body>
+  <div class="row">
+    <span class="lbl"><span class="eyebrow eyebrow--accent">Eyebrow accent</span></span>
+    <span class="lbl"><span class="eyebrow">Eyebrow standard</span></span>
+    <span class="lbl"><span class="eyebrow eyebrow--small">Eyebrow · small</span></span>
+    <span class="chip">Chip · pill</span>
+  </div>
+  <div class="chrome-strip">
+    <span>Home</span><span>Content</span><span>Evergreen</span><span>Recent</span><span>Collections</span><span>Work</span>
+  </div>
+  <div class="meta">JetBrains Mono · 10–11px · 0.12–0.16em tracking · uppercase</div>
+</body>
+</html>

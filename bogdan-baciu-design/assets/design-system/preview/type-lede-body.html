@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Type — Lede &amp; body</title>
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  body { background: var(--paper); padding: 18px 22px; max-width: 660px; }
+  .lede { font-family: 'Instrument Serif', serif; font-style: italic; font-size: 22px; line-height: 1.4; color: var(--ink-soft); text-align: justify; text-wrap: pretty; hyphens: manual; margin: 0 0 16px; }
+  p.body { font-family: var(--font-body); font-size: 16px; line-height: 1.78; color: var(--ink); text-align: justify; hyphens: auto; -webkit-hyphens: auto; hyphenate-limit-chars: 10 4 4; margin: 0 0 8px; font-variant-numeric: oldstyle-nums proportional-nums; max-width: 70ch; }
+  .meta { margin-top: 10px; font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-faint); }
+  .meta b { color: var(--ink-soft); font-weight: 500; margin-right: 14px; }
+</style>
+</head>
+<body>
+  <p class="lede">A long lede sets justify + text-wrap pretty &mdash; never balance, which gives up on long text.</p>
+  <p class="body">Body lands at 20px on the live site; here it's 16 to fit the card. Hyphenation kicks in at ten characters with at least four on each side, which keeps abbreviations and short words intact while permitting longer compounds to break and prevent rivers in justified prose.</p>
+  <div class="meta"><b>Body</b>Geist 20/1.78 · 74ch · justify · hyphens auto · oldstyle nums</div>
+</body>
+</html>

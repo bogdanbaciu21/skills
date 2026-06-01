@@ -1,0 +1,14 @@
+Skill sync status: drift found
+
+Missing Installed Skills:
+- ~/.codex/skills/blog-image-gen
+- ~/.claude/skills/number-formats
+
+Content Drift:
+- ~/.codex/skills/handoff/SKILL.md differs from source
+
+Unmanaged Custom Skills:
+- ~/.claude/skills/private-local-skill
+
+Codex restart recommended after last change: yes
+Full report: /Users/example/.local/state/codex-skill-sync/report.md
