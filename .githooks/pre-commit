@@ -1,0 +1,36 @@
+#!/bin/sh
+# pre-commit — fail-closed secret gate for the skill PROPAGATION SOURCE.
+#
+# This repo is what codex-skill-sync injects into the 4 install roots (and
+# refreshes into every opted-in repo) on a timer, unattended. A skill committed
+# here with a live credential or a client-confidential marker would be spread
+# everywhere — including out of a client repo. So block it at the door.
+#
+# Scans only the staged skill content (not the whole tree), skips the hook dir
+# itself (it legitimately contains the pattern strings). Reviewed exception:
+# git commit --no-verify.
+set -u
+REPO=$(git rev-parse --show-toplevel)
+SCANNER="$REPO/.githooks/skill_secret_scan.py"
+[ -f "$SCANNER" ] || exit 0   # scanner absent -> fail-open (never block on tooling gap)
+
+staged=$(git diff --cached --name-only --diff-filter=ACM | grep -v '^\.githooks/' || true)
+[ -z "$staged" ] && exit 0
+
+# Resolve to absolute paths that exist, then scan.
+set --
+for f in $staged; do
+  [ -f "$REPO/$f" ] && set -- "$@" "$REPO/$f"
+done
+[ "$#" -eq 0 ] && exit 0
+
+if ! python3 "$SCANNER" "$@" >/tmp/_skill_secret_gate.out 2>&1; then
+  echo "✋ pre-commit: secret / client-confidential marker in staged skill content — refusing to commit." >&2
+  echo "   This repo propagates skills everywhere; a secret here would spread." >&2
+  sed 's/^/   /' /tmp/_skill_secret_gate.out >&2
+  echo "   If this is a reviewed false positive: git commit --no-verify" >&2
+  rm -f /tmp/_skill_secret_gate.out
+  exit 1
+fi
+rm -f /tmp/_skill_secret_gate.out
+exit 0
