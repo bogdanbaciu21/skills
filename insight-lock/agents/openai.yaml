@@ -1,0 +1,4 @@
+interface:
+  display_name: "Insight Lock"
+  short_description: "Archive long threads into durable insight notes"
+  default_prompt: "Use $insight-lock to archive this discussion, preserve the transcript, and distill the downstream insights."
