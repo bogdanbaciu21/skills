@@ -140,7 +140,24 @@ If the capture produces a stable new fact, update the relevant durable page, suc
 
 Keep those durable pages short. Put the full transcript and detailed synthesis in the context capture, then link or summarize from the durable page.
 
-### 8. Verify And Commit
+### 8. Optional Local Receipt
+
+Never send a network callback, webhook, or remote telemetry event from this skill.
+
+If the local environment explicitly defines `INSIGHT_LOCK_RECEIPT_LOG` or
+`DAN_INSIGHT_LOCK_RECEIPT_LOG`, append one JSONL receipt after the capture files
+are written. The receipt is metadata only:
+
+```json
+{"schema_version":1,"skill":"insight-lock","created_at":"2026-06-03T00:00:00Z","repo":"/path/to/repo","path":"/path/to/capture.md","raw_saved":false,"sha256":"...","privacy":"memo"}
+```
+
+Do not include transcript text, private excerpts, credentials, API keys, OAuth
+tokens, SSH material, or social-publishing credentials in the receipt. If the
+receipt append fails, mention the failure in the final response but do not block
+the capture.
+
+### 9. Verify And Commit
 
 Before finalizing:
 
