@@ -45,10 +45,7 @@ skills/
 ├─ CODE_OF_CONDUCT.md
 ├─ SECURITY.md
 ├─ .gitignore
-<<<<<<< HEAD
-=======
 ├─ sync-skills.sh    (propagate canonical skills → machine skill dirs)
->>>>>>> e34b4928187db09389c1c79013a08b160ab4ece1
 ├─ agent-coordination/
 │  └─ SKILL.md
 ├─ handoff/
@@ -57,8 +54,8 @@ skills/
 │  └─ SKILL.md
 ├─ parallel-dispatch/
 │  └─ SKILL.md
-<<<<<<< HEAD
-=======
+├─ insight-lock/
+│  └─ SKILL.md
 ├─ skill-drift-scanner/
 ├─ bogdan-baciu-design/
 │  ├─ SKILL.md
@@ -89,7 +86,6 @@ skills/
 │        ├─ SKILL.md
 │        ├─ reskin.py            (detect → sync → reframe; hybrid bespoke/generic)
 │        └─ reskin.example.json
->>>>>>> e34b4928187db09389c1c79013a08b160ab4ece1
 ├─ excel-wow/
 │  └─ SKILL.md
 └─ blog-image-gen/
@@ -138,10 +134,7 @@ Use this checklist before publishing a skill:
 | `grill-me` | Ready | Runs a one-question-at-a-time pressure-test interview for plans/decisions. |
 | `parallel-dispatch` | Ready | Generates multi-agent prompts and coordinator playbook from a parallel work plan. |
 | `quiz-me` | Ready | Active-recall quiz on a topic, doc, codebase area, or interview prep — one question at a time, adaptive difficulty. |
-<<<<<<< HEAD
-| `excel-wow` | Draft | Placeholder for a future Excel/financial-modeling workflow skill. |
-| `blog-image-gen` | Ready | Generates editorial hero images for blog posts via OpenAI `gpt-image-2` (Responses API + thinking), with batch/ingest workflows. |
-=======
+| `insight-lock` | Ready | Preserves and distills a high-value conversation into durable downstream context — raw capture, distilled insight memo, retrieval hooks, and a light future-use note. The capture skill `parallel-dispatch` runners use per track. |
 | `chat-analysis` | Ready | Analyzes Codex or Claude Code session transcripts for friction patterns, redacts sensitive text, and proposes reviewed agent-instruction improvements. |
 | `weekly-update` | Ready | Drafts evidence-driven stakeholder updates from git plus issue-tracker data, with GitHub, Linear, and Jira data contracts. |
 | `pagecraft` | Ready | Multi-skill **plugin bundle** for HTML formatting + visual safety. Contains the four skills below; `pagecraft/skills/pagecraft` is the overview + installer. |
@@ -154,7 +147,6 @@ Use this checklist before publishing a skill:
 | `blog-image-gen` | Ready | Generates editorial hero images for blog posts through the blog repo's OpenAI image scripts, with current-doc verification, batch/ingest workflows, and thumbnail review. |
 | `bogdan-baciu-design` | Ready | Applies Bogdan Baciu's personal editorial design system to sites, prototypes, documents, slide decks, and scoped financial artifacts, bundling tokens, fonts, imagery, previews, and the brand reference. |
 | `deep-research-agents` | Ready | Treats Claude Managed Agent, Gemini Deep Research, and Parallel.ai as one deep-research capability with repo-specific harness guidance. |
->>>>>>> e34b4928187db09389c1c79013a08b160ab4ece1
 
 ---
 

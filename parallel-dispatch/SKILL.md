@@ -1,6 +1,6 @@
 ---
 name: parallel-dispatch
-description: Generate copy-paste agent prompts and a coordinator playbook from a pre-built parallel work plan. Use when the user has decomposed a large task into independent, conflict-free parallel tracks and needs formatted prompts for multiple coding-agent sessions. Triggers on "parallel dispatch", "parallel agents", "dispatch tracks", "multi-agent", "generate agent prompts". Do NOT use to invent a decomposition from scratch, to author handover documents, or to launch/monitor agents. Do NOT use for single-session sub-agent delegation via the Agent tool — this is for spinning up separate coding-agent sessions.
+description: Generate copy-paste agent prompts and a coordinator playbook from a pre-built parallel work plan. Use when the user has decomposed a large task into independent, conflict-free parallel tracks and needs formatted prompts for multiple coding-agent sessions. Optionally layers in per-runner insight-lock capture (condensed into one cross-track insight memo at the end) and end-of-run pagecraft polish for HTML deliverables. Triggers on "parallel dispatch", "parallel agents", "dispatch tracks", "multi-agent", "generate agent prompts". Do NOT use to invent a decomposition from scratch, to author handover documents, or to launch/monitor agents. Do NOT use for single-session sub-agent delegation via the Agent tool — this is for spinning up separate coding-agent sessions.
 ---
 
 # Parallel Dispatch
@@ -82,10 +82,11 @@ Read the appropriate template, fill in the bracketed placeholders, and emit the 
   - Analysis tracks: no gates
 - **Issue action:** Code tracks "close" issues. Analysis tracks "comment on" issues.
 - **File scope phrasing:** Be explicit. List specific files when possible. Use "and their `lib/` helpers" for function groups. ALWAYS include both CAN and CANNOT lists.
+- **Capture add-on (optional):** If the per-runner capture add-on is enabled (see [Optional add-ons](#optional-add-ons)), append [`assets/runner-capture-addendum.md`](assets/runner-capture-addendum.md) to each prompt and fill its `[capture path]` with `<capture-dir>/<run-slug>/<track-slug>.md`. Pick `<run-slug>` and each `<track-slug>` once, up front, and bake the literal path into each prompt — the separate sessions then need no coordination.
 
 ### Step 4 — Generate coordinator playbook
 
-After the agent prompts, produce a **Coordinator Playbook** section by reading [`assets/coordinator-playbook.md`](assets/coordinator-playbook.md) and filling in the track names, issue numbers, and any track-specific verification commands.
+After the agent prompts, produce a **Coordinator Playbook** section by reading [`assets/coordinator-playbook.md`](assets/coordinator-playbook.md) and filling in the track names, issue numbers, and any track-specific verification commands. The playbook carries two optional end-of-run passes (pagecraft HTML polish, combined-insight digest); keep or drop them to match the [Optional add-ons](#optional-add-ons) you enabled.
 
 ### Step 5 — Summary table
 
@@ -102,11 +103,61 @@ End with a summary table so the user can see the full dispatch at a glance:
 | 4 | ... | code | ... | ... | After 1+2 | After merge |
 ```
 
+## Optional add-ons
+
+Two opt-in add-ons. Both default **off** so the base flow is unchanged. Turn them
+on when the user asks ("with capture", "insight-lock per runner", "polish the HTML
+at the end"), or proactively offer when the conditions below hold. State which
+add-ons are on at the top of your output.
+
+### A. Per-runner capture → combined insight (insight-lock)
+
+Each runner writes a short `insight-lock` capture as it finishes; the coordinator
+condenses all of them into one cross-track memo at the end and surfaces the
+headline. Offer this for research-heavy or multi-track runs where the *learning*
+matters as much as the diff.
+
+**How the captures get back with no extra plumbing:** runners already commit and
+push to main, and the coordinator already pulls after each merge. So:
+
+1. Pick one `<run-slug>` (date + short label, e.g. `2026-06-03-layer-c`) and one
+   `<track-slug>` per track, up front.
+2. Choose `<capture-dir>` by repo, following `insight-lock`'s storage rule:
+   - `/root/dans-brain` (or the Mac mirror): `brain/context-captures/parallel-dispatch/`
+   - any other repo: `.agent-handoffs/context-captures/parallel-dispatch/`
+3. In Step 3, append [`assets/runner-capture-addendum.md`](assets/runner-capture-addendum.md)
+   to each prompt with `[capture path]` = `<capture-dir>/<run-slug>/<track-slug>.md`.
+   Because every track's path is a distinct literal string baked into its own
+   prompt, the separate sessions never coordinate and never collide.
+4. After all tracks merge and you have pulled their captures, read every
+   `<capture-dir>/<run-slug>/*.md` and write a condensed
+   `<capture-dir>/<run-slug>/_combined.md` from
+   [`assets/combined-insight.md`](assets/combined-insight.md). The cross-track value
+   is in the disagreements — lift each runner's *Contradictions / Integration Risks*
+   into the combined memo. A risk only one track saw is what the others were blind to.
+5. **Surface it:** end your final report with the combined memo's **Headline**
+   inline, a link to `_combined.md`, and anything in Contradictions / Integration
+   Risks that should change the next decision.
+
+The capture file is an allowed addition beyond a track's file scope (it is new,
+uniquely named, and conflict-free); tell the coordinator not to flag it as scope
+drift.
+
+### B. End-of-run HTML polish (pagecraft)
+
+If any merged track produced or changed **static HTML deliverables**, finish them
+with `pagecraft` before declaring done — never ship hand-checked HTML. Auto-offer
+whenever a track's file scope includes `.html`/HTML output roots; skip entirely
+otherwise. The operational commands live in the coordinator playbook's
+"HTML polish with pagecraft" pass: install (or reuse) pagecraft, run the
+deterministic `check-keystone.py` guard, then the real-browser `runner.py` probe,
+fix keystone/wrap failures, and allowlist only confirmed non-defects.
+
 ## Output format
 
 - Agent prompts go inside fenced code blocks for easy copy-paste
 - Coordinator playbook is regular markdown (not fenced — it's reference, not copy-paste)
-- Keep prompts concise — under 200 words each. The handover doc has the details; the prompt just scopes the work.
+- Keep the work scope of each prompt concise — under ~200 words. The handover doc has the details; the prompt just scopes the work. When the capture add-on is on, the fixed capture block is appended on top of that budget.
 
 ## Common Pitfalls
 

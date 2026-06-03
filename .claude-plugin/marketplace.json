@@ -27,14 +27,12 @@
     {
       "name": "parallel-dispatch",
       "source": "./parallel-dispatch",
-      "description": "Turns a pre-built parallel work plan into copy-paste agent prompts plus a coordinator playbook. Validates file-scope conflicts."
+      "description": "Turns a pre-built parallel work plan into copy-paste agent prompts plus a coordinator playbook. Validates file-scope conflicts. Optional add-ons: per-runner insight-lock capture condensed into one cross-track insight memo, and end-of-run pagecraft polish for HTML deliverables."
     },
     {
       "name": "quiz-me",
       "source": "./quiz-me",
       "description": "Active-recall quiz on a topic, document, codebase area, or interview prep. One question at a time, adaptive difficulty."
-<<<<<<< HEAD
-=======
     },
     {
       "name": "pagecraft",
@@ -50,7 +48,6 @@
       "name": "bogdan-baciu-design",
       "source": "./bogdan-baciu-design",
       "description": "Applies Bogdan Baciu's personal editorial design system to websites, static HTML, prototypes, documents, slide decks, and scoped financial-model artifacts. Bundles the Puddles sky-blue on warm-cream palette, Instrument Serif + Geist + JetBrains Mono typography, flat editorial layout rules, fonts, imagery, previews, and the .db-scope artifact styling."
->>>>>>> e34b4928187db09389c1c79013a08b160ab4ece1
     }
   ]
 }
