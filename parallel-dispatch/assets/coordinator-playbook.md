@@ -16,7 +16,7 @@
 ### After Each Track Merges
 1. `git pull origin main`
 2. Scan for merge conflicts (should be none if file scopes are clean)
-3. Verify commit scope matches expected files: `git log -1 --stat` — flag if the commit only touched docs when code changes were expected
+3. Verify commit scope matches expected files: `git log -1 --stat` — flag if the commit only touched docs when code changes were expected (when the capture add-on is on, the track's one capture file under `<capture-dir>/<run-slug>/` is also expected — do not flag it as scope drift)
 4. Verify issue closures: `for i in <expected issue numbers>; do echo -n "#$i: "; gh issue view $i --json state -q .state; done`
 5. If any expected issues are still OPEN, close them now with the track's findings
 6. Spot-check the agent summary against the diff for systematic errors or scope drift
@@ -31,6 +31,35 @@ gh issue list --label <workflow-label> --state open --limit 50
 ```
 
 After the final gate, read all agent summaries together and check that the combined result still makes sense. Independent fixes can each be correct locally while producing an integration problem together.
+
+### Add-on pass: HTML polish with pagecraft (only if tracks produced HTML deliverables)
+
+Run only when at least one merged track created or changed static HTML deliverables (check the merged file scopes). Skip entirely otherwise.
+
+1. Identify the HTML output root(s) from the track file scopes.
+2. Install if absent, or reuse the repo's existing install: `sh <skills>/pagecraft/skills/pagecraft/install-pagecraft.sh <repo-root>`.
+3. Deterministic keystone guard (no browser, never flakes): `python3 scripts/check-keystone.py --portal <html-root>`.
+4. Real-browser probe (8 viewports + right-edge alignment): `python3 scripts/runner.py --local --portal <html-root> --known-issues tests/pagecraft/wrap-known-issues.json`.
+5. Fix keystone/wrap failures; allowlist only confirmed non-defects. Do not silently truncate output.
+6. Commit the polished HTML plus any known-issues updates.
+
+### Add-on pass: Combined insight digest (only if per-runner capture was enabled)
+
+Each runner wrote a capture to `<capture-dir>/<run-slug>/<track-slug>.md` and committed it with its work. After the Final Gate:
+
+1. `git pull origin main` so every track's capture is present locally.
+2. List them: `ls <capture-dir>/<run-slug>/*.md`. If a track that had capture enabled is missing its file, note the gap — do not fabricate it.
+3. Read ALL captures together and write a condensed cross-track memo to `<capture-dir>/<run-slug>/_combined.md` using the combined-insight template (`assets/combined-insight.md`): Headline, Convergent Findings, Contradictions To Hold, Integration Risks, Cross-Track Open Questions, Per-Track index, Provenance.
+4. The cross-track value is in the disagreements: lift every track's "Contradictions / Integration Risks" up into the combined memo. A risk only one track saw is exactly what the others were blind to — and what the per-track summaries miss when read in isolation.
+5. Commit `_combined.md`.
+
+### Surface the result
+
+End your final report to the user with:
+
+- The **Headline** from `_combined.md` (one or two sentences), inline.
+- A link to the combined memo artifact and, if the pagecraft pass ran, the polished HTML root.
+- Anything in Contradictions / Integration Risks that should change the next decision.
 
 ### Issue Closure Checklist
 - **[Track Name] closes:** [issue numbers]

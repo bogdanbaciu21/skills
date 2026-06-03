@@ -92,6 +92,37 @@ tracks:
         self.assertIn("evidence", playbook.lower())
         self.assertIn("merge", playbook.lower())
 
+    def test_runner_capture_addendum_asset_present(self):
+        addendum = (Path(__file__).resolve().parents[1] / "assets" / "runner-capture-addendum.md").read_text(encoding="utf-8")
+
+        self.assertIn("insight-lock", addendum.lower())
+        self.assertIn("Contradictions / Integration Risks", addendum)
+        self.assertIn("[capture path]", addendum)
+
+    def test_combined_insight_template_present(self):
+        combined = (Path(__file__).resolve().parents[1] / "assets" / "combined-insight.md").read_text(encoding="utf-8")
+
+        for section in ("Headline", "Convergent Findings", "Contradictions To Hold", "Integration Risks", "Per-Track Captures"):
+            self.assertIn(section, combined)
+
+    def test_coordinator_playbook_documents_optional_addons(self):
+        playbook = (Path(__file__).resolve().parents[1] / "assets" / "coordinator-playbook.md").read_text(encoding="utf-8")
+        low = playbook.lower()
+
+        self.assertIn("pagecraft", low)
+        self.assertIn("combined insight", low)
+        self.assertIn("_combined.md", playbook)
+
+    def test_skill_documents_optional_addons(self):
+        skill = (Path(__file__).resolve().parents[1] / "SKILL.md").read_text(encoding="utf-8")
+        low = skill.lower()
+
+        self.assertIn("optional add-ons", low)
+        self.assertIn("insight-lock", low)
+        self.assertIn("pagecraft", low)
+        self.assertIn("runner-capture-addendum.md", skill)
+        self.assertIn("combined-insight.md", skill)
+
 
 if __name__ == "__main__":
     unittest.main()
