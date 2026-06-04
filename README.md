@@ -46,6 +46,9 @@ skills/
 ├─ SECURITY.md
 ├─ .gitignore
 ├─ sync-skills.sh    (propagate canonical skills → machine skill dirs)
+├─ scripts/skillopt_pilot.py
+│                   (no-mutate skill benchmark/proposal harness)
+├─ tests/           (repo-level harness tests)
 ├─ agent-coordination/
 │  └─ SKILL.md
 ├─ handoff/
@@ -122,6 +125,41 @@ Use this checklist before publishing a skill:
 - [ ] **Safety constraints:** guardrails around destructive or high-risk actions.
 - [ ] **Examples:** at least one realistic input → output example.
 - [ ] **Source attribution:** include upstream references when adapted.
+
+## SkillOpt pilot
+
+This repo includes a conservative SkillOpt-style pilot at
+`scripts/skillopt_pilot.py`. It does not call an LLM and does not mutate
+`SKILL.md`. It scores a skill document against deterministic benchmark rows,
+applies curated section patches to a copy of the body, and writes
+`proposed.md` plus `receipt.json` for human review.
+
+The first concrete benchmark lives at `excel-wow/evals/skillopt_pilot.jsonl`.
+It is intentionally aimed at the draft `excel-wow` skill so the pilot has real
+headroom to measure.
+
+**LOCAL Mac - zsh**
+
+```bash
+cd /Users/danb/Desktop/skills
+PYTHONDONTWRITEBYTECODE=1 python3 scripts/skillopt_pilot.py \
+  --skill excel-wow/SKILL.md \
+  --benchmark excel-wow/evals/skillopt_pilot.jsonl \
+  --out-dir /tmp/excel-wow-skillopt-pilot
+```
+
+Review `/tmp/excel-wow-skillopt-pilot/proposed.md` and
+`/tmp/excel-wow-skillopt-pilot/receipt.json`; copy changes manually only after
+review. Generated in-repo `skillopt-pilot/` folders are ignored by git.
+
+Run the pilot tests with:
+
+**LOCAL Mac - zsh**
+
+```bash
+cd /Users/danb/Desktop/skills
+PYTHONDONTWRITEBYTECODE=1 python3 -m unittest tests/test_skillopt_pilot.py
+```
 
 ---
 
