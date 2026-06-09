@@ -1,6 +1,6 @@
 ---
 name: pagecraft
-description: Portable HTML formatting and visual-safety bundle for static HTML, portal pages, dashboards, blog posts, and one-off deliverables. Use when creating or reviewing HTML/CSS that needs robust tables, financial number formatting, headers/section dividers, or text-wrap prevention. Bundles the real wrap-safe probe + verify-text-wrap runner + keystone guard so you validate with proven tools, not hand-rolled checks.
+description: Portable HTML formatting and visual-safety bundle for static HTML, portal pages, dashboards, blog posts, and one-off deliverables. Use when creating or reviewing HTML/CSS that needs robust tables, financial number formatting, headers/section dividers, or text-wrap prevention; when the user reports broken text wrapping, phantom right edge, or magician divider; when normalizing ad hoc table systems; or when formatting financial numbers in HTML/Excel. Bundles verify-text-wrap, table-system-migration, and number-formats as nested sub-skills — load those bodies from this skill, do not invoke them as standalone top-level skills.
 ---
 
 # Pagecraft
@@ -38,15 +38,15 @@ It does not reinvent the checks. It bundles them:
    `.pc-heading-anchor` (the always-on gutter bar), `.pc-eyebrow`, `.num`, the
    `.cell-*` Macabacus provenance colors, etc. Raw grid/table CSS is a code smell.
 4. **Validate with the bundled tools — two layers, both required.** The probe and
-   verifiers live in the sibling `verify-text-wrap` skill (see its SKILL.md for
-   full options):
+   verifiers live in the nested `verify-text-wrap/` sub-skill (see
+   `verify-text-wrap/SKILL.md` for full options):
 
 ```bash
 # Deterministic root-cause guard (no browser, CI-safe, never flakes):
-python3 ../verify-text-wrap/check-keystone.py --portal <static-html-root>
+python3 verify-text-wrap/check-keystone.py --portal <static-html-root>
 
 # Real-browser probe across 8 viewports + right-edge alignment:
-python3 ../verify-text-wrap/runner.py --local --portal <static-html-root> \
+python3 verify-text-wrap/runner.py --local --portal <static-html-root> \
   --known-issues tests/pagecraft/wrap-known-issues.json
 ```
 
@@ -81,13 +81,17 @@ installation first:
 
 ## Which subskill should I use?
 
-| Need | Use | Start here |
+These are **pagecraft sub-skills** — nested under this skill, not standalone installs.
+Load the sub-skill body from the path below; do not expect a top-level
+`.claude/skills/<name>/` copy.
+
+| Need | Sub-skill | Start here |
 |---|---|---|
-| Install the bundle or finish one static HTML surface | `pagecraft` | `install-pagecraft.sh`, then these references |
-| Prove wrap/container safety after CSS or deploy | `verify-text-wrap` | `../verify-text-wrap/SKILL.md` |
-| Normalize many ad hoc tables into one system | `table-system-migration` | `../table-system-migration/SKILL.md` |
-| Format financial numbers in HTML or Excel | `number-formats` | `../number-formats/SKILL.md` |
-| Apply an existing repo design system across pages | `reskin` | `../reskin/SKILL.md` |
+| Install the bundle or finish one static HTML surface | `pagecraft` (this file) | `install-pagecraft.sh`, then these references |
+| Prove wrap/container safety after CSS or deploy | `verify-text-wrap` | `verify-text-wrap/SKILL.md` |
+| Normalize many ad hoc tables into one system | `table-system-migration` | `table-system-migration/SKILL.md` |
+| Format financial numbers in HTML or Excel | `number-formats` | `number-formats/SKILL.md` |
+| Apply an existing repo design system across pages | `reskin` (standalone sibling) | `../reskin/SKILL.md` in source repo |
 
 ## Key rules
 

@@ -13,7 +13,7 @@ set -eu
 # This script lives in the pagecraft overview skill (pagecraft/skills/pagecraft).
 # The probe + verifiers are self-contained in the sibling verify-text-wrap skill.
 skill_dir=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
-vtw_dir=$(CDPATH= cd -- "$skill_dir/../verify-text-wrap" && pwd)
+vtw_dir=$(CDPATH= cd -- "$skill_dir/verify-text-wrap" && pwd)
 target=${1:-$(pwd)}
 static_root=${2:-"$target"}
 pagecraft_version=$(git -C "$skill_dir" rev-parse --short HEAD 2>/dev/null || printf '%s' "0.1.0")

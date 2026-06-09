@@ -1,9 +1,12 @@
 ---
 name: verify-text-wrap
-description: Verify a static-HTML portal has no caterpillar text-wrap, ugly hyphenation, display-text orphan lines, narrow-card prose, horizontal overflow, or container-collapse bugs, both locally and against the deployed URL. Use after any CSS edit, after any deploy, or when the user reports "the text wrapping is broken" / "this looks off" / "random text wrapping" / "phantom right edge" / "magician divider". Runs the wrap-safe runtime probe across desktop/tablet/mobile viewports plus a right-edge alignment check that catches container-vs-element max-width mismatches. Compares findings against a per-repo `tests/wrap-known-issues.json` allowlist if present. Do NOT use for generic CSS bugs unrelated to text wrapping or container width.
+description: Pagecraft sub-skill — load via pagecraft, not as a standalone skill. Verify a static-HTML portal has no caterpillar text-wrap, ugly hyphenation, display-text orphan lines, narrow-card prose, horizontal overflow, or container-collapse bugs, both locally and against the deployed URL. Use after any CSS edit, after any deploy, or when the user reports "the text wrapping is broken" / "this looks off" / "random text wrapping" / "phantom right edge" / "magician divider". Runs the wrap-safe runtime probe across desktop/tablet/mobile viewports plus a right-edge alignment check. Compares findings against a per-repo `tests/wrap-known-issues.json` allowlist if present. Do NOT use for generic CSS bugs unrelated to text wrapping or container width.
 ---
 
 # verify-text-wrap
+
+> **Pagecraft sub-skill.** Installed at `pagecraft/verify-text-wrap/` — invoke through
+> `pagecraft`, not as a top-level skill.
 
 A protocol for confirming a static-HTML portal renders correctly across viewport widths after CSS or markup changes. The `wrap-safe` runtime library (the `wrap-safe.css` reset + the `wrapcheck.js` probe) is **bundled in this skill** — `runner.py` loads `./wrapcheck.js` by default, and `check-keystone.py` recognizes `wrap-safe.css` as the keystone source. See [The bundled wrap-safe library](#the-bundled-wrap-safe-library) below.
 
