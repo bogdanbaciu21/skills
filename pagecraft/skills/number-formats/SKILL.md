@@ -1,9 +1,12 @@
 ---
 name: number-formats
-description: Apply the Macabacus financial number-format standard to Excel models and HTML tables — en-dash zeros, parenthesized negatives with decimal-aligned positives, currency symbol only on the top row, blue inputs, green cross-sheet links, red errors, grey-italic margins, bold totals, plus percent/multiple/toggle formats. Use when formatting a financial model, operating model, or numeric table; when the user says "format these numbers", "make the numbers look right", "Macabacus formatting", "apply number formats", or hands over an .xlsx model to clean up. Ships byte-exact Excel format codes (formats.json) and an openpyxl applicator.
+description: Pagecraft sub-skill — load via pagecraft, not as a standalone skill. Apply the Macabacus financial number-format standard to Excel models and HTML tables — en-dash zeros, parenthesized negatives with decimal-aligned positives, currency symbol only on the top row, blue inputs, green cross-sheet links, red errors, grey-italic margins, bold totals, plus percent/multiple/toggle formats. Use when formatting a financial model, operating model, or numeric table; when the user says "format these numbers", "make the numbers look right", "Macabacus formatting", "apply number formats", or hands over an .xlsx model to clean up. Ships byte-exact Excel format codes (formats.json) and an openpyxl applicator.
 ---
 
 # Number Formats
+
+> **Pagecraft sub-skill.** Installed at `pagecraft/number-formats/` — invoke through
+> `pagecraft`, not as a top-level skill.
 
 The house standard for formatting financial numbers, captured byte-exact from a
 reference model. It covers two surfaces — **Excel** (the custom format codes in

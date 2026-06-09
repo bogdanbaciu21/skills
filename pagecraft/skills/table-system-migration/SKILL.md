@@ -1,9 +1,12 @@
 ---
 name: table-system-migration
-description: Audit, migrate, and regression-test table systems across content-heavy websites, blogs, documentation sites, and admin surfaces. Use when Codex needs to normalize many ad hoc HTML table styles into a canonical table component, preserve legacy/admin table behavior, build a no-new-violations ratchet, add real-browser CSS regression coverage for table layout, or prepare a public-safe writeup/skill from a private table cleanup.
+description: Pagecraft sub-skill — load via pagecraft, not as a standalone skill. Audit, migrate, and regression-test table systems across content-heavy websites, blogs, documentation sites, and admin surfaces. Use when normalizing many ad hoc HTML table styles into a canonical table component, preserving legacy/admin table behavior, building a no-new-violations ratchet, adding real-browser CSS regression coverage for table layout, or preparing a public-safe writeup from a private table cleanup.
 ---
 
 # Table System Migration
+
+> **Pagecraft sub-skill.** Installed at `pagecraft/table-system-migration/` — invoke through
+> `pagecraft`, not as a top-level skill.
 
 ## Overview
 
