@@ -22,6 +22,8 @@ The pipeline:
 - "What rules should I add to my agent instructions?"
 - "How many sessions had verification failures?"
 - Weekly improvement cadence: run on the last 50–100 sessions
+- Monthly `/insights` cadence: review recent sessions for skills, memory, and
+  automation candidates rather than one-off bug fixes
 
 ## Setup (verify once)
 
@@ -108,6 +110,20 @@ to the file. **Never auto-apply any delta to agent instructions** — the user d
 If the user says "accept all" or "apply them", ask them to confirm which
 specific items they want and make only those edits. The model does not edit
 its own operating rules autonomously.
+
+## Monthly `/insights` cadence
+
+In `dans-brain`, the Mac LaunchAgent
+`launchd/com.dansbrain.monthly-agent-insights.plist` runs this pipeline monthly
+against recent Codex sessions and writes:
+
+```text
+state/monthly-agent-insights.md
+```
+
+Use that report as an improvement backlog for skills, memory notes, and
+automation candidates. Do not auto-apply proposed instruction deltas; Dan still
+decides which changes become durable operating rules.
 
 ## Output file
 
