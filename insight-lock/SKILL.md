@@ -13,6 +13,35 @@ Turn an important conversation into durable context: a raw transcript capture, a
 mention `capture-context`, treat that as a legacy name for this skill rather than
 recreating or invoking a separate duplicate.
 
+## Worked examples
+
+### Example 1: Strategic conversation capture
+
+User: "capture this, I do not want to lose the read."
+
+Do:
+- Save a distilled memo under `brain/context-captures/` with Observed,
+  Inferred, Hypothesis, Actionable, and Privacy Boundary labels.
+- Add downstream hooks such as people, project names, phrases, and repo paths.
+- Skip raw transcript unless the user asked for exact language or it is
+  strategically valuable.
+
+### Example 2: Event prep from a long thread
+
+User: "lock this down before my Client call."
+
+Do:
+- Add the Event Prep block because there is a real external clock.
+- Separate private relationship read from text that may be reused externally.
+- Include "questions to ask" and "watch signals" instead of only a memo summary.
+
+### Example 3: Light context preservation, not task handoff
+
+User: "park this thread for future agents."
+
+Use `insight-lock`, not `handoff`, when the value is durable context or judgment
+rather than a next-session execution checklist.
+
 ## Workflow
 
 ### 1. Define The Capture Boundary

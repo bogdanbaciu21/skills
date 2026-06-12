@@ -179,6 +179,30 @@ Or for a failure:
 
 Exit code: 0 if all pages pass (or only known-issue matches), 1 if any new finding, 2 if operational failure (URL unreachable, Playwright not installed, etc.).
 
+## Worked examples
+
+### Example 1: Static local portal
+
+User: "Check this portal before I send it."
+
+Run the keystone check first. If it passes, run the local browser sweep across
+default viewports. Report both the deterministic result and any browser findings.
+
+### Example 2: Deployed page after a push
+
+User: "Verify the live page; it looked weird on mobile."
+
+Use deployed mode against the live URL, pass any gate key/password through the
+consuming repo's normal secret path, and keep screenshots for the failing
+viewport. Do not rely on local `file://` inspection.
+
+### Example 3: Known issue handling
+
+User: "This one finding is intentional."
+
+Only add a known-issue entry after inspecting it and writing the reason. A known
+issue is an audited exception, not a way to make the report green.
+
 ## What this skill does NOT do
 
 - Does NOT modify CSS or HTML. Pure observation.

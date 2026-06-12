@@ -134,6 +134,31 @@ tr.tot td       { font-weight:700; }              /* bold totals */
 - Use `fixtures/html-table-parity.html` as the static proof fixture for web
   parity with the Excel convention.
 
+## Worked examples
+
+### Example 1: Operating-model row
+
+User: "Format this revenue row in the model."
+
+Use `number` format for the numeric cells, blue font/yellow fill only for typed
+drivers, green only for cross-sheet links, and bold only if the row is a real
+subtotal or total.
+
+### Example 2: Web table parity
+
+User: "Make the HTML table match the model."
+
+Use `.num` cells, render zero as `-` only if the consuming artifact cannot render
+an en dash safely, prefer en-dash zeros otherwise, reserve parenthesis width with
+hidden affix spans, and state scale once in the caption.
+
+### Example 3: Toggle sanity check
+
+User: "This yes/no assumption keeps getting messy."
+
+Apply a toggle format (`yes-no`, `y-n`, or `on-off`) so any value other than 1 or
+0 renders as `ERROR`. Do not silently coerce arbitrary text into a boolean.
+
 ---
 
 ## What this skill does NOT do
