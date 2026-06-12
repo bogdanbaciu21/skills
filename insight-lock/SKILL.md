@@ -140,6 +140,18 @@ If the capture produces a stable new fact, update the relevant durable page, suc
 
 Keep those durable pages short. Put the full transcript and detailed synthesis in the context capture, then link or summarize from the durable page.
 
+Do not let ingest become write-only accumulation. When a capture changes what is
+known about a person, project, finance topic, client, or operating procedure:
+
+- update the narrow entity page in the same turn when safe;
+- add a source pointer to the capture or raw evidence path;
+- label contradictions instead of flattening them away;
+- use a memory candidate rather than active memory when the fact is plausible
+  but not yet reviewed.
+
+If filing back is unsafe, too broad, or blocked by missing source access, say so
+explicitly in the final response as `entity-page update deferred: <reason>`.
+
 ### 8. Optional Local Receipt
 
 Never send a network callback, webhook, or remote telemetry event from this skill.
@@ -164,6 +176,8 @@ Before finalizing:
 - Run `git status --short --branch -uall`.
 - Check for accidental live credentials or runtime streams.
 - Re-read created files.
+- Report whether a durable entity/project/finance/procedure page was updated,
+  not needed, or deferred with a reason.
 - Follow the repo policy for committing and pushing changes unless the user says not to.
 
 Final response should include:
