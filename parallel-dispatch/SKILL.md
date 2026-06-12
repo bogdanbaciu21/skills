@@ -39,6 +39,30 @@ arguing in prose:
 Do not use code-wins when the variants would mutate the same database, send
 messages, deploy to production, or change irreversible external state.
 
+### Step 0.6 — Babysit open PRs with a bounded `/loop`
+
+Use this recipe when Dan asks to babysit PRs, keep agent branches moving, or run
+a standing `/loop` over `dans-brain`, `brain/_repos/*`, and Acme-adjacent repos.
+The point is to turn scattered branch/CI state into a small action queue, not to
+merge risky work by momentum.
+
+1. Inventory the repos and open PRs: root repo first, then active submodules
+   under `brain/_repos/`, then explicitly named repos such as Acme.
+2. For each PR, record branch, author/agent, files touched, check status, merge
+   conflict status, and whether the PR is mechanical or needs judgment.
+3. Apply the CI/CD tier gate: mechanical `auto` failures can be fixed, verified,
+   committed, and pushed; `propose` failures get a diagnosis or draft fix only.
+4. Land or rebase one clean PR at a time. Use the repo's sanctioned land path
+   (`git land`, merge button, or repo-specific instructions), then re-check the
+   next PR against fresh `main`.
+5. Stop on any conflict, red check that changes behavior, missing secret, or
+   unclear ownership. Surface a short queue with owner, blocker, and next action.
+
+The loop is deliberately bounded: run one pass, produce the queue, act only on
+safe mechanical items, and end with exact proof links or commands. Do not keep
+polling indefinitely, bypass branch protection, rewrite another agent's branch,
+or edit workflow/secrets/branch-protection files to make checks green.
+
 ### Step 1 — Collect track definitions
 
 Ask the user for track definitions if not already provided. Each track needs these fields:

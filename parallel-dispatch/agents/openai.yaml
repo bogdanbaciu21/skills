@@ -1,4 +1,4 @@
 interface:
   display_name: "Parallel Dispatch"
-  short_description: "Split work into safe tracks or code-wins variants."
-  default_prompt: "Use $parallel-dispatch to convert this work split or code-wins variant decision into independent agent prompts plus a coordinator playbook with evidence, file scopes, dependencies, and merge order."
+  short_description: "Split work into safe tracks, code-wins variants, or bounded PR loops."
+  default_prompt: "Use $parallel-dispatch to convert this work split, code-wins variant decision, or babysit-PRs loop into independent agent prompts plus a coordinator playbook with evidence, file scopes, dependencies, and merge order."
