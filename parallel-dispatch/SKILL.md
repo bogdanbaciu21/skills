@@ -1,6 +1,6 @@
 ---
 name: parallel-dispatch
-description: Generate copy-paste agent prompts and a coordinator playbook from a pre-built parallel work plan. Use when the user has decomposed a large task into independent, conflict-free parallel tracks and needs formatted prompts for multiple coding-agent sessions. Optionally layers in per-runner insight-lock capture (condensed into one cross-track insight memo at the end) and end-of-run pagecraft polish for HTML deliverables. Triggers on "parallel dispatch", "parallel agents", "dispatch tracks", "multi-agent", "generate agent prompts". Do NOT use to invent a decomposition from scratch, to author handover documents, or to launch/monitor agents. Do NOT use for single-session sub-agent delegation via the Agent tool — this is for spinning up separate coding-agent sessions.
+description: Generate copy-paste agent prompts and a coordinator playbook from a pre-built parallel work plan, or turn a cheap design dispute into competing "code wins" implementation variants. Use when the user has decomposed a large task into independent, conflict-free parallel tracks and needs formatted prompts for multiple coding-agent sessions; or when the user says "parallel dispatch", "parallel agents", "dispatch tracks", "multi-agent", "generate agent prompts", "code wins", "build competing implementations", or "settle this by building variants". Optionally layers in per-runner insight-lock capture (condensed into one cross-track insight memo at the end) and end-of-run pagecraft polish for HTML deliverables. Do NOT use to invent a decomposition from scratch, to author handover documents, or to launch/monitor agents. Do NOT use for single-session sub-agent delegation via the Agent tool — this is for spinning up separate coding-agent sessions.
 ---
 
 # Parallel Dispatch
@@ -21,6 +21,23 @@ Before generating prompts, verify that the plan is a good candidate for parallel
 | **Payoff** | There are 2+ genuinely independent tracks; 3+ is usually where the benefit is clearest | One focused session would likely finish faster than coordinating agents |
 
 If the tracks are related, have shared state, or are still exploratory, tell the user to run one sequential investigation first. If the decomposition is incomplete, ask for the missing track fields instead of inventing tracks.
+
+### Step 0.5 — Use code-wins for cheap design disputes
+
+<!-- # patch: claude-sonnet-4-6, 2026-06-12, code-wins keeps parallel-dispatch from over-debating cheap implementation choices. -->
+When the unresolved question is a design or implementation preference and
+building variants is cheap, dispatch the work as competing artifacts instead of
+arguing in prose:
+
+1. Define the shared acceptance criteria and non-negotiable constraints.
+2. Assign 2-3 agents to produce divergent implementations in isolated worktrees
+   or artifact folders.
+3. Require each runner to include a short tradeoff note and proof commands.
+4. Compare the artifacts directly, choose one, and either delete the throwaway
+   variants or preserve the winning pattern in a follow-up task.
+
+Do not use code-wins when the variants would mutate the same database, send
+messages, deploy to production, or change irreversible external state.
 
 ### Step 1 — Collect track definitions
 
@@ -161,6 +178,13 @@ fix keystone/wrap failures, and allowlist only confirmed non-defects.
 
 ## Common Pitfalls
 
+### Cheap building beats long argument
+
+If the team is stuck on "which UI/layout/approach is better" and each option can
+be built in under an hour, create variant tracks. The output should be artifacts
+plus proof, not essays. Preserve only the winner unless the alternatives teach a
+durable lesson worth capturing.
+
 ### Zombie issues — code merged, issues still open
 
 When dispatching parallel agents, each agent will do the work but often skip issue closure — leaving issues in a zombie-open state where the code is merged but the issue dangles. This happened systematically on the Layer C migration: all 16 issues across Tracks C and D were left open despite code being committed and pushed.
@@ -197,3 +221,30 @@ When editing the validator or dispatch rules, run:
 ```bash
 PYTHONDONTWRITEBYTECODE=1 python3 evals/run_evals.py
 ```
+
+## Worked examples
+
+### Example 1: Five-track implementation rollout
+
+User: "I have tracks A-E and want copy-paste prompts."
+
+Do:
+- Validate that no two code tracks own the same files.
+- Put each track's goal, CAN/CANNOT touch list, gates, commit rules, and final
+  table requirement directly in the prompt.
+- Produce a coordinator playbook that checks commit scope after each merge.
+
+### Example 2: Variant design decision
+
+User: "We keep arguing about the dashboard layout."
+
+Use code-wins if each variant can be built safely in its own folder. Create
+parallel prompts for 2-3 directions, require screenshots or static checks, then
+make the coordinator choose from artifacts.
+
+### Example 3: False parallelism
+
+User: "Split these three failing tests across agents."
+
+If all failures touch the same parser, migration, external service, or fixture,
+do not dispatch. Ask for one sequential root-cause investigation first.

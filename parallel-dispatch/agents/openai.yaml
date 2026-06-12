@@ -1,4 +1,4 @@
 interface:
   display_name: "Parallel Dispatch"
-  short_description: "Split large work into safe independent agent tracks, with optional per-runner insight capture and end-of-run HTML polish."
-  default_prompt: "Use $parallel-dispatch to convert this work into independent agent prompts plus a coordinator playbook with evidence, file scopes, dependencies, and merge order. Optionally enable per-runner insight-lock capture (condensed into one cross-track insight memo at the end) and pagecraft polish for any HTML deliverables."
+  short_description: "Split work into safe tracks or code-wins variants."
+  default_prompt: "Use $parallel-dispatch to convert this work split or code-wins variant decision into independent agent prompts plus a coordinator playbook with evidence, file scopes, dependencies, and merge order."
