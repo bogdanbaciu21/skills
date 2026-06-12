@@ -1,8 +1,8 @@
 {
   "name": "pagecraft",
   "version": "0.1.0",
-  "subskills": ["verify-text-wrap", "table-system-migration", "number-formats"],
-  "description": "Portable HTML formatting and visual-safety bundle: robust tables, financial number formatting, headers/section dividers, and text-wrap prevention — patterns plus proven, installable checks.",
+  "subskills": ["html", "html-diagram", "verify-text-wrap", "table-system-migration", "number-formats"],
+  "description": "Portable HTML formatting and visual-safety bundle: self-contained HTML artifacts, SVG-first architecture diagrams, robust tables, financial number formatting, headers/section dividers, and text-wrap prevention — patterns plus proven, installable checks.",
   "author": {
     "name": "Bogdan Baciu",
     "url": "https://github.com/bogdanbaciu21"

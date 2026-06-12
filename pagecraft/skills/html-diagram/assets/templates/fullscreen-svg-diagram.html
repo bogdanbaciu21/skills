@@ -1,0 +1,243 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TBU Architecture Diagram</title>
+<script>
+  (function () {
+    var saved = localStorage.getItem("pc-diagram-theme");
+    var dark = saved ? saved === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
+    document.documentElement.classList.toggle("dark", dark);
+  })();
+</script>
+<style>
+  :root {
+    --bg: #fbfaf6;
+    --surface: #ffffff;
+    --ink: #171716;
+    --body: #42413c;
+    --muted: #77746b;
+    --line: #d8d4c8;
+    --soft: rgba(120, 169, 200, 0.14);
+    --accent: #78a9c8;
+    --accent-strong: #367fa8;
+    --warn: #b7794b;
+    --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    --sans: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    --serif: Georgia, "Times New Roman", serif;
+  }
+  html.dark {
+    --bg: #151514;
+    --surface: #20201e;
+    --ink: #fbfaf6;
+    --body: #d8d4c8;
+    --muted: #aaa69a;
+    --line: #3e3d38;
+    --soft: rgba(140, 195, 230, 0.16);
+    --accent: #8cc3e6;
+    --accent-strong: #a9d8f2;
+    --warn: #d19a66;
+  }
+  * { box-sizing: border-box; min-width: 0; }
+  html, body { height: 100%; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--body);
+    font-family: var(--sans);
+    overflow: hidden;
+  }
+  .bar {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--line);
+    background: var(--bg);
+  }
+  h1 {
+    margin: 0;
+    color: var(--ink);
+    font: 500 20px/1.1 var(--serif);
+    letter-spacing: 0;
+  }
+  .sub {
+    color: var(--muted);
+    font: 11px/1.2 var(--mono);
+    letter-spacing: .06em;
+    text-transform: uppercase;
+  }
+  .spacer { flex: 1; }
+  .chips { display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
+  button {
+    border: 1px solid var(--line);
+    background: var(--surface);
+    color: var(--muted);
+    border-radius: 999px;
+    padding: 7px 10px;
+    font: 700 11px/1 var(--mono);
+    letter-spacing: .04em;
+    cursor: pointer;
+  }
+  button[aria-pressed="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+  #themeToggle { border-radius: 6px; }
+  .stage {
+    position: relative;
+    height: calc(100vh - 58px);
+    min-height: 420px;
+  }
+  svg { width: 100%; height: 100%; display: block; }
+  .zone rect { fill: var(--soft); stroke: var(--line); stroke-dasharray: 6 5; }
+  .zone text { fill: var(--muted); font: 700 12px var(--mono); letter-spacing: .08em; text-transform: uppercase; }
+  .node { cursor: pointer; }
+  .node rect { fill: var(--surface); stroke: var(--line); stroke-width: 1.4; }
+  .node:focus rect, .node:hover rect, .node.active rect { stroke: var(--accent-strong); stroke-width: 2; }
+  .node .title { fill: var(--ink); font: 700 15px var(--sans); }
+  .node .meta { fill: var(--muted); font: 11px var(--mono); }
+  .edge { fill: none; stroke: var(--muted); stroke-width: 1.7; marker-end: url(#arrow-muted); }
+  .edge.dashed { stroke-dasharray: 6 4; }
+  .label { fill: var(--muted); font: 11px var(--mono); }
+  .stage.flowing .edge, .stage.flowing .label, .stage.flowing .node { opacity: .22; }
+  .stage.flowing .edge.lit {
+    opacity: 1;
+    stroke: var(--accent-strong);
+    marker-end: url(#arrow-accent);
+    stroke-dasharray: 8 5;
+    animation: march 1s linear infinite;
+  }
+  .stage.flowing .label.lit, .stage.flowing .node.lit { opacity: 1; }
+  @keyframes march { to { stroke-dashoffset: -13; } }
+  @media (prefers-reduced-motion: reduce) {
+    .stage.flowing .edge.lit { animation: none; }
+  }
+  .panel {
+    position: absolute;
+    right: 14px;
+    bottom: 14px;
+    width: min(360px, calc(100% - 28px));
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    background: var(--surface);
+    padding: 14px;
+  }
+  .panel h2 { margin: 0 0 4px; color: var(--ink); font: 700 16px/1.2 var(--sans); }
+  .panel p { margin: 0; font-size: 13px; line-height: 1.45; }
+  @media (max-width: 780px) {
+    body { overflow: auto; }
+    .bar { align-items: flex-start; flex-direction: column; }
+    .stage { height: 720px; }
+    .panel { position: static; margin: 12px 14px; width: auto; }
+  }
+</style>
+</head>
+<body>
+  <div class="bar">
+    <div>
+      <h1>TBU Architecture</h1>
+      <div class="sub">TBU boundary / cadence / source</div>
+    </div>
+    <div class="spacer"></div>
+    <div class="chips" id="flowControls">
+      <button type="button" data-flow="all" aria-pressed="true">Everything</button>
+      <button type="button" data-flow="read" aria-pressed="false">Read</button>
+      <button type="button" data-flow="write" aria-pressed="false">Write</button>
+      <button type="button" data-flow="recover" aria-pressed="false">Recover</button>
+      <button type="button" id="themeToggle">Theme</button>
+    </div>
+  </div>
+  <main class="stage" id="stage">
+    <svg viewBox="0 0 1440 820" role="img" aria-label="TBU architecture diagram">
+      <defs>
+        <marker id="arrow-muted" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+          <path d="M0,0 L10,5 L0,10 z" style="fill: var(--muted)"></path>
+        </marker>
+        <marker id="arrow-accent" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+          <path d="M0,0 L10,5 L0,10 z" style="fill: var(--accent-strong)"></path>
+        </marker>
+      </defs>
+      <g class="zone">
+        <rect x="48" y="96" width="280" height="560" rx="16"></rect>
+        <text x="72" y="130">Actors</text>
+      </g>
+      <g class="zone">
+        <rect x="390" y="96" width="420" height="560" rx="16"></rect>
+        <text x="414" y="130">Control Plane</text>
+      </g>
+      <g class="zone">
+        <rect x="872" y="96" width="520" height="560" rx="16"></rect>
+        <text x="896" y="130">Data and Proof</text>
+      </g>
+
+      <path class="edge" data-flow="read write" id="edge-a-b" d="M278 250 C 340 250, 360 250, 426 250"></path>
+      <path class="edge" data-flow="write" id="edge-b-c" d="M746 250 C 830 250, 850 250, 934 250"></path>
+      <path class="edge dashed" data-flow="recover" id="edge-c-b" d="M934 440 C 840 440, 832 440, 746 440"></path>
+      <text class="label" data-edge="edge-a-b" x="340" y="232">request</text>
+      <text class="label" data-edge="edge-b-c" x="824" y="232">write + manifest</text>
+      <text class="label" data-edge="edge-c-b" x="812" y="424">repair signal</text>
+
+      <g class="node" tabindex="0" data-flow="read write" data-title="User or agent" data-body="TBU actor and entry point." transform="translate(92 205)">
+        <rect width="186" height="86" rx="10"></rect>
+        <text class="title" x="16" y="32">TBU Actor</text>
+        <text class="meta" x="16" y="56">human / agent</text>
+      </g>
+      <g class="node" tabindex="0" data-flow="read write recover" data-title="Application boundary" data-body="TBU service, worker, script, or approval gate." transform="translate(426 205)">
+        <rect width="320" height="86" rx="10"></rect>
+        <text class="title" x="16" y="32">TBU Control Boundary</text>
+        <text class="meta" x="16" y="56">script / worker / gate</text>
+      </g>
+      <g class="node" tabindex="0" data-flow="write recover" data-title="Durable artifact" data-body="TBU store, report, log, or proof packet." transform="translate(934 205)">
+        <rect width="284" height="86" rx="10"></rect>
+        <text class="title" x="16" y="32">TBU Artifact Store</text>
+        <text class="meta" x="16" y="56">state / report / proof</text>
+      </g>
+      <g class="node" tabindex="0" data-flow="recover" data-title="Recovery path" data-body="TBU retry, alert, or human review path." transform="translate(934 395)">
+        <rect width="284" height="86" rx="10"></rect>
+        <text class="title" x="16" y="32">TBU Recovery</text>
+        <text class="meta" x="16" y="56">retry / alert / review</text>
+      </g>
+    </svg>
+    <aside class="panel" id="detail">
+      <h2>Overview</h2>
+      <p>Select a node or flow. Replace every TBU with sourced system facts before shipping.</p>
+    </aside>
+  </main>
+  <script>
+    var stage = document.getElementById("stage");
+    var detail = document.getElementById("detail");
+    function setFlow(flow) {
+      document.querySelectorAll("[data-flow]").forEach(function (el) {
+        var flows = (el.getAttribute("data-flow") || "").split(/\s+/);
+        el.classList.toggle("lit", flow !== "all" && flows.indexOf(flow) !== -1);
+      });
+      stage.classList.toggle("flowing", flow !== "all");
+      document.querySelectorAll("#flowControls button[data-flow]").forEach(function (button) {
+        button.setAttribute("aria-pressed", button.getAttribute("data-flow") === flow ? "true" : "false");
+      });
+    }
+    document.getElementById("flowControls").addEventListener("click", function (event) {
+      var button = event.target.closest("button[data-flow]");
+      if (button) setFlow(button.getAttribute("data-flow"));
+    });
+    document.querySelectorAll(".node").forEach(function (node) {
+      function select() {
+        document.querySelectorAll(".node.active").forEach(function (el) { el.classList.remove("active"); });
+        node.classList.add("active");
+        detail.innerHTML = "<h2>" + node.dataset.title + "</h2><p>" + node.dataset.body + "</p>";
+      }
+      node.addEventListener("click", select);
+      node.addEventListener("keydown", function (event) {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          select();
+        }
+      });
+    });
+    document.getElementById("themeToggle").addEventListener("click", function () {
+      var dark = !document.documentElement.classList.contains("dark");
+      document.documentElement.classList.toggle("dark", dark);
+      localStorage.setItem("pc-diagram-theme", dark ? "dark" : "light");
+    });
+  </script>
+</body>
+</html>
