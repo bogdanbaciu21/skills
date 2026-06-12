@@ -1,17 +1,21 @@
 ---
 name: pagecraft
-description: Portable HTML formatting and visual-safety bundle for static HTML, portal pages, dashboards, blog posts, and one-off deliverables. Use when creating or reviewing HTML/CSS that needs robust tables, financial number formatting, headers/section dividers, or text-wrap prevention; when the user reports broken text wrapping, phantom right edge, or magician divider; when normalizing ad hoc table systems; or when formatting financial numbers in HTML/Excel. Bundles verify-text-wrap, table-system-migration, and number-formats as nested sub-skills — load those bodies from this skill, do not invoke them as standalone top-level skills.
+description: Portable HTML artifact and visual-safety bundle for static HTML, portal pages, dashboards, blog posts, one-off deliverables, and SVG-first architecture diagrams. Use when creating or reviewing self-contained HTML pages, visual documents, architecture/system diagrams, robust tables, financial number formatting, headers/section dividers, or text-wrap prevention; when the user says "make this an HTML artifact", "diagram this", "architecture diagram", "visual plan", or reports broken wrapping, phantom right edge, or magician divider. Bundles html, html-diagram, verify-text-wrap, table-system-migration, and number-formats as nested sub-skills.
 ---
 
 # Pagecraft
 
-Pagecraft is a portable HTML finishing **bundle**: a comprehensive stylesheet
-plus the *real, proven* verifiers — vendored in so one install gives you the
-whole toolchain. It exists so you stop hand-fixing the same table, number,
-header, and text-wrap bugs in every repo.
+Pagecraft is a portable HTML artifact and finishing **bundle**: focused output
+lanes for new self-contained HTML plus a comprehensive stylesheet and the *real,
+proven* verifiers. It exists so you stop hand-fixing the same HTML, diagram,
+table, number, header, and text-wrap bugs in every repo.
 
-It does not reinvent the checks. It bundles them:
+It does not replace a repo's design system. It bundles output modes and checks:
 
+- **`html`** — create self-contained, brand-aware HTML artifacts from source
+  material, then route them through Pagecraft verification.
+- **`html-diagram`** — create full-screen, SVG-first architecture/system diagrams
+  with brand-aware tokens, minimal prose, and optional interactive flow states.
 - **`wrap-safe`** — the CSS keystone/reset and the `wrapcheck.js` runtime probe.
 - **`verify-text-wrap`** — the `runner.py` browser verifier (8 viewports + the
   right-edge "magician's divider" check) and the deterministic `check-keystone.py`.
@@ -28,6 +32,8 @@ It does not reinvent the checks. It bundles them:
    repo already has a design system, adapt class names/variables instead of
    replacing it.
 2. **Use the references as needed.**
+   - New HTML artifacts: `../html/SKILL.md`
+   - Architecture/system diagrams: `../html-diagram/SKILL.md`
    - Tables: `references/tables.md` (the `.bbt` system + when to use `table-system-migration`)
    - Text wrap: `references/text-wrap.md`
    - Number formats: `references/number-formats.md`
@@ -121,6 +127,8 @@ Load the sub-skill body from the path below; do not expect a top-level
 | Need | Sub-skill | Start here |
 |---|---|---|
 | Install the bundle or finish one static HTML surface | `pagecraft` (this file) | `install-pagecraft.sh`, then these references |
+| Create a new self-contained HTML artifact, report, explainer, plan, or prototype | `html` | `../html/SKILL.md` |
+| Create a full-screen architecture, stack, sequence, lineage, or system diagram | `html-diagram` | `../html-diagram/SKILL.md` |
 | Prove wrap/container safety after CSS or deploy | `verify-text-wrap` | `verify-text-wrap/SKILL.md` |
 | Normalize many ad hoc tables into one system | `table-system-migration` | `table-system-migration/SKILL.md` |
 | Format financial numbers in HTML or Excel | `number-formats` | `number-formats/SKILL.md` |
@@ -140,6 +148,9 @@ Load the sub-skill body from the path below; do not expect a top-level
 - Numbers follow the Macabacus convention: color encodes provenance, negatives
   use parentheses (not red), units stated once in the header.
 - Every exception needs a same-line reason: `/* wrap-exempt: metric-only KPI grid */`.
+- New visual artifacts must keep the repo/client/Bogdan brand contract first and
+  use Pagecraft as the mechanics and verification layer, not as a competing
+  palette.
 
 ## What's in the bundle
 
@@ -158,6 +169,14 @@ pagecraft/                          the plugin
    │  │                             safe grids, headers, callouts, focus, print
    │  ├─ assets/wrap-lab/*.html     synthetic good/bad fixtures for the checker
    │  └─ references/*.md            tables, text-wrap, number-formats, headers, …
+   ├─ html/                         self-contained HTML artifact lane
+   │  ├─ SKILL.md
+   │  ├─ assets/templates/html-artifact.html
+   │  └─ references/html-artifact-patterns.md
+   ├─ html-diagram/                 SVG-first architecture/system diagram lane
+   │  ├─ SKILL.md
+   │  ├─ assets/templates/fullscreen-svg-diagram.html
+   │  └─ references/diagram-patterns.md
    ├─ verify-text-wrap/             the wrap probe + verifiers (canonical home)
    │  ├─ runner.py                  browser verifier (8 viewports + right-edge)
    │  ├─ check-keystone.py          deterministic keystone guard (no browser)

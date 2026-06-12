@@ -10,10 +10,18 @@
 
 set -eu
 
-# This script lives in the pagecraft overview skill (pagecraft/skills/pagecraft).
-# The probe + verifiers are self-contained in the sibling verify-text-wrap skill.
+# This script lives in the pagecraft overview skill. The probe + verifiers are
+# self-contained in the sibling verify-text-wrap skill in both plugin and flat
+# installs.
 skill_dir=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
-vtw_dir=$(CDPATH= cd -- "$skill_dir/verify-text-wrap" && pwd)
+if [ -d "$skill_dir/../verify-text-wrap" ]; then
+  vtw_dir=$(CDPATH= cd -- "$skill_dir/../verify-text-wrap" && pwd)
+elif [ -d "$skill_dir/verify-text-wrap" ]; then
+  vtw_dir=$(CDPATH= cd -- "$skill_dir/verify-text-wrap" && pwd)
+else
+  echo "ERR_PAGECRAFT_INSTALL missing verify-text-wrap sibling for $skill_dir" >&2
+  exit 2
+fi
 target=${1:-$(pwd)}
 static_root=${2:-"$target"}
 pagecraft_version=$(git -C "$skill_dir" rev-parse --short HEAD 2>/dev/null || printf '%s' "0.1.0")

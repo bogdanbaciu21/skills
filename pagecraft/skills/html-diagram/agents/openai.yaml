@@ -1,0 +1,4 @@
+interface:
+  display_name: "HTML Diagram"
+  short_description: "SVG-first architecture and system diagrams"
+  default_prompt: "Use $html-diagram to create a self-contained, SVG-first architecture or system diagram and verify it with Pagecraft checks."

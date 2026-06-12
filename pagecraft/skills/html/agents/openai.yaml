@@ -1,0 +1,4 @@
+interface:
+  display_name: "HTML Artifact"
+  short_description: "Brand-aware standalone HTML pages"
+  default_prompt: "Use $html to turn this source material into a polished, self-contained HTML artifact and verify the result with Pagecraft checks."
