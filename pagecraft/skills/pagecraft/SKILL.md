@@ -67,6 +67,39 @@ installation first:
 5. Convert tables/grids opportunistically as pages are touched; do not attempt a
    full estate migration unless `table-system-migration` is explicitly in scope.
 
+## Worked examples
+
+### Example 1: One static finance page
+
+User: "This finance HTML is basically right, but make it safe to ship."
+
+Do:
+- Install or reuse Pagecraft.
+- Convert the main financial table to `.bbt` inside `.bbt-wrap`.
+- Run `verify-text-wrap/check-keystone.py` first, then `verify-text-wrap/runner.py`
+  if the page is visual or recently failed visually.
+- Keep number provenance visible with `number-formats`.
+
+### Example 2: Text wrapping complaint
+
+User: "The text wraps randomly on mobile."
+
+Do:
+- Run the keystone check before changing CSS.
+- Look for missing `min-width: 0`, too-narrow grid columns, or inconsistent
+  prose caps.
+
+Do not:
+- Add `text-wrap: pretty`, `hyphens: auto`, or `word-break: break-all` as the
+  first fix.
+
+### Example 3: Large legacy table estate
+
+User: "Normalize all these dashboard tables."
+
+Do not start by hand-editing every table. Load `table-system-migration` and audit
+table families first, then migrate in controlled batches with a ratchet.
+
 ## Update or uninstall
 
 - **Update:** rerun `sh install-pagecraft.sh <repo-root>` from the latest skills

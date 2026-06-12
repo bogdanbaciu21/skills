@@ -139,3 +139,37 @@ Output the handoff inside a fenced code block so the user can copy it in one cli
 After outputting the handoff block, remind the user where the artifact was saved and how to use it:
 
 > Paste the block above as the first message in the new chat, or give the next session the saved markdown artifact at [path]. If the next session is on another machine or VPS, use the pasted block unless you have copied or committed the file there.
+
+## Worked examples
+
+### Example 1: Repo work with unfinished implementation
+
+User: "handoff this to the next agent."
+
+Include:
+- Current branch, repo root, and whether commits were pushed.
+- Exact files changed and the verification commands already run.
+- A "What's Left" checklist that starts with the next executable step, not a
+  vague project goal.
+- Any current blockers, including the exact error text.
+
+### Example 2: Cross-machine transfer
+
+User: "pass this to the VPS."
+
+Do:
+- Say that the chat block is the portable copy unless the file is committed or
+  copied.
+- Label suggested commands as `VPS Hetzner - ssh shell` and include `cd
+  /root/dans-brain` when relevant.
+
+Do not:
+- Claim that a Mac-local `.agent-handoffs/...` path exists on the VPS.
+
+### Example 3: Finished work, but user wants a record
+
+User: "wrap this up for handoff even though it's done."
+
+Use the same structure, but make "What's Left" explicit: "None for this task;
+future follow-up is optional..." Then list the proof and pushed commit so the
+next session can verify without redoing the work.

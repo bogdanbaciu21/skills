@@ -113,3 +113,50 @@ manifest shape.
   target repo already requires it.
 - Do not replace a repo's existing production design system without first
   mapping the Bogdan tokens onto its local conventions.
+
+## Worked examples
+
+### Example 1: Personal finance HTML
+
+User: "Brand this budget pacing page."
+
+Do:
+- Use `assets/design-system/colors_and_type.css` and self-host the `fonts/`
+  directory next to the artifact if it must open from disk.
+- Keep the global page in the Puddles paper/sky system.
+- Put any dense table or operating-model exhibit inside `.db-scope`.
+- Run the repo's `brand_lint.py` when present, then inspect mobile and desktop
+  widths for overflow.
+
+Do not:
+- Copy inlined CSS from a prior artifact.
+- Invent new chip colors or use rust as a call-to-action fill.
+
+### Example 2: Client-facing artifact
+
+User: "Make this LJB dashboard look polished."
+
+Do not apply this skill directly. Client context wins. Use the client design
+system (`ljbcpa-design`) unless the user explicitly asks for Dan's personal
+brand.
+
+### Example 3: Plain document or one-pager
+
+User: "Make this internal one-pager feel like my brand."
+
+Do:
+- Preserve the factual content and leave missing owner-authored copy as `TBU`.
+- Use Instrument Serif for the main title, Geist for body/UI text, and
+  JetBrains Mono for labels or provenance lines.
+- Keep depth flat: borders, rules, spacing, no global shadows or gradients.
+
+### Example 4: Financial model exhibit embedded in a broader page
+
+User: "The model table needs to look like finance, but the page should still be
+mine."
+
+Do:
+- Use the global brand for the page shell.
+- Use `.db-scope` only around the model exhibit.
+- Format numbers with en-dash zeros, parenthesized negatives, and provenance
+  colors from `number-formats`.
