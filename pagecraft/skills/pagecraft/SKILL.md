@@ -45,7 +45,9 @@ It does not replace a repo's design system. It bundles output modes and checks:
 3. **Prefer the bundled primitives before new CSS.** `.pc-grid`, `.pc-card-grid`,
    `.bbt` (+ `.pc-table` alias), `.pc-section-break`, `.pc-chapter`,
    `.pc-heading-anchor` (the always-on gutter bar), `.pc-eyebrow`, `.num`, the
-   `.cell-*` Macabacus provenance colors, etc. Raw grid/table CSS is a code smell.
+   `.cell-*` Macabacus provenance colors, `.pc-state`, `.pc-skeleton`,
+   `.pc-media-box`, `.pc-ph-img`, `.pc-sr-only`, etc. Raw grid/table/state CSS is
+   a code smell.
 4. **Validate with the bundled tools — two layers, both required.** The probe and
    verifiers live in the nested `verify-text-wrap/` sub-skill (see
    `verify-text-wrap/SKILL.md` for full options):
@@ -160,6 +162,12 @@ Load the sub-skill body from the path below; do not expect a top-level
 - For new non-trivial artifacts, run the artifact intelligence pass before
   writing CSS: choose the artifact class, name the anti-patterns, and select the
   verification gates up front.
+- Stateful/data-bearing surfaces need loading, empty, error, populated, and edge
+  states. Use `.pc-state` and `.pc-skeleton` rather than styling one-off empty
+  boxes.
+- Avoid default AI tells before polish: unsupported metrics, filler copy,
+  emoji-as-icons, generic purple-blue gradients, Tailwind-indigo hardcodes, and
+  external placeholder image CDNs.
 
 ## What's in the bundle
 

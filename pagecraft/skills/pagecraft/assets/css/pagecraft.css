@@ -17,6 +17,9 @@
   --pc-serif: var(--font-serif, "Instrument Serif", "Iowan Old Style", Georgia, serif);
   --pc-mono: var(--font-mono, "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace);
   --pc-grid-min: 220px;
+  --pc-radius: var(--radius, 6px);
+  --pc-motion-fast: 150ms;
+  --pc-motion-med: 220ms;
 }
 
 *, *::before, *::after { box-sizing: border-box; }
@@ -62,6 +65,40 @@ button, [role="button"], summary, label[for], a[href] { cursor: pointer; }
 img, svg, video, canvas {
   max-width: 100%;
   height: auto;
+}
+
+.pc-sr-only,
+.pc-visually-hidden {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+.pc-tap-target,
+.pc-icon-button {
+  min-inline-size: 44px;
+  min-block-size: 44px;
+}
+
+.pc-icon-button {
+  display: inline-grid;
+  place-items: center;
+  border: 1px solid var(--pc-rule);
+  border-radius: var(--pc-radius);
+  background: var(--pc-paper);
+  color: var(--pc-ink);
+}
+
+.pc-icon-button[aria-pressed="true"],
+.pc-icon-button[aria-current="true"] {
+  border-color: color-mix(in srgb, var(--pc-accent), var(--pc-rule) 45%);
+  background: color-mix(in srgb, var(--pc-accent), transparent 88%);
 }
 
 .pc-page {
@@ -476,6 +513,123 @@ a.pc-anchor-legacy,
   line-height: 1.55;
 }
 
+.pc-state {
+  display: grid;
+  gap: 10px;
+  align-content: center;
+  min-block-size: var(--pc-state-min, 160px);
+  margin: 24px 0;
+  padding: 22px 24px;
+  border: 1px solid var(--pc-rule);
+  border-radius: var(--pc-radius);
+  background: var(--pc-paper-warm);
+  color: var(--pc-ink);
+}
+
+.pc-state__label {
+  color: var(--pc-ink-soft);
+  font-family: var(--pc-mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.pc-state__title {
+  margin: 0;
+  color: var(--pc-ink);
+  font-family: var(--pc-serif);
+  font-size: clamp(22px, 3vw, 34px);
+  font-weight: 500;
+  line-height: 1.1;
+}
+
+.pc-state__body {
+  max-width: 68ch;
+  margin: 0;
+  color: var(--pc-ink-soft);
+  line-height: 1.55;
+}
+
+.pc-state__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.pc-state--loading { border-color: color-mix(in srgb, var(--pc-blue), var(--pc-rule) 55%); }
+.pc-state--empty { border-style: dashed; }
+.pc-state--error {
+  border-color: color-mix(in srgb, var(--pc-red), var(--pc-rule) 40%);
+  background: color-mix(in srgb, var(--pc-red), var(--pc-paper) 93%);
+}
+.pc-state--success {
+  border-color: color-mix(in srgb, var(--pc-green), var(--pc-rule) 45%);
+  background: color-mix(in srgb, var(--pc-green), var(--pc-paper) 94%);
+}
+
+.pc-skeleton {
+  position: relative;
+  min-block-size: 1em;
+  overflow: hidden;
+  border-radius: calc(var(--pc-radius) - 2px);
+  background: color-mix(in srgb, var(--pc-rule), transparent 35%);
+  color: transparent;
+}
+
+.pc-skeleton::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(90deg, transparent, color-mix(in srgb, white, transparent 42%), transparent);
+  animation: pc-shimmer 1.2s ease-in-out infinite;
+}
+
+@keyframes pc-shimmer {
+  to { transform: translateX(100%); }
+}
+
+.pc-media-box,
+.pc-ph-img {
+  display: grid;
+  place-items: center;
+  aspect-ratio: var(--pc-media-ratio, 16 / 9);
+  width: 100%;
+  overflow: hidden;
+  border: 1px solid var(--pc-rule);
+  border-radius: var(--pc-radius);
+  background:
+    linear-gradient(135deg, color-mix(in srgb, var(--pc-paper-warm), var(--pc-rule) 20%), var(--pc-paper));
+  color: var(--pc-ink-soft);
+}
+
+.pc-media-box > :where(img, video, iframe, canvas, svg) {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.pc-media-box > .pc-ph-img {
+  width: 100%;
+  height: 100%;
+  border: 0;
+  border-radius: 0;
+}
+
+.pc-ph-img::before {
+  content: attr(data-label);
+  max-width: 28ch;
+  padding: 12px;
+  font-family: var(--pc-mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-align: center;
+  text-transform: uppercase;
+}
+
 .pc-stat {
   border: 1px solid var(--pc-rule);
   background: var(--pc-paper);
@@ -537,6 +691,12 @@ blockquote.pc-quote {
     animation-iteration-count: 1 !important;
     scroll-behavior: auto !important;
     transition-duration: 0.01ms !important;
+  }
+
+  .pc-skeleton::after {
+    animation: none !important;
+    background: transparent !important;
+    transform: none !important;
   }
 }
 
