@@ -13,6 +13,19 @@ finishing an existing page.
   `verify-text-wrap`.
 - Financial model or numeric exhibit: render with `html`, but load
   `number-formats` before writing tables.
+- New non-trivial artifact with unclear structure: run the Pagecraft
+  `design-intelligence.md` pass before choosing layout or writing CSS.
+
+## Intelligence Pass
+
+Use `../pagecraft/references/design-intelligence.md` when the artifact needs
+more than a simple prose page. The pass forces these choices before code:
+
+- Artifact class and reader job.
+- Source trust and unknowns to mark as `TBU`.
+- Active brand contract and any page-specific token overrides.
+- Density, first viewport, primary interaction, and data/exhibit contract.
+- Anti-patterns to avoid and verification gates to run.
 
 ## Artifact Contract
 
@@ -38,6 +51,12 @@ finishing an existing page.
   no explanatory feature-tour text inside the UI.
 - Plan page: objective, acceptance criteria, work bands, blockers, validator
   questions, proof plan.
+- Landing/offer page: literal offer, proof, CTA, objections, real imagery or
+  product surface; never generic marketing filler.
+- Knowledge/docs page: search or TOC, task groups, examples, deep links,
+  version/source notes.
+- Data exhibit: chart/table pair, unit and period labels, legend, source line,
+  accessible fallback.
 
 ## Verification
 
