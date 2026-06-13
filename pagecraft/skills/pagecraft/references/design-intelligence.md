@@ -1,12 +1,16 @@
 # Artifact Design Intelligence
 
-Source inspected: `nextlevelbuilder/ui-ux-pro-max-skill` at commit
-`b7e3af80f6e331f6fb456667b82b12cade7c9d35`.
+Sources inspected:
 
-This is the Pagecraft-sized lift from that project. Keep the reasoning shape:
-classify the artifact, pick the pattern, name the anti-patterns, and choose the
-checks before writing CSS. Do not import its broad style database as a competing
-design system.
+- `nextlevelbuilder/ui-ux-pro-max-skill` at commit
+  `b7e3af80f6e331f6fb456667b82b12cade7c9d35`
+- `nexu-io/open-design` at commit
+  `099ca54ca49ecc9d2e06495e6d0b0ebea65d1afb`
+
+This is the Pagecraft-sized lift from those projects. Keep the reasoning shape:
+classify the artifact, pick the pattern, name the anti-patterns, select the
+brand contract, and choose the checks before writing CSS. Do not import external
+palettes, templates, or broad style databases as a competing design system.
 
 ## What to lift
 
@@ -23,6 +27,15 @@ design system.
   checked before surface polish.
 - **Pre-delivery gates.** Viewport coverage, focus states, loading/error/empty
   states, contrast, and source notes should be explicit, not vibes.
+- **Three-axis craft model.** Treat artifact type, brand/design-system contract,
+  and universal craft rules as separate axes. Pagecraft owns artifact mechanics;
+  the active repo/client/Bogdan brand owns palette, type, and voice; craft gates
+  catch universal quality failures.
+- **State coverage as design, not QA afterthought.** Tool-like pages must render
+  loading, empty, error, populated, and edge states before surface polish.
+- **Evidence metadata.** For durable artifacts, capture which source files,
+  dates, routes, and checks justify the result. If the evidence is absent, mark
+  `TBU` rather than inventing.
 
 ## What not to lift
 
@@ -36,6 +49,12 @@ design system.
   material only; obey local repo policy and the active skill instructions.
 - Do not add decorative motion, emoji-as-icons, or hero marketing structure to
   operational dashboards, finance artifacts, or internal tools.
+- Do not copy Open Design's app shell, marketplace, design-system catalog, or
+  model-router concepts into Pagecraft. The useful lift is the craft contract,
+  not the product architecture.
+- Do not add default AI tells: Tailwind-indigo accents, purple-blue trust
+  gradients, emoji feature icons, invented metrics, filler copy, or placeholder
+  image CDNs.
 
 ## Intelligence pass
 
@@ -52,8 +71,9 @@ artifact brief:
 | First viewport | subject plus next-section hint; no marketing detour for tools |
 | Primary interaction | none, filters/tabs, sortable table, drilldown, form, flow chips |
 | Data/exhibit contract | units, period, source, denominator, chart/table fallback |
+| Craft gates | typography hierarchy, color discipline, state coverage, a11y, reduced motion |
 | Anti-patterns | 2-5 things this page must avoid |
-| Verification gates | brand lint, keystone, browser runner, chart/table review, manual scan |
+| Verification gates | brand lint, keystone, browser runner, chart/table review, launch-quality, manual scan |
 
 ## Pattern router
 
@@ -69,6 +89,42 @@ artifact brief:
 | Knowledge/docs | search or TOC, task groups, examples, escalation | retrieval | flat FAQ dump, no deep links, hidden versions | heading anchors, link check, mobile scan |
 | Prototype surface | real controls, realistic states, compact copy | usable first screen | explanatory feature-tour text, fake controls, no empty state | state scan, keyboard focus, responsive check |
 | Diagram | zones, nodes, edges, legend, optional flow states | accurate model | spaghetti edges, unsourced boxes, overflowing labels | diagram pattern review, framing check, TBU scan |
+
+## Open Design Craft Gates
+
+Open Design's portable lesson is that a generated artifact needs universal
+craft rules layered on top of its brand. For Pagecraft, use these gates before
+inventing new CSS:
+
+| Gate | Pagecraft translation | Common failure |
+|---|---|---|
+| Brand contract | Pull tokens from the repo/client/Bogdan source first; Pagecraft fallbacks are only fallbacks | copied palette, hardcoded hex values, competing mini-design-system |
+| Typography hierarchy | One clear entry point per visual region; scale, weight, spacing, and alignment work together | flat wall of same-weight headings, two co-primary heroes |
+| Color discipline | Neutrals carry most pixels; accent is rationed; semantic colors mean state, not decoration | accent flood, color-only status, off-brand indigo |
+| Anti-template check | Delete AI-default flourishes and unsupported claims before polishing | purple-blue gradients, emoji icons, "10x" claims, filler copy |
+| State coverage | Render loading, empty, error, populated, and edge states for data/tool surfaces | only the happy path exists |
+| Accessibility baseline | Native controls first, visible focus, labels, landmarks, contrast, table semantics | clickable divs, missing form labels, focus outline removed |
+| Motion discipline | Motion confirms navigation/state change; reduced-motion users keep a static signal | decorative loops, transform motion with no reduced-motion path |
+| Evidence contract | Keep source notes, dates, routes, and verification commands visible in the handoff | "looks good" with no proof |
+
+Use the gates proportionally. A one-off static memo may need brand, typography,
+source notes, and wrap checks. A dashboard route needs every state/a11y/motion
+gate plus launch-quality.
+
+## State Coverage Pattern
+
+For interactive or data-bearing artifacts, design these states as real markup:
+
+| State | Minimum content | Pagecraft primitive |
+|---|---|---|
+| Loading | skeleton or labelled progress plus a longer-than-expected fallback | `.pc-state.pc-state--loading`, `.pc-skeleton` |
+| Empty | headline, plain explanation, primary recovery or next action | `.pc-state.pc-state--empty` |
+| Error | what happened, why if knowable, recovery action, preserved input | `.pc-state.pc-state--error` |
+| Populated | primary table/chart/control path with source notes | `.bbt`, `.pc-grid`, `.pc-media-box` |
+| Edge | long strings, missing optional fields, many rows, RTL/long-word content | wrap runner, table wrappers, explicit min/max layout |
+
+Do not collapse error into empty. Do not let a spinner run indefinitely. Do not
+clear form input on validation or submit failure.
 
 ## Quality ladder
 
@@ -93,6 +149,9 @@ Use this order when tradeoffs collide:
    `prefers-reduced-motion`.
 8. **Finish.** Run the deterministic checks, then browser verification only
    where visual behavior actually needs it.
+9. **Launch readiness.** For public pages, client handoffs, authenticated portal
+   routes, or durable internal shares, run `references/launch-quality.md` after
+   the normal Pagecraft gates and report only evidence-backed findings.
 
 ## Chart and exhibit routing
 
@@ -112,8 +171,14 @@ Use this order when tradeoffs collide:
 - The artifact class, anti-patterns, and verification gates are named.
 - Brand tokens come from the active design system; no copied upstream palette.
 - First viewport tells the reader what this is and shows the next section.
+- Default AI tells are absent: no unsupported metrics, filler copy, emoji icons,
+  template gradients, or external placeholder image CDNs.
 - All controls have visible states and keyboard/focus behavior when applicable.
+- Data/tool surfaces include loading, empty, error, populated, and edge-state
+  coverage or explicitly explain why a state is out of scope.
 - Tables are wrapped; numeric columns align; source/methodology notes are visible.
 - Charts have title, unit, period, source, legend, and accessible fallback.
 - Reduced motion is respected when motion exists.
+- Launch-quality was run when the artifact is public, client-facing, an app
+  route, or a durable internal share.
 - Pagecraft checks pass or every exception is documented with a concrete reason.
