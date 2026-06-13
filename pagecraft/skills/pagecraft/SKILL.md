@@ -40,6 +40,7 @@ It does not replace a repo's design system. It bundles output modes and checks:
    - Headers / section dividers: `references/headers.md`
    - Artifact design intelligence: `references/design-intelligence.md`
      (pattern routing, anti-patterns, and quality gates for new artifacts)
+   - Launch / share readiness: `references/launch-quality.md`
    - Lifted flourish inventory: `references/flourishes-lift.md` · Backlog: `references/future-ideas.md`
 3. **Prefer the bundled primitives before new CSS.** `.pc-grid`, `.pc-card-grid`,
    `.bbt` (+ `.pc-table` alias), `.pc-section-break`, `.pc-chapter`,
@@ -153,6 +154,9 @@ Load the sub-skill body from the path below; do not expect a top-level
 - New visual artifacts must keep the repo/client/Bogdan brand contract first and
   use Pagecraft as the mechanics and verification layer, not as a competing
   palette.
+- Before a public launch, client handoff, or durable internal share, run the
+  launch-quality sweep after brand/wrap/table checks. Treat it as a prioritized
+  evidence pass, not as a generic wishlist.
 - For new non-trivial artifacts, run the artifact intelligence pass before
   writing CSS: choose the artifact class, name the anti-patterns, and select the
   verification gates up front.
