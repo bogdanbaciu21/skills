@@ -38,6 +38,8 @@ It does not replace a repo's design system. It bundles output modes and checks:
    - Text wrap: `references/text-wrap.md`
    - Number formats: `references/number-formats.md`
    - Headers / section dividers: `references/headers.md`
+   - Artifact design intelligence: `references/design-intelligence.md`
+     (pattern routing, anti-patterns, and quality gates for new artifacts)
    - Lifted flourish inventory: `references/flourishes-lift.md` · Backlog: `references/future-ideas.md`
 3. **Prefer the bundled primitives before new CSS.** `.pc-grid`, `.pc-card-grid`,
    `.bbt` (+ `.pc-table` alias), `.pc-section-break`, `.pc-chapter`,
@@ -151,6 +153,9 @@ Load the sub-skill body from the path below; do not expect a top-level
 - New visual artifacts must keep the repo/client/Bogdan brand contract first and
   use Pagecraft as the mechanics and verification layer, not as a competing
   palette.
+- For new non-trivial artifacts, run the artifact intelligence pass before
+  writing CSS: choose the artifact class, name the anti-patterns, and select the
+  verification gates up front.
 
 ## What's in the bundle
 
@@ -168,7 +173,8 @@ pagecraft/                          the plugin
    │  │                             tables, number formats + Macabacus colors,
    │  │                             safe grids, headers, callouts, focus, print
    │  ├─ assets/wrap-lab/*.html     synthetic good/bad fixtures for the checker
-   │  └─ references/*.md            tables, text-wrap, number-formats, headers, …
+   │  └─ references/*.md            tables, text-wrap, number-formats, headers,
+   │                                artifact intelligence, …
    ├─ html/                         self-contained HTML artifact lane
    │  ├─ SKILL.md
    │  ├─ assets/templates/html-artifact.html
