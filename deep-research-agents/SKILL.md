@@ -18,7 +18,7 @@ Prefer the local `dans-brain` checkout when you need a repo-neutral research
 run. Do not assume a Linux/root home path; resolve the project root explicitly:
 
 ```bash
-DANS_BRAIN_ROOT="${DANS_BRAIN_ROOT:-$HOME/Desktop/dans-brain}"
+DANS_BRAIN_ROOT="${DANS_BRAIN_ROOT:-$HOME/src/dans-brain}"
 test -f "$DANS_BRAIN_ROOT/bin/deep_research.py"
 cd "$DANS_BRAIN_ROOT" && uv run python bin/deep_research.py --list-providers
 cd "$DANS_BRAIN_ROOT" && uv run python bin/deep_research.py "research question" --dry-run
@@ -31,7 +31,7 @@ with one markdown file per provider plus `combined.md` and `manifest.json`.
 Before any live provider call, check local provider availability:
 
 ```bash
-python3 /Users/danb/Desktop/skills/deep-research-agents/scripts/check_provider_env.py
+python3 /Users/danb/src/skills/deep-research-agents/scripts/check_provider_env.py
 ```
 
 Then run a no-cost harness check:
