@@ -141,7 +141,7 @@ headroom to measure.
 **LOCAL Mac - zsh**
 
 ```bash
-cd /Users/danb/Desktop/skills
+cd /Users/danb/src/skills
 PYTHONDONTWRITEBYTECODE=1 python3 scripts/skillopt_pilot.py \
   --skill excel-wow/SKILL.md \
   --benchmark excel-wow/evals/skillopt_pilot.jsonl \
@@ -157,7 +157,7 @@ Run the pilot tests with:
 **LOCAL Mac - zsh**
 
 ```bash
-cd /Users/danb/Desktop/skills
+cd /Users/danb/src/skills
 PYTHONDONTWRITEBYTECODE=1 python3 -m unittest tests/test_skillopt_pilot.py
 ```
 

@@ -122,7 +122,7 @@ generated and reviewed.
 For batch review, build a local contact sheet from the blog repo root:
 
 ```bash
-python3 /Users/danb/Desktop/skills/blog-image-gen/scripts/thumbnail_contact_sheet.py --repo .
+python3 /Users/danb/src/skills/blog-image-gen/scripts/thumbnail_contact_sheet.py --repo .
 ```
 
 Open `priv/static/images/posts/contact-sheet.html` and scan for duplicate visual
@@ -143,7 +143,7 @@ The PNGs are committed to the repo (Fly.io builds the release from this tree;
 When editing prompt parsing or review workflow text in this skill, run:
 
 ```bash
-PYTHONDONTWRITEBYTECODE=1 python3 /Users/danb/Desktop/skills/blog-image-gen/evals/prompt_fixture_eval.py
+PYTHONDONTWRITEBYTECODE=1 python3 /Users/danb/src/skills/blog-image-gen/evals/prompt_fixture_eval.py
 ```
 
 The fixture locks the contract that `--dry-run` output must expose the final
