@@ -116,6 +116,37 @@ def load_plan(path):
     return yaml.safe_load(text)
 
 
+BROAD_GLOBS = {"**", "**/*", "src/**", "app/**", "bin/**"}
+
+
+def is_broad_glob(pattern):
+    normalized = pattern.strip().rstrip("/")
+    return normalized in BROAD_GLOBS or normalized.endswith("/**")
+
+
+def broad_glob_errors(tracks):
+    errors = []
+    code_tracks = [t for t in tracks if t.get("type", "code") != "analysis"]
+    for track in code_tracks:
+        name = track.get("name") or "unnamed"
+        broad = [p for p in as_list(track.get("can_touch")) if is_broad_glob(p)]
+        if broad:
+            errors.append(
+                f"{name}: can_touch uses broad glob(s) {', '.join(repr(b) for b in broad)}; narrow scope or mark landing_mode serial with single owner"
+            )
+    owners = {}
+    for track in code_tracks:
+        for pattern in as_list(track.get("can_touch")):
+            if is_broad_glob(pattern):
+                owners.setdefault(pattern, []).append(track.get("name") or "unnamed")
+    for pattern, names in owners.items():
+        if len(names) > 1:
+            errors.append(
+                f"multiple tracks claim broad glob {pattern!r}: {', '.join(names)}"
+            )
+    return errors
+
+
 def validate(plan):
     errors = []
     tracks = plan.get("tracks")
@@ -153,6 +184,8 @@ def validate(plan):
                 errors.append(
                     f"{left.get('name')} and {right.get('name')}: shared state {', '.join(shared)} without dependency"
                 )
+
+    errors.extend(broad_glob_errors(tracks))
 
     return errors
 

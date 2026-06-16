@@ -12,6 +12,37 @@ A protocol for confirming a static-HTML portal renders correctly across viewport
 
 Default runner coverage is intentionally strict: `wide` 1440x900, `desktop` 1280x900, `laptop` 1024x900, `tablet-wide` 820x900, `tablet` 768x900, `phone-wide` 430x844, `mobile` 390x844, and `phone-narrow` 360x780. One viewport is not enough; many ugly wrap bugs appear only between named breakpoints or when a mobile header gets too narrow.
 
+## Recent failure audit and ratchet
+
+Recent portal/blog failures clustered in a few repeatable page types, so treat
+these as first-class verifier coverage, not one-off screenshot cleanup:
+
+- Mobile label, KPI, and heading strands (`short-text-many-lines`,
+  `heading-many-lines`, display-text orphan / short-final line).
+- Table and card overflow (`body-horizontal-overflow`,
+  `element-horizontal-overflow`, `clipped-text`) on dense financial/status pages.
+- Narrow-card prose after grid/flex collapse (`dense-prose-in-narrow-column`,
+  `narrow-container`, caterpillar text).
+- Right-edge mismatch from prose caps/dividers (`right-edge-alignment`).
+- Typography anti-pattern fixes that hide the container bug (`hyphens:auto`,
+  `text-wrap:pretty`, `text-wrap:balance`, `word-break:break-all`).
+
+`runner.py` includes an in-run repeated-failure ratchet. It fingerprints each new
+failure by page, failure kind, selector, and text/rule key, then flags the same
+fingerprint when it appears across multiple checked viewports. If the ratchet
+appears in stdout or under `ratchet.repeated_failures` in a `--json-report`, do
+not add a broad allowlist entry. Fix the shared component, renderer, grid/table
+wrapper, or prose-width rule.
+
+`wrap-ratchet.py` adds a cross-run ratchet on top of the JSON report. It records
+failure fingerprints in a repo-local history file (default
+`.wrap-ratchet-history.json`) and fails when the same fingerprint shows up again
+on a later verification run. Use it after `runner.py --json-report` in CI or
+pre-commit wrappers so repeated portal failures cannot keep cycling through
+advisory downgrades. If the finder missed a real repeat class, update
+`wrapcheck.js`, `runner.py`, or `wrap-ratchet.py` and the mirrored tests before
+promoting the skill change.
+
 ## When to invoke
 
 - **After any CSS edit** touching `display`, `width`, `max-width`, `flex`, `grid`, `padding`, `margin`, `text-wrap`, `hyphens`, `word-break`, `overflow-wrap`, or any selector containing `p`, `li`, `h1-h6`, `td`, `th`, `article`, `main`, `section`, `.doc`, `.article`, `.prose`, `.tile`, `.kpi`.
@@ -105,7 +136,22 @@ python3 <skill-dir>/runner.py --local --portal portal \
 ```
 
 The JSON report schema is versioned with `schema_version: 1`; downstream CI
-annotations should key off that field before assuming report shape.
+annotations should key off that field before assuming report shape. Reports also
+include `summary.failure_types`, `summary.repeated_failures`, and
+`ratchet.repeated_failures` so CI or a human reviewer can tell whether a failure
+is an isolated page defect or a repeated verifier/skill gap.
+
+Cross-run ratchet after a JSON report:
+
+```
+python3 <skill-dir>/wrap-ratchet.py --check \
+  --report /tmp/verify-text-wrap-report.json \
+  --history .wrap-ratchet-history.json
+```
+
+Exit 1 means the same fingerprint already failed in a prior recorded run. Exit 0
+still allows the underlying runner failure to block; this script only adds the
+cross-run repeat signal and updates history.
 
 ### CI examples
 
@@ -178,6 +224,13 @@ Or for a failure:
 ```
 
 Exit code: 0 if all pages pass (or only known-issue matches), 1 if any new finding, 2 if operational failure (URL unreachable, Playwright not installed, etc.).
+
+When the same new failure fingerprint repeats across viewports, output includes
+a `repeated failure ratchet` section. This is still exit 1, but it carries a
+stronger meaning: the same defect survived breakpoint variation, so fix the
+shared source of the failure before narrowing the page set or adding
+`known-issues` entries. Known issues remain audited exceptions, not a mechanism
+for hiding repeated untriaged failures.
 
 ## Worked examples
 
