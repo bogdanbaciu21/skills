@@ -39,6 +39,30 @@ arguing in prose:
 Do not use code-wins when the variants would mutate the same database, send
 messages, deploy to production, or change irreversible external state.
 
+### Step 0.7 - Default to serial landing (not parallel push)
+
+<!-- # patch: 2026-06-16, concept-loop P2 multi-agent overlap / landing friction -->
+Parallel **investigation** can run concurrently; parallel **landing on `main`**
+cannot unless every track has a separate clone/worktree, zero file overlap, and
+Dan explicitly accepts push races. Default every code dispatch to a **serial
+landing queue**:
+
+| Role | Does | Does NOT |
+|------|------|----------|
+| **Runner** | Work in `git wt <track-slug>`, commit locally, run track gates, return summary + `git log -1 --stat` + verification + branch/worktree path | Push to `main`, edit outside CAN touch, land from the canonical dirty checkout |
+| **Coordinator** | Pull fresh `main`, land one track at a time via `git land` (or repo-specific land path), re-run gates after each land, stop on conflict or scope drift | Let every runner push concurrently, use piped push commands that mask exit codes, or land while another track is still writing |
+
+**When to keep serial (default):** 2+ code tracks, shared repo, any overlap risk,
+dans-brain canonical checkout (permanently dirty), LJB/shared-tree history, or
+when the concept-loop flagged multi-agent overlap / landing friction.
+
+**When parallel push is allowed:** Dan explicitly opts in **and** the validator
+reports zero overlapping `can_touch` scopes **and** each runner uses its own
+worktree/clone. Even then, prefer serial unless the tracks are truly trivial.
+
+Read [`assets/serial-landing-queue.md`](assets/serial-landing-queue.md) when
+filling the coordinator playbook and code-track prompts.
+
 ### Step 0.6 — Babysit open PRs with a bounded `/loop`
 
 Use this recipe when Dan asks to babysit PRs, keep agent branches moving, or run
@@ -73,21 +97,36 @@ Ask the user for track definitions if not already provided. Each track needs the
 | **Handover doc** | Yes | Path to the handover document for this track |
 | **Goal / evidence** | Yes | Self-contained problem statement, expected outcome, and concrete evidence such as failing tests, errors, URLs, or acceptance checks |
 | **Soldiers** | Yes | List of sub-task IDs the agent should execute |
-| **File scope** | Yes | CAN touch / CANNOT touch — explicit file lists or globs |
+| **File scope** | Yes | CAN touch / CANNOT touch: explicit file lists or globs (no repo-wide `**` unless the track truly owns everything) |
+| **Worktree slug** | Yes (code) | Short slug for `git wt <slug>`: one isolated worktree per code track |
 | **Issues** | Yes | GitHub issue numbers to close (code tracks) or comment on (analysis tracks) |
-| **Dependencies** | No | Which tracks must merge before this one starts (default: none) |
+| **Dependencies** | No | Which tracks must **land** before this one starts (default: none) |
+| **Landing order** | No | Integer rank for the serial queue when dependencies are insufficient (lower lands first) |
 | **Type** | No | `code` (default) or `analysis` |
 
 The user may provide these as a table, a list, or point to a file. Accept any format — extract the required and optional fields.
 
-### Step 2 — Validate file scope
+### Step 2 - Validate file scope and ownership matrix
 
-Before generating prompts, check for file overlap between tracks:
+Before generating prompts, check for file overlap between tracks and emit an
+explicit **File Ownership Matrix** (file/area to owning track). Shared infra
+must have a single owner or sit in CANNOT touch for every other track:
 
-1. Compare the "CAN touch" file lists across all tracks
-2. If two tracks claim the same file (or overlapping globs), **stop and flag it**:
-   > "Tracks A and D both claim `netlify/functions/firm-comp.mts`. This will cause merge conflicts. Either split the file scope or add a dependency so they run sequentially."
-3. Analysis tracks (read-only) are exempt from overlap checks — they don't edit files
+- `.github/workflows/**`, lockfiles, root build/config (`package.json`,
+  `pyproject.toml`, `netlify.toml`, `staticwebapp.config.json`, ...)
+- Shared engines (`shared-engine.cjs`, `parser/`, `gate.js`, design tokens)
+- Capture dirs, handoff dirs, and coordinator-only landing paths
+
+Validation steps:
+
+1. Compare the "CAN touch" file lists across all tracks.
+2. Reject repo-wide or directory-wide globs (`**`, `src/**`, `app/**`) unless
+   exactly one code track claims them and others list that tree under CANNOT touch.
+3. If two tracks claim the same file (or overlapping globs), **stop and flag it**:
+   > "Tracks A and D both claim `netlify/functions/firm-comp.mts`. Split the scope, add a dependency + serial landing order, or collapse into one track."
+4. Analysis tracks (read-only) are exempt from overlap checks; they do not edit files.
+5. Append the matrix to the dispatch output and coordinator playbook so runners
+   see neighbor ownership without reading each other's prompts.
 
 If the plan is available as JSON or YAML, run the bundled validator first:
 
@@ -112,7 +151,8 @@ Read the appropriate template, fill in the bracketed placeholders, and emit the 
 
 #### Template rules
 
-- **Dependencies:** If a track has dependencies, prepend: `**DO NOT START until [dependency tracks] have merged their work to main.**`
+- **Worktree + landing:** Every code prompt must name `git wt <worktree-slug>` and forbid pushing to `main`. Runners return proof; the coordinator lands serially.
+- **Dependencies:** If a track has dependencies, prepend: `**DO NOT START until [dependency tracks] have landed on main (coordinator confirmed).**`
 - **Self-contained context:** Prompts must not depend on the coordinator's current chat history. Include the track goal, concrete evidence, and expected output directly in the prompt, even when a handover doc exists.
 - **Focused scope:** One agent gets one problem domain. Do not use prompts like "fix all failing tests"; use prompts like "fix these failures in this file/subsystem."
 - **Constraints:** Tell the agent not to broaden scope. If the evidence points outside its file scope, it should stop and report the scope issue instead of editing unrelated files.
@@ -136,12 +176,12 @@ End with a summary table so the user can see the full dispatch at a glance:
 ```markdown
 ## Dispatch Summary
 
-| Agent | Track | Type | Soldiers | Issues | Dependencies | Can Start |
-|-------|-------|------|----------|--------|--------------|-----------|
-| 1 | ... | code | ... | ... | None | Now |
-| 2 | ... | code | ... | ... | None | Now |
-| 3 | ... | analysis | ... | ... | None | Now |
-| 4 | ... | code | ... | ... | After 1+2 | After merge |
+| Agent | Track | Type | Worktree | Soldiers | Issues | Land order | Can Start |
+|-------|-------|------|----------|----------|--------|------------|-----------|
+| 1 | ... | code | `git wt a` | ... | ... | 1 | Now (work only) |
+| 2 | ... | code | `git wt b` | ... | ... | 2 | Now (work only) |
+| 3 | ... | analysis | - | ... | ... | - | Now |
+| 4 | ... | code | `git wt d` | ... | ... | 3 | After 1+2 land |
 ```
 
 ## Optional add-ons
@@ -158,8 +198,9 @@ condenses all of them into one cross-track memo at the end and surfaces the
 headline. Offer this for research-heavy or multi-track runs where the *learning*
 matters as much as the diff.
 
-**How the captures get back with no extra plumbing:** runners already commit and
-push to main, and the coordinator already pulls after each merge. So:
+**How the captures get back with no extra plumbing:** under serial landing, runners
+commit captures in their worktrees; the coordinator lands each track (capture
+included) and pulls after each land. So:
 
 1. Pick one `<run-slug>` (date + short label, e.g. `2026-06-03-layer-c`) and one
    `<track-slug>` per track, up front.
@@ -229,6 +270,31 @@ Agents in separate sessions do not inherit the coordinator's context. If a promp
 
 Parallel dispatch is counterproductive when failures are symptoms of one underlying change. If the same module, fixture, migration, environment variable, or external service appears across tracks, either collapse the work into one investigation or add dependencies so agents do not make contradictory fixes.
 
+### Multi-agent overlap / landing friction - everyone pushed to `main`
+
+The highest-cost failure mode: multiple runners commit/push concurrently in one
+repo (especially a shared or dirty canonical checkout). Symptoms: resurrected
+files, stale `origin/main` vs worktree truth, push races, hidden scope drift,
+and hours lost to sync deadlocks.
+
+**Root cause:** Prompts that say "commit and push to main when done" treat
+runners as integrators. In parallel dispatch, runners implement; the coordinator
+integrates.
+
+**Prevention (default):**
+1. Serial landing queue (Step 0.7): runners stay in `git wt`, coordinator lands
+   one track at a time with `git land`.
+2. File ownership matrix (Step 2): explicit CAN/CANNOT, no overlapping globs.
+3. Verify landings with `git log -1 --stat` + track gates after each land, not
+   only at the end.
+4. Never pipe push output in a way that masks exit codes; capture `rc=$?` from the bare push.
+5. Ground-truth check for "is file on main?" = fresh detached worktree checkout,
+   not `git ls-tree origin/main` alone on a shared `.git`.
+
+If a runner already pushed: stop parallel lands, inventory diverged files, land
+remaining tracks from isolated worktrees, and rewrite future dispatches to serial
+mode.
+
 ## What this skill does NOT do
 
 - **Decompose work into tracks** — the user does that upfront
@@ -254,9 +320,10 @@ User: "I have tracks A-E and want copy-paste prompts."
 
 Do:
 - Validate that no two code tracks own the same files.
-- Put each track's goal, CAN/CANNOT touch list, gates, commit rules, and final
-  table requirement directly in the prompt.
-- Produce a coordinator playbook that checks commit scope after each merge.
+- Validate file ownership matrix; assign each code track a `git wt` slug.
+- Put each track's goal, CAN/CANNOT touch list, gates, worktree rules, and return
+  packet requirement directly in the prompt.
+- Produce a coordinator playbook with serial landing order and scope check after each land.
 
 ### Example 2: Variant design decision
 

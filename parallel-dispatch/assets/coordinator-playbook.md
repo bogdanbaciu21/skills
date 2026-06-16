@@ -3,8 +3,21 @@
 ### Pre-Launch Sanity Check
 1. Confirm every track has one independent problem domain and a self-contained goal/evidence package
 2. Confirm no prompt depends on the coordinator's private chat context
-3. Confirm file scopes and shared resources do not overlap unless a dependency is listed
-4. If failures look related or share a likely root cause, collapse them into one investigation or make them sequential
+3. Confirm file scopes and shared resources do not overlap; publish the File Ownership Matrix
+4. Confirm code tracks use serial landing (runners do not push to `main`) unless Dan opted into parallel push
+5. If failures look related or share a likely root cause, collapse them into one investigation or make them sequential
+
+
+### Serial landing queue (default)
+
+Runners work in `git wt <slug>` and do **not** push to `main`. Only the
+coordinator lands, one track at a time. Fill the File Ownership Matrix and
+landing-order table from `assets/serial-landing-queue.md` before launch.
+
+| Land order | Track | Worktree | Blocked until |
+|-----------:|-------|----------|---------------|
+| 1 | [name] | [path] | none |
+| 2 | [name] | [path] | track 1 landed |
 
 ### Launch Order
 | Phase | Tracks | Can start |
@@ -13,14 +26,15 @@
 | 2 | [tracks waiting on phase 1] | After [dependencies] merge |
 | ... | ... | ... |
 
-### After Each Track Merges
-1. `git pull origin main`
-2. Scan for merge conflicts (should be none if file scopes are clean)
-3. Verify commit scope matches expected files: `git log -1 --stat` — flag if the commit only touched docs when code changes were expected (when the capture add-on is on, the track's one capture file under `<capture-dir>/<run-slug>/` is also expected — do not flag it as scope drift)
-4. Verify issue closures: `for i in <expected issue numbers>; do echo -n "#$i: "; gh issue view $i --json state -q .state; done`
-5. If any expected issues are still OPEN, close them now with the track's findings
-6. Spot-check the agent summary against the diff for systematic errors or scope drift
-7. [Track-specific verification if any]
+### After Each Track Lands
+1. From the track worktree: `git land` (or repo-specific land path). Capture push exit code with `rc=$?`; do not pipe push output.
+2. In repo root: `git pull origin main`
+3. Scan for merge conflicts (should be none if file scopes are clean)
+4. Verify commit scope matches expected files: `git log -1 --stat` — flag if the commit only touched docs when code changes were expected (when the capture add-on is on, the track's one capture file under `<capture-dir>/<run-slug>/` is also expected — do not flag it as scope drift)
+5. Verify issue closures: `for i in <expected issue numbers>; do echo -n "#$i: "; gh issue view $i --json state -q .state; done`
+6. If any expected issues are still OPEN, close them now with the track's findings
+7. Spot-check the agent summary against the diff for systematic errors or scope drift
+8. [Track-specific verification if any]
 
 ### Final Gate (after ALL tracks merge)
 ```bash
@@ -66,4 +80,4 @@ End your final report to the user with:
 - **[Track Name] comments on:** [issue numbers]
 - ...
 
-**Coordinator responsibility:** If agents leave issues open (common — see Common Pitfalls), the coordinator closes them during the "After Each Track Merges" step. Do not defer to the Final Gate.
+**Coordinator responsibility:** If agents leave issues open (common — see Common Pitfalls), the coordinator closes them during the "After Each Track Lands" step. Do not defer to the Final Gate.

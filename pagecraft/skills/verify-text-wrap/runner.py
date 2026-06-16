@@ -495,6 +495,114 @@ def _viewport_summary(viewports):
     return ", ".join(f"{v['name']}:{v['width']}x{v['height']}" for v in viewports)
 
 
+def _clean_key(value, limit=90):
+    text = " ".join(str(value or "").split()).lower()
+    return text[:limit]
+
+
+def _finding_selector(finding):
+    selector = finding.get("selector")
+    if selector:
+        return _clean_key(selector, limit=120)
+    tag = finding.get("tag") or "unknown"
+    cls = finding.get("cls") or ""
+    return _clean_key(f"{tag}.{cls}" if cls else tag, limit=120)
+
+
+def _finding_text_key(finding):
+    if finding.get("rules"):
+        return _clean_key(",".join(str(rule) for rule in finding.get("rules") or []), limit=120)
+    for field in ("textPreview", "orphanText", "finalLineText"):
+        if finding.get(field):
+            return _clean_key(finding.get(field), limit=120)
+    if finding.get("overflowPx") is not None:
+        return f"overflow:{finding.get('overflowPx')}"
+    return ""
+
+
+def _failure_events(reports):
+    """Return normalized new-failure events for JSON summaries and ratchets."""
+    events = []
+    for report in reports:
+        page = str(report.get("page") or "")
+        viewport = report.get("viewport") or {}
+        viewport_name = str(viewport.get("name") or f"{viewport.get('width', '?')}x{viewport.get('height', '?')}")
+        if report.get("error"):
+            message = _clean_key(report.get("error"), limit=160)
+            events.append({
+                "kind": "operational-error",
+                "page": page,
+                "viewport": viewport_name,
+                "selector": "",
+                "text_key": message,
+                "fingerprint": "|".join(["error", page, message]),
+            })
+        for finding in report.get("findings_new") or []:
+            kind = str(finding.get("kind") or "wrap-finding")
+            selector = _finding_selector(finding)
+            text_key = _finding_text_key(finding)
+            events.append({
+                "kind": kind,
+                "page": page,
+                "viewport": viewport_name,
+                "selector": selector,
+                "text_key": text_key,
+                "fingerprint": "|".join(["wrap", page, kind, selector, text_key]),
+            })
+        if report.get("edge_failure"):
+            events.append({
+                "kind": "right-edge-alignment",
+                "page": page,
+                "viewport": viewport_name,
+                "selector": "main-flow-prose",
+                "text_key": f"spread>{RIGHT_EDGE_TOLERANCE_PX}px",
+                "fingerprint": "|".join(["right-edge", page, "main-flow-prose"]),
+            })
+    return events
+
+
+def _failure_type_counts(reports):
+    counts = {}
+    for event in _failure_events(reports):
+        counts[event["kind"]] = counts.get(event["kind"], 0) + 1
+    return dict(sorted(counts.items()))
+
+
+def _collect_repeated_failures(reports):
+    """Flag the same new failure fingerprint when it repeats across viewports."""
+    buckets = {}
+    for event in _failure_events(reports):
+        fingerprint = event["fingerprint"]
+        bucket = buckets.setdefault(
+            fingerprint,
+            {
+                "kind": event["kind"],
+                "page": event["page"],
+                "selector": event["selector"],
+                "text_key": event["text_key"],
+                "count": 0,
+                "viewports": set(),
+            },
+        )
+        bucket["count"] += 1
+        bucket["viewports"].add(event["viewport"])
+
+    repeated = []
+    for fingerprint, bucket in buckets.items():
+        if len(bucket["viewports"]) < 2:
+            continue
+        repeated.append({
+            "fingerprint": fingerprint,
+            "kind": bucket["kind"],
+            "page": bucket["page"],
+            "selector": bucket["selector"],
+            "text_key": bucket["text_key"],
+            "count": bucket["count"],
+            "viewports": sorted(bucket["viewports"]),
+        })
+    return sorted(repeated, key=lambda item: (-item["count"], item["page"], item["kind"], item["selector"]))
+
+
 def _emit(reports, args):
     """Print human-readable report and return exit code."""
     if getattr(args, "json_report", None):
@@ -553,18 +661,34 @@ def _emit(reports, args):
         if r.get("screenshot"):
             print(f"    📸 {r['screenshot']}")
 
+    repeated = _collect_repeated_failures(reports)
+    if repeated:
+        any_failure = True
+        print(f"\n  ✗ repeated failure ratchet: {len(repeated)} repeated new failure fingerprint(s)")
+        for item in repeated[:6]:
+            vp = ", ".join(item["viewports"])
+            detail = item["text_key"] or item["selector"]
+            print(f"      {item['kind']}: {item['page']} x{item['count']} [{vp}] {detail}")
+
     print(f"\n[verify-text-wrap] {'FAIL' if any_failure else 'PASS'}")
     return 1 if any_failure else 0
 
 
 def _write_json_report(path, reports):
     os.makedirs(os.path.dirname(os.path.abspath(path)), exist_ok=True)
+    repeated = _collect_repeated_failures(reports)
     payload = {
         "schema_version": 1,
         "ts": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
         "summary": {
             "checks": len(reports),
             "failures": sum(1 for r in reports if r.get("error") or r.get("findings_new") or r.get("edge_failure")),
+            "failure_types": _failure_type_counts(reports),
+            "repeated_failures": len(repeated),
+        },
+        "ratchet": {
+            "mode": "same-fingerprint-across-viewports",
+            "repeated_failures": repeated,
         },
         "reports": reports,
     }

@@ -123,6 +123,45 @@ tracks:
         self.assertIn("runner-capture-addendum.md", skill)
         self.assertIn("combined-insight.md", skill)
 
+    def test_rejects_broad_can_touch_glob(self):
+        result = run_plan(
+            {
+                "tracks": [
+                    {
+                        "name": "A",
+                        "goal": "Sweep src",
+                        "evidence": ["test A"],
+                        "can_touch": ["src/**"],
+                    }
+                ]
+            }
+        )
+
+        self.assertEqual(1, result.returncode)
+        self.assertIn("broad glob", result.stdout)
+
+    def test_skill_documents_serial_landing_queue(self):
+        skill = (Path(__file__).resolve().parents[1] / "SKILL.md").read_text(encoding="utf-8")
+        low = skill.lower()
+
+        self.assertIn("serial landing", low)
+        self.assertIn("file ownership matrix", low)
+        self.assertIn("serial-landing-queue.md", skill)
+
+    def test_coordinator_playbook_documents_serial_landing(self):
+        playbook = (Path(__file__).resolve().parents[1] / "assets" / "coordinator-playbook.md").read_text(encoding="utf-8")
+        low = playbook.lower()
+
+        self.assertIn("serial landing", low)
+        self.assertIn("git land", low)
+
+    def test_code_prompt_forbids_push_to_main(self):
+        prompt = (Path(__file__).resolve().parents[1] / "assets" / "agent-prompt-code.md").read_text(encoding="utf-8")
+        low = prompt.lower()
+
+        self.assertIn("do not push to `main`", low)
+        self.assertIn("git wt", low)
+
 
 if __name__ == "__main__":
     unittest.main()
