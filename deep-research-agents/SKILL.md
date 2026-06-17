@@ -1,16 +1,50 @@
 ---
 name: deep-research-agents
-description: "Use Dan's three paid deep-research providers as one capability: Claude Managed Agent, Gemini Deep Research, and Parallel.ai. Trigger when the user asks for deep research, a research harness, multi-angle research fan-out, five angles, Workflow tool unavailable, Gemini API deep research, Claude managed agent research, Parallel.ai research, or wants the same research methodology to work across repos such as dans-brain, bogdanbaciu-dot-com, and Acme."
+description: "Use Dan's paid deep-research providers as one capability: Claude Managed Agent, Gemini Deep Research, Parallel.ai, Exa, and Firecrawl Research Index. Trigger when the user asks for deep research, a research harness, multi-angle research fan-out, five angles, Workflow tool unavailable, Gemini API deep research, Claude managed agent research, Parallel.ai research, or wants the same research methodology to work across repos such as dans-brain, bogdanbaciu-dot-com, and Acme."
 ---
 
 # Deep Research Agents
 
 ## Overview
 
-Dan has three research backends that should be treated as one shared capability:
-Claude Managed Agent, Gemini Deep Research, and Parallel.ai. If a requested
-methodology expects a missing `Workflow` tool, do not stop there; use the local
-provider harness or the repo-specific surface instead.
+Dan has five research backends that should be treated as one shared capability:
+Claude Managed Agent, Gemini Deep Research, Parallel.ai, Exa Agent, and Firecrawl
+Research Index. If a requested methodology expects a missing `Workflow` tool, do
+not stop there; use the local provider harness or the repo-specific surface
+instead.
+
+## Default Flow (local preprocess first)
+
+For a raw research question, **do not** send the question straight to paid
+providers. `bin/deep_research.py` now runs the GEX44 local preprocessor by
+default: discover URLs, scrape in parallel, dedupe chunks, embed-rank, then bill
+providers only on the curated prompt.
+
+```bash
+DANS_BRAIN_ROOT="${DANS_BRAIN_ROOT:-$HOME/src/dans-brain}"
+cd "$DANS_BRAIN_ROOT"
+
+# 1) No-cost: provider status + preprocess discovery + planned paid runs
+uv run python bin/deep_research.py "research question" --dry-run
+
+# 2) Live: preprocess locally, then fan out paid providers on curated prompt
+uv run python bin/deep_research.py "research question"
+
+# Escape hatches
+uv run python bin/deep_research.py "research question" --no-preprocess
+uv run python bin/deep_research.py --prompt-file state/research-preprocess/<bundle>/curated_prompt.md --no-preprocess
+```
+
+Preprocessor-only (no paid calls):
+
+```bash
+cd "$DANS_BRAIN_ROOT" && uv run python bin/research_preprocess.py "research question" --dry-run
+cd "$DANS_BRAIN_ROOT" && uv run python bin/research_preprocess.py "research question"
+```
+
+If preprocess fails (embed tunnel down), `deep_research.py` **fails open** to the
+raw question and prints `WARN_DEEP_RESEARCH_PREPROCESS_SKIPPED`. Prefer running
+on the VPS with the GEX44 scheduler tunnel up (`EMBED_API_BASE` on `:18081`).
 
 ## Canonical Harness
 
@@ -26,7 +60,9 @@ cd "$DANS_BRAIN_ROOT" && uv run python bin/deep_research.py "research question" 
 
 The harness writes provider outputs to `state/deep-research/<timestamp>-<slug>/`
 with one markdown file per provider plus `combined.md` and `manifest.json`.
-`state/` is git-ignored runtime data.
+When preprocess ran, `manifest.json` also records the local bundle under
+`state/research-preprocess/` and token reduction stats. `state/` is git-ignored
+runtime data.
 
 Before any live provider call, check local provider availability:
 
@@ -58,9 +94,10 @@ cd "$DANS_BRAIN_ROOT" && uv run python bin/deep_research.py "overall question" \
 
 ## Repo Surfaces
 
-- `dans-brain`: `bin/deep_research.py` and provider plumbing in
-  `bin/deep_research_agents.py`; `bin/discover_sources.py` reuses that provider
-  layer and defaults to all three engines. Use `--plan-only` for a no-API check.
+- `dans-brain`: `bin/deep_research.py` (default `--preprocess`), local grunt work in
+  `bin/research_preprocess.py`, provider plumbing in `bin/deep_research_agents.py`;
+  `bin/discover_sources.py` reuses that provider layer and defaults to all engines.
+  Use `--plan-only` for a no-API check.
 - `bogdanbaciu-dot-com`: Phoenix modules under `lib/bogdan/research/` and the
   admin `/admin/research` surface.
 - `acme`: client portal research functions under
