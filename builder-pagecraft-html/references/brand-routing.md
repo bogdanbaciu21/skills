@@ -8,7 +8,7 @@ Pagecraft supplies mechanics and gates.
 | Context | Brand route | Source |
 |---|---|---|
 | LJB client-facing, Brian-facing, LJB portal/report/deck | LJB CPA brand | `/root/repos/ljb/.agents/skills/ljbcpa-design/SKILL.md` or the same skill inside the LJB repo |
-| Dan-owned, personal, internal, ambiguous | Bogdan Baciu | `.agents/skills/bogdan-baciu-design/SKILL.md`, `DESIGN.md`, `config/uxos/*.json` |
+| Dan-owned, personal, internal, ambiguous | Bogdan Baciu | `.agents/skills/bogdan-baciu-design/SKILL.md`, `DESIGN.md`, `config/uxos/*.json` (resolve with `references/contract-locations.md`) |
 | bogdanbaciu.com public/editorial/site UI | bogdanbaciu.com product design | `PRODUCT.md`, `design.md`, existing Phoenix components/CSS |
 | Other client | That client's design system | inspect the client repo first |
 | Pure mechanics review with no visual output | Pagecraft only | `.agents/skills/pagecraft/SKILL.md` |
@@ -41,7 +41,8 @@ Use Bogdan for Dan-owned, personal, internal, or ambiguous visual artifacts.
 
 - Start from `.agents/skills/bogdan-baciu-design/SKILL.md`.
 - Use `DESIGN.md`, `docs/uxos.md`, and `config/uxos/*.json` for agent-readable
-  rules.
+  rules. Resolve paths with `references/contract-locations.md` when the current
+  repo is not `dans-brain`.
 - Use `colors_and_type.css` and local fonts/assets when making portable HTML.
 - Keep the global brand warm paper, ink, one Puddles sky-blue accent, flat
   borders, and restrained type.
