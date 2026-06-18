@@ -64,6 +64,10 @@ skills/
 │  ├─ SKILL.md
 │  ├─ references/brand-system.md
 │  └─ assets/design-system/      (tokens, fonts, images, previews, UI kit)
+├─ builder-pagecraft-html/
+│  ├─ SKILL.md
+│  ├─ agents/openai.yaml
+│  └─ references/                 (Builder workflow, brand routing, HTML gates)
 ├─ pagecraft/                    (multi-skill plugin bundle)
 │  ├─ .claude-plugin/plugin.json
 │  └─ skills/
@@ -184,6 +188,7 @@ PYTHONDONTWRITEBYTECODE=1 python3 -m unittest tests/test_skillopt_pilot.py
 | `excel-wow` | Draft | Placeholder for a future Excel/financial-modeling workflow skill. |
 | `blog-image-gen` | Ready | Generates editorial hero images for blog posts through the blog repo's OpenAI image scripts, with current-doc verification, batch/ingest workflows, and thumbnail review. |
 | `bogdan-baciu-design` | Ready | Applies Bogdan Baciu's personal editorial design system to sites, prototypes, documents, slide decks, and scoped financial artifacts, bundling tokens, fonts, imagery, previews, and the brand reference. |
+| `builder-pagecraft-html` | Ready | Runs the Builder.io Fusion + Pagecraft/UX OS workflow for branded HTML artifacts, routing brand first and finishing with Pagecraft, Builder, and browser/render proof gates. |
 | `deep-research-agents` | Ready | Treats Claude Managed Agent, Gemini Deep Research, and Parallel.ai as one deep-research capability with repo-specific harness guidance. |
 
 ---

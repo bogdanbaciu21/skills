@@ -1,0 +1,56 @@
+# Brand Routing Reference
+
+Choose brand before layout. Brand owns palette, type, voice, and visual density.
+Pagecraft supplies mechanics and gates.
+
+## Decision Table
+
+| Context | Brand route | Source |
+|---|---|---|
+| LJB client-facing, Brian-facing, LJB portal/report/deck | LJB CPA brand | `/root/repos/ljb/.agents/skills/ljbcpa-design/SKILL.md` or the same skill inside the LJB repo |
+| Dan-owned, personal, internal, ambiguous | Bogdan Baciu | `.agents/skills/bogdan-baciu-design/SKILL.md`, `DESIGN.md`, `config/uxos/*.json` |
+| Other client | That client's design system | inspect the client repo first |
+| Pure mechanics review with no visual output | Pagecraft only | `.agents/skills/pagecraft/SKILL.md` |
+
+## LJB
+
+Use the `ljbcpa-design` skill when available. Its high-order constraints:
+
+- Import `colors_and_type.css` first and reference tokens.
+- Use Open Sans and official LJB assets/logos.
+- Use the real LJB brand gradient only for hero/cover moments.
+- Prefer evidence tables and source registers over decorative cards.
+- No emoji, fake numbers, localhost/file links, or internal strategy leakage in
+  client-facing artifacts.
+- Validate with the LJB skill's validator when editing inside the LJB repo.
+
+For LJB/client-branded HTML in `dans-brain`, do not run Dan's personal
+`brand_lint.py` as if the page should be Bogdan-branded. Use:
+
+**VPS Hetzner -- ssh shell**
+
+```bash
+cd /root/dans-brain
+python3 bin/pagecraft_qa.py --html path/to/client.html --no-brand-lint
+```
+
+## Bogdan Baciu / Dan UX OS
+
+Use Bogdan for Dan-owned, personal, internal, or ambiguous visual artifacts.
+
+- Start from `.agents/skills/bogdan-baciu-design/SKILL.md`.
+- Use `DESIGN.md`, `docs/uxos.md`, and `config/uxos/*.json` for agent-readable
+  rules.
+- Use `colors_and_type.css` and local fonts/assets when making portable HTML.
+- Keep the global brand warm paper, ink, one Puddles sky-blue accent, flat
+  borders, and restrained type.
+- Reserve `.db-scope` for embedded financial-model exhibits.
+- Do not use generic purple AI palettes, broad gradients, glassmorphism,
+  nested cards, decorative blobs, or invented chip colors.
+
+## Copy And Claims
+
+- Preserve user-provided copy and source-backed facts.
+- Use `TBU` for missing Dan-authored public prose.
+- Never invent metrics, dates, ROI, quotes, client claims, or source labels.
+- Put provenance close to tables, charts, KPIs, and claims.
