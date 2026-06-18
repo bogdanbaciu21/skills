@@ -1,4 +1,0 @@
-interface:
-  display_name: "Pagecraft"
-  short_description: "Master brand-routed Builder/Pagecraft visual HTML lane"
-  default_prompt: "Use $pagecraft to create or harden a brand-routed HTML, deck, banner, icon, or visual artifact with Format HTML gates, the upstream design adapter when relevant, and repo proof."
