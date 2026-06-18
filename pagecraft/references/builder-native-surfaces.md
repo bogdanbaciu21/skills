@@ -28,9 +28,9 @@ self-contained enough to route work even when helper references are ignored.
 
 For this repo:
 
-- Primary Builder path: `.builder/skills/builder-pagecraft-html/SKILL.md`
-- Codex path: `.agents/skills/builder-pagecraft-html/SKILL.md`
-- Claude path: `.claude/skills/builder-pagecraft-html/SKILL.md`
+- Primary Builder path: `.builder/skills/pagecraft/SKILL.md`
+- Codex path: `.agents/skills/pagecraft/SKILL.md`
+- Claude path: `.claude/skills/pagecraft/SKILL.md`
 
 When editing the skill, keep all three copies aligned unless the target surface
 requires a small compatibility note.

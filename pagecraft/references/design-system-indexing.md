@@ -96,9 +96,9 @@ The local process indexes:
 - `config/uxos/**`
 - `.builder/**`
 - `.builderrules`
-- `.builder/skills/builder-pagecraft-html/**`
-- `.agents/skills/builder-pagecraft-html/**`
+- `.builder/skills/pagecraft/**`
 - `.agents/skills/pagecraft/**`
+- `.agents/skills/format-html/**`
 - `brain/_repos/Bogdan-Baciu-Design-System/**`
 
 It excludes:

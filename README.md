@@ -64,14 +64,14 @@ skills/
 │  ├─ SKILL.md
 │  ├─ references/brand-system.md
 │  └─ assets/design-system/      (tokens, fonts, images, previews, UI kit)
-├─ builder-pagecraft-html/
+├─ pagecraft/
 │  ├─ SKILL.md
 │  ├─ agents/openai.yaml
 │  └─ references/                 (Builder workflow, brand routing, upstream adapter, HTML gates)
-├─ pagecraft/                    (multi-skill plugin bundle)
+├─ format-html/                  (multi-skill plugin bundle)
 │  ├─ .claude-plugin/plugin.json
 │  └─ skills/
-│     ├─ pagecraft/              (overview + installer + shared design assets)
+│     ├─ format-html/            (overview + installer + shared design assets)
 │     │  ├─ SKILL.md
 │     │  ├─ install-pagecraft.sh
 │     │  ├─ assets/css/pagecraft.css
@@ -100,8 +100,8 @@ skills/
 ```
 
 > **Bundles vs. loose skills.** Most folders are single skills (one `SKILL.md`).
-> `pagecraft` is a multi-skill **plugin bundle**: its members live under
-> `pagecraft/skills/` and stay self-contained (each owns its own tools, nothing
+> `format-html` is a multi-skill **plugin bundle**: its members live under
+> `format-html/skills/` and stay self-contained (each owns its own tools, nothing
 > vendored or duplicated). `sync-skills.sh` *flattens* bundle members on export,
 > so each still installs as a top-level loose skill (`~/.tool/skills/<name>/`)
 > invokable by its bare name.
@@ -179,16 +179,16 @@ PYTHONDONTWRITEBYTECODE=1 python3 -m unittest tests/test_skillopt_pilot.py
 | `insight-lock` | Ready | Preserves and distills a high-value conversation into durable downstream context — raw capture, distilled insight memo, retrieval hooks, and a light future-use note. The capture skill `parallel-dispatch` runners use per track. |
 | `chat-analysis` | Ready | Analyzes Codex or Claude Code session transcripts for friction patterns, redacts sensitive text, and proposes reviewed agent-instruction improvements. |
 | `weekly-update` | Ready | Drafts evidence-driven stakeholder updates from git plus issue-tracker data, with GitHub, Linear, and Jira data contracts. |
-| `pagecraft` | Ready | Multi-skill **plugin bundle** for HTML formatting + visual safety. Contains the four skills below; `pagecraft/skills/pagecraft` is the overview + installer. |
-| `pagecraft » verify-text-wrap` | Ready | Verifies static HTML portals for caterpillar text, narrow containers, and right-edge layout drift. Canonical home of the `wrap-safe` runtime library (`wrap-safe.css` reset + `wrapcheck.js` probe) it drives. |
-| `pagecraft » table-system-migration` | Ready | Audits, migrates, and regression-tests messy HTML table systems with a public-safe scrub gate. |
-| `pagecraft » number-formats` | Ready | Applies the Macabacus financial number-format standard (en-dash zeros, aligned parenthesized negatives, blue inputs, green links, grey-italic margins, bold totals) to Excel models and HTML tables. Byte-exact codes + openpyxl applicator. |
-| `pagecraft » reskin` | Ready | Detects a repo's design system (a `*-design`/`*-brand` skill, tokens stylesheet, or `reskin.json`) and applies its brand frame (nav/hero/footer + tokens + assets) across the site. Hybrid: runs the repo's bespoke applier if present, else a built-in frame injector. Idempotent + dry-run-able. |
+| `pagecraft` | Ready | Master Builder.io Fusion + Pagecraft/UX OS workflow for branded HTML artifacts, routing brand first and finishing with Format HTML, Builder, and browser/render proof gates. |
+| `format-html` | Ready | Multi-skill **plugin bundle** for HTML formatting + visual safety. Contains the mechanics skills below; `format-html/skills/format-html` is the overview + installer. |
+| `format-html » verify-text-wrap` | Ready | Verifies static HTML portals for caterpillar text, narrow containers, and right-edge layout drift. Canonical home of the `wrap-safe` runtime library (`wrap-safe.css` reset + `wrapcheck.js` probe) it drives. |
+| `format-html » table-system-migration` | Ready | Audits, migrates, and regression-tests messy HTML table systems with a public-safe scrub gate. |
+| `format-html » number-formats` | Ready | Applies the Macabacus financial number-format standard (en-dash zeros, aligned parenthesized negatives, blue inputs, green links, grey-italic margins, bold totals) to Excel models and HTML tables. Byte-exact codes + openpyxl applicator. |
+| `format-html » reskin` | Ready | Detects a repo's design system (a `*-design`/`*-brand` skill, tokens stylesheet, or `reskin.json`) and applies its brand frame (nav/hero/footer + tokens + assets) across the site. Hybrid: runs the repo's bespoke applier if it has one, else a built-in frame injector. Idempotent + dry-run-able. |
 | `skill-drift-scanner` | Ready | Audits Codex and Claude skill deployment drift, autosync health, scheduler status, and reload requirements across machine-level skill installs. |
 | `excel-wow` | Draft | Placeholder for a future Excel/financial-modeling workflow skill. |
 | `blog-image-gen` | Ready | Generates editorial hero images for blog posts through the blog repo's OpenAI image scripts, with current-doc verification, batch/ingest workflows, and thumbnail review. |
 | `bogdan-baciu-design` | Ready | Applies Bogdan Baciu's personal editorial design system to sites, prototypes, documents, slide decks, and scoped financial artifacts, bundling tokens, fonts, imagery, previews, and the brand reference. |
-| `builder-pagecraft-html` | Ready | Runs the Builder.io Fusion + Pagecraft/UX OS workflow for branded HTML artifacts, routing brand first and finishing with Pagecraft, Builder, and browser/render proof gates. |
 | `deep-research-agents` | Ready | Treats Claude Managed Agent, Gemini Deep Research, and Parallel.ai as one deep-research capability with repo-specific harness guidance. |
 
 ---

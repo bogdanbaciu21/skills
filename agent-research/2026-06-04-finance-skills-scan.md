@@ -12,7 +12,7 @@ The best path is not to install every finance-looking skill. The strongest setup
 6. `finance-reconciliation-agent` for GL, bank, subledger, AR/AP, and export-based tie-outs.
 7. `qbo-close-control-board` for read-only close evidence when QBO access is available.
 
-The local repo already has one finance-adjacent production skill: `pagecraft/skills/number-formats`. The obvious next build is still `excel-wow`, which is currently a placeholder and should become the modeling/audit engine rather than a generic Excel helper.
+The local repo already has one finance-adjacent production skill: `format-html/skills/number-formats`. The obvious next build is still `excel-wow`, which is currently a placeholder and should become the modeling/audit engine rather than a generic Excel helper.
 
 ## What Was Searched
 
@@ -178,7 +178,7 @@ Roadmap impact: `excel-wow` should prioritize live-workbook inspection and trace
 ## Boundaries That Matter
 
 - Do not turn `excel-wow` into a source-system skill. It should own workbook architecture, formula integrity, model checks, scenario controls, and export review.
-- Do not duplicate number formats. Reuse `pagecraft/skills/number-formats`.
+- Do not duplicate number formats. Reuse `format-html/skills/number-formats`.
 - Do not pretend public packages replace CapIQ, PitchBook, or FactSet. Build optional ingestion paths for user-provided exports.
 - Do not let finance agents operate under broad service-account permissions by default. Agent access should inherit the invoking user's practical access boundary wherever possible.
 - Do not run accounting-system write actions by default. QBO/Xero/NetSuite skills should start read-only and require explicit approval before any write path exists.

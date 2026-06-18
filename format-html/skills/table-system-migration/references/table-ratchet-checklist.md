@@ -15,7 +15,7 @@ canonical system.
 Example:
 
 ```sh
-python3 pagecraft/skills/table-system-migration/table-ratchet.py \
+python3 format-html/skills/table-system-migration/table-ratchet.py \
   --root . \
   --canonical-table-class content-table \
   --canonical-wrapper-class table-scroll \
@@ -38,7 +38,7 @@ Add the check to the smallest reliable gate: package script, pre-commit hook, or
 CI job.
 
 ```sh
-python3 pagecraft/skills/table-system-migration/table-ratchet.py \
+python3 format-html/skills/table-system-migration/table-ratchet.py \
   --root . \
   --canonical-table-class content-table \
   --canonical-wrapper-class table-scroll \
@@ -51,7 +51,7 @@ python3 pagecraft/skills/table-system-migration/table-ratchet.py \
 ```json
 {
   "scripts": {
-    "test:tables": "python3 pagecraft/skills/table-system-migration/table-ratchet.py --root . --canonical-table-class content-table --canonical-wrapper-class table-scroll"
+    "test:tables": "python3 format-html/skills/table-system-migration/table-ratchet.py --root . --canonical-table-class content-table --canonical-wrapper-class table-scroll"
   }
 }
 ```
@@ -66,7 +66,7 @@ def test_table_ratchet():
     result = subprocess.run(
         [
             "python3",
-            "pagecraft/skills/table-system-migration/table-ratchet.py",
+            "format-html/skills/table-system-migration/table-ratchet.py",
             "--root",
             ".",
             "--canonical-table-class",
@@ -93,7 +93,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.x"
-      - run: python3 pagecraft/skills/table-system-migration/table-ratchet.py --root . --canonical-table-class content-table --canonical-wrapper-class table-scroll
+      - run: python3 format-html/skills/table-system-migration/table-ratchet.py --root . --canonical-table-class content-table --canonical-wrapper-class table-scroll
 ```
 
 ## 4. Acceptance Checks

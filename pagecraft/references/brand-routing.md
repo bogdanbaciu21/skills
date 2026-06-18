@@ -11,7 +11,7 @@ Pagecraft supplies mechanics and gates.
 | Dan-owned, personal, internal, ambiguous | Bogdan Baciu | `.agents/skills/bogdan-baciu-design/SKILL.md`, `DESIGN.md`, `config/uxos/*.json` (resolve with `references/contract-locations.md`) |
 | bogdanbaciu.com public/editorial/site UI | bogdanbaciu.com product design | `PRODUCT.md`, `design.md`, existing Phoenix components/CSS |
 | Other client | That client's design system | inspect the client repo first |
-| Pure mechanics review with no visual output | Pagecraft only | `.agents/skills/pagecraft/SKILL.md` |
+| Pure mechanics review with no visual output | Format HTML only | `.agents/skills/format-html/SKILL.md` |
 
 ## Acme
 
