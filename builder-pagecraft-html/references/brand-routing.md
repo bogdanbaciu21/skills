@@ -9,6 +9,7 @@ Pagecraft supplies mechanics and gates.
 |---|---|---|
 | Acme client-facing, Client-facing, Acme portal/report/deck | Acme brand | `/root/repos/acme/.agents/skills/acme-design/SKILL.md` or the same skill inside the Acme repo |
 | Dan-owned, personal, internal, ambiguous | Bogdan Baciu | `.agents/skills/bogdan-baciu-design/SKILL.md`, `DESIGN.md`, `config/uxos/*.json` |
+| bogdanbaciu.com public/editorial/site UI | bogdanbaciu.com product design | `PRODUCT.md`, `design.md`, existing Phoenix components/CSS |
 | Other client | That client's design system | inspect the client repo first |
 | Pure mechanics review with no visual output | Pagecraft only | `.agents/skills/pagecraft/SKILL.md` |
 
@@ -47,6 +48,20 @@ Use Bogdan for Dan-owned, personal, internal, or ambiguous visual artifacts.
 - Reserve `.db-scope` for embedded financial-model exhibits.
 - Do not use generic purple AI palettes, broad gradients, glassmorphism,
   nested cards, decorative blobs, or invented chip colors.
+
+## bogdanbaciu.com
+
+Use the personal-site product system for public site work.
+
+- Read `PRODUCT.md` first for audience, purpose, anti-references, and
+  accessibility stance.
+- Read `design.md` before changing UI, layout, tables, typography, or token use.
+- Use the global Puddles palette for the site; reserve `.db-scope` for embedded
+  financial-model artifacts.
+- Do not invent public copy, headings, CTA labels, visible alt text, or article
+  prose. Use `TBU` when Dan has not supplied the words.
+- Never publish or flip a post live from this skill. Deploying committed staged
+  work is separate from publishing.
 
 ## Copy And Claims
 

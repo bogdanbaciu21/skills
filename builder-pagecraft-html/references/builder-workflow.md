@@ -13,6 +13,7 @@ proof.
 - `.builderrules`
 - `.builder/rules/*.mdc`
 - `.builder/agents/*.md`
+- `references/design-production-routing.md` for repo-specific playbooks.
 
 ## Builder Availability Decision
 
@@ -86,10 +87,19 @@ the system itself:
 - `config/uxos`
 - `.builder/rules`
 - `.builder/agents`
+- `PRODUCT.md` and `design.md` in `bogdanbaciu-dot-com`
+- `.agents/skills/acme-design` in Acme
 
 Normal write targets are the requested artifact/page/component and its narrowly
 needed local CSS or tests. Do not edit runtime folders (`state/`, `logs/`,
 `inbox/`) or secrets.
+
+## Upstream Design Packs
+
+The upstream `nextlevelbuilder/ui-ux-pro-max-skill` can be used as reference for
+task routing and asset-type checklists, but Builder briefs must still name the
+local brand route, source files, privacy boundary, and proof commands. Do not
+paste a generic upstream prompt into Builder without repo-specific constraints.
 
 ## Builder Prompt Checklist
 

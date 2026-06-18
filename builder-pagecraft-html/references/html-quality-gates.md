@@ -49,6 +49,16 @@ Data-bearing UI must have explicit states:
 
 Use existing Pagecraft/UX OS primitives before one-off boxes.
 
+## Fixed-Canvas Assets
+
+For banners, social images, thumbnails, and slide exports:
+
+- Set explicit canvas dimensions and avoid scroll.
+- Keep critical content inside safe zones.
+- Verify the exported PNG/SVG/PDF dimensions, not only the HTML source.
+- Inspect at the target display size and at thumbnail size when applicable.
+- Keep public/client copy source-backed or `TBU`.
+
 ## Static Checks
 
 For one or more generated HTML files:
