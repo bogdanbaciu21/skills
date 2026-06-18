@@ -6,13 +6,16 @@ proof.
 
 ## Source Files To Read
 
-- `builder.config.json`
-- `config/builder_html_process.json`
-- `docs/builder-html-process.md`
-- `docs/builder-best-practices.md`
-- `.builderrules`
-- `.builder/rules/*.mdc`
-- `.builder/agents/*.md`
+Resolve paths with `references/contract-locations.md` when the current repo is
+not `dans-brain`.
+
+- `builder.config.json` (`dans-brain`)
+- `config/builder_html_process.json` (`dans-brain`)
+- `docs/builder-html-process.md` (`dans-brain`)
+- `docs/builder-best-practices.md` (`dans-brain`)
+- `.builderrules` (repo-local; canonical in `dans-brain`)
+- `.builder/rules/*.mdc` (repo-local; canonical in `dans-brain`)
+- `.builder/agents/*.md` (`dans-brain`, or linked from repo-local rules)
 - `references/design-production-routing.md` for repo-specific playbooks.
 
 ## Builder Availability Decision
