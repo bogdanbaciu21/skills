@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Install Pagecraft into a temp repo and verify the copied-asset manifest."""
+"""Install Format HTML/Pagecraft assets into a temp repo and verify the manifest."""
 
 import json
 import subprocess

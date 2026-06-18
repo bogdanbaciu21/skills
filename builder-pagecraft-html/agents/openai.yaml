@@ -1,4 +1,0 @@
-interface:
-  display_name: "Builder Pagecraft HTML"
-  short_description: "Brand-routed Builder/Pagecraft HTML and visual asset workflow"
-  default_prompt: "Use $builder-pagecraft-html to create or harden a brand-routed HTML, deck, banner, icon, or visual artifact with Pagecraft gates, the upstream design adapter when relevant, and repo proof."

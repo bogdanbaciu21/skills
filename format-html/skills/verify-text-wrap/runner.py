@@ -33,7 +33,7 @@ PLAYWRIGHT_INSTALL_HINT = (
 # Default location of the wrap-safe probe. Prefer the local file bundled in this
 # skill so edits take effect immediately against deployed pages. Fall back to the
 # public CDN when the runner is copied somewhere without wrapcheck.js next to it.
-DEFAULT_WRAPCHECK_URL = "https://cdn.jsdelivr.net/gh/bogdanbaciu21/skills@main/pagecraft/skills/verify-text-wrap/wrapcheck.js"
+DEFAULT_WRAPCHECK_URL = "https://cdn.jsdelivr.net/gh/bogdanbaciu21/skills@main/format-html/skills/verify-text-wrap/wrapcheck.js"
 DEFAULT_WRAPCHECK_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), "wrapcheck.js"))
 DEFAULT_VIEWPORTS = [
     {"name": "wide", "width": 1440, "height": 900},

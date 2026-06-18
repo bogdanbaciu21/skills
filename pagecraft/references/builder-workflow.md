@@ -86,7 +86,7 @@ the system itself:
 - `brain/_repos/Bogdan-Baciu-Design-System`
 - `.agents/skills/pagecraft`
 - `.agents/skills/bogdan-baciu-design`
-- `.agents/skills/builder-pagecraft-html`
+- `.agents/skills/format-html`
 - `config/uxos`
 - `.builder/rules`
 - `.builder/agents`

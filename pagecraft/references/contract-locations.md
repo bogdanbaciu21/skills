@@ -41,7 +41,7 @@ only when a Dan UX OS rule is needed:
 - `design.md` - site tokens, components, type, and visual rules
 - `.builderrules`
 - `.builder/rules/*.mdc`
-- `.builder/skills/builder-pagecraft-html/SKILL.md`
+- `.builder/skills/pagecraft/SKILL.md`
 
 If a linked `dans-brain` file is needed, resolve in this order:
 
@@ -59,13 +59,15 @@ Read local client instructions and brand sources first:
 - `CLAUDE.md`
 - `.agents/skills/ljbcpa-design/SKILL.md`
 - `.agents/skills/pagecraft/SKILL.md`
+- `.agents/skills/format-html/SKILL.md`
 - `.builderrules`
 - `.builder/rules/*.mdc`
-- `.builder/skills/builder-pagecraft-html/SKILL.md`
+- `.builder/skills/pagecraft/SKILL.md`
 
 If a Dan UX OS rule is needed for Builder/Pagecraft mechanics, resolve to
 `dans-brain` using sibling `../dans-brain/`, `/Users/danb/src/dans-brain`, or
-`/root/dans-brain`. Do not use Dan/Bogdan brand for LJB client-facing artifacts.
+`/root/dans-brain`. Use `.agents/skills/format-html/SKILL.md` for mechanics-only
+work. Do not use Dan/Bogdan brand for LJB client-facing artifacts.
 
 ### Global skills install (`~/src/skills`, `.claude/skills`, `.agents/skills`)
 

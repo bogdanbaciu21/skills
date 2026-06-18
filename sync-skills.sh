@@ -9,7 +9,7 @@
 # Two kinds of source skill are recognized:
 #   1. A top-level dir with its own SKILL.md (e.g. handoff/).
 #   2. A skill nested inside a multi-skill plugin bundle — a top-level dir that
-#      has a skills/ subdir (e.g. pagecraft/skills/verify-text-wrap/).
+#      has a skills/ subdir (e.g. format-html/skills/verify-text-wrap/).
 # Nested skills are FLATTENED on export: each installs as a top-level loose skill
 # (~/.tool/skills/<name>/) so tools that don't recurse into a plugin's skills/
 # dir still find them by their bare name. Inside the repo they stay bundled.

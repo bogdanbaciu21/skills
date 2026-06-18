@@ -51,7 +51,7 @@ After the final gate, read all agent summaries together and check that the combi
 Run only when at least one merged track created or changed static HTML deliverables (check the merged file scopes). Skip entirely otherwise.
 
 1. Identify the HTML output root(s) from the track file scopes.
-2. Install if absent, or reuse the repo's existing install: `sh <skills>/pagecraft/skills/pagecraft/install-pagecraft.sh <repo-root>`.
+2. Install if absent, or reuse the repo's existing install: `sh <skills>/format-html/skills/format-html/install-pagecraft.sh <repo-root>`.
 3. Deterministic keystone guard (no browser, never flakes): `python3 scripts/check-keystone.py --portal <html-root>`.
 4. Real-browser probe (8 viewports + right-edge alignment): `python3 scripts/runner.py --local --portal <html-root> --known-issues tests/pagecraft/wrap-known-issues.json`.
 5. Fix keystone/wrap failures; allowlist only confirmed non-defects. Do not silently truncate output.
