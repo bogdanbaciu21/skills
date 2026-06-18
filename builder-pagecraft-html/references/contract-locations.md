@@ -32,12 +32,16 @@ Read repo-local files at the repo root:
 
 ### `bogdanbaciu-dot-com`
 
-Read local bridge files first, then follow their links to `dans-brain`:
+Read local product and design files first, then follow links to `dans-brain`
+only when a Dan UX OS rule is needed:
 
-- `DESIGN.md` - bridge doc; site tokens live in `design.md`
-- `docs/uxos.md` - pointer to Dan UX OS runbook
+- `AGENTS.md`
+- `CLAUDE.md`
+- `PRODUCT.md`
+- `design.md` - site tokens, components, type, and visual rules
 - `.builderrules`
 - `.builder/rules/*.mdc`
+- `.builder/skills/builder-pagecraft-html/SKILL.md`
 
 If a linked `dans-brain` file is needed, resolve in this order:
 
@@ -46,6 +50,22 @@ If a linked `dans-brain` file is needed, resolve in this order:
    under `~/src/`
 3. `/Users/danb/src/dans-brain` on Dan's Mac
 4. `/root/dans-brain` on the VPS
+
+### `Acme`
+
+Read local client instructions and brand sources first:
+
+- `AGENTS.md`
+- `CLAUDE.md`
+- `.agents/skills/acme-design/SKILL.md`
+- `.agents/skills/pagecraft/SKILL.md`
+- `.builderrules`
+- `.builder/rules/*.mdc`
+- `.builder/skills/builder-pagecraft-html/SKILL.md`
+
+If a Dan UX OS rule is needed for Builder/Pagecraft mechanics, resolve to
+`dans-brain` using sibling `../dans-brain/`, `/Users/danb/src/dans-brain`, or
+`/root/dans-brain`. Do not use Dan/Bogdan brand for Acme client-facing artifacts.
 
 ### Global skills install (`~/src/skills`, `.claude/skills`, `.agents/skills`)
 
@@ -63,7 +83,12 @@ linked `dans-brain` authority files above.
 
 - HTML QA for brain artifacts:
   `python3 bin/pagecraft_qa.py --html path/to/file.html` from `dans-brain`
+- Acme portal shell checks:
+  `bash client-portal/scripts/check-pagecraft.sh` from `Acme`
+- Acme dashboard shell checks:
+  `python3 dashboard-poc/scripts/wrap_brand_in_portal.py --verify` from `Acme`
 - Site CSS regressions for `bogdanbaciu-dot-com`:
-  `mix assets.build && npm run test:css` from that repo's `assets/` directory
+  `mix compile --warnings-as-errors` and
+  `node scripts/check_tables.mjs --verbose` from that repo
 
 Name whichever proof surface matches the artifact you changed.

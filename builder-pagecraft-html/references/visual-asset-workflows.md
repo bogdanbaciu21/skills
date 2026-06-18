@@ -136,7 +136,8 @@ Acceptance:
 
 The upstream `nextlevelbuilder/ui-ux-pro-max-skill` includes script catalogs for
 logo, CIP, and SVG icon generation. Those scripts are not bundled into this
-skill. If a task explicitly benefits from them:
+skill. Load `upstream-design-adapter.md` first. If a task explicitly benefits
+from them:
 
 1. Clone or inspect the upstream repo in a temporary directory.
 2. Confirm license and secret/billing scope.
