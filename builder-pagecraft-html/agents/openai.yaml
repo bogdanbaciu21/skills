@@ -1,0 +1,4 @@
+interface:
+  display_name: "Builder Pagecraft HTML"
+  short_description: "Builder-backed polished HTML workflow"
+  default_prompt: "Use $builder-pagecraft-html to create or harden a Builder-backed HTML artifact with the right brand and Pagecraft gates."
