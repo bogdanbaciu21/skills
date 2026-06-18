@@ -33,6 +33,14 @@ This repo provides:
 
 If your goal is to host skills that feel polished like those on curated skill hubs, this structure gives you a strong baseline.
 
+**Boundary:** this repository is the shared/global skill source. It must contain
+portable skills that are safe to propagate into multiple machines and client
+repos. Brain-owned orchestration skills, repo-specific Builder workflows,
+`.builder/` routing, and client-specific bindings stay in their owning repo and
+fan out directly from that repo only after explicit approval. In particular,
+`builder-pagecraft-html` is a `dans-brain` project skill, not a global skills
+repo skill.
+
 ---
 
 ## Repository structure
@@ -64,10 +72,6 @@ skills/
 │  ├─ SKILL.md
 │  ├─ references/brand-system.md
 │  └─ assets/design-system/      (tokens, fonts, images, previews, UI kit)
-├─ pagecraft/
-│  ├─ SKILL.md
-│  ├─ agents/openai.yaml
-│  └─ references/                 (Builder workflow, brand routing, upstream adapter, HTML gates)
 ├─ format-html/                  (multi-skill plugin bundle)
 │  ├─ .claude-plugin/plugin.json
 │  └─ skills/
@@ -179,7 +183,6 @@ PYTHONDONTWRITEBYTECODE=1 python3 -m unittest tests/test_skillopt_pilot.py
 | `insight-lock` | Ready | Preserves and distills a high-value conversation into durable downstream context — raw capture, distilled insight memo, retrieval hooks, and a light future-use note. The capture skill `parallel-dispatch` runners use per track. |
 | `chat-analysis` | Ready | Analyzes Codex or Claude Code session transcripts for friction patterns, redacts sensitive text, and proposes reviewed agent-instruction improvements. |
 | `weekly-update` | Ready | Drafts evidence-driven stakeholder updates from git plus issue-tracker data, with GitHub, Linear, and Jira data contracts. |
-| `pagecraft` | Ready | Master Builder.io Fusion + Pagecraft/UX OS workflow for branded HTML artifacts, routing brand first and finishing with Format HTML, Builder, and browser/render proof gates. |
 | `format-html` | Ready | Multi-skill **plugin bundle** for HTML formatting + visual safety. Contains the mechanics skills below; `format-html/skills/format-html` is the overview + installer. |
 | `format-html » verify-text-wrap` | Ready | Verifies static HTML portals for caterpillar text, narrow containers, and right-edge layout drift. Canonical home of the `wrap-safe` runtime library (`wrap-safe.css` reset + `wrapcheck.js` probe) it drives. |
 | `format-html » table-system-migration` | Ready | Audits, migrates, and regression-tests messy HTML table systems with a public-safe scrub gate. |

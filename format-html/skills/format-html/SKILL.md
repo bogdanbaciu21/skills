@@ -11,6 +11,10 @@ mechanics bundle when you need the old Pagecraft HTML/table/number/wrap tooling.
 It exists so you stop hand-fixing the same HTML, diagram, table, number, header,
 and text-wrap bugs in every repo.
 
+Boundary: this shared skill stays portable. Repo-specific visual-builder lanes,
+tool routing rules, client bindings, and brain-owned orchestration skills live
+in the owning repo and should not be promoted into this shared skill source.
+
 It does not replace a repo's design system. It bundles output modes and checks:
 
 - **`html`** — create self-contained, brand-aware HTML artifacts from source
