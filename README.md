@@ -67,7 +67,7 @@ skills/
 ├─ builder-pagecraft-html/
 │  ├─ SKILL.md
 │  ├─ agents/openai.yaml
-│  └─ references/                 (Builder workflow, brand routing, HTML gates)
+│  └─ references/                 (Builder workflow, brand routing, upstream adapter, HTML gates)
 ├─ pagecraft/                    (multi-skill plugin bundle)
 │  ├─ .claude-plugin/plugin.json
 │  └─ skills/

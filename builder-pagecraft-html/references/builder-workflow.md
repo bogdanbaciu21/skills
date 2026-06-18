@@ -103,6 +103,8 @@ The upstream `nextlevelbuilder/ui-ux-pro-max-skill` can be used as reference for
 task routing and asset-type checklists, but Builder briefs must still name the
 local brand route, source files, privacy boundary, and proof commands. Do not
 paste a generic upstream prompt into Builder without repo-specific constraints.
+Load `references/upstream-design-adapter.md` before using upstream design-pack
+language in a Builder prompt.
 
 ## Builder Prompt Checklist
 
