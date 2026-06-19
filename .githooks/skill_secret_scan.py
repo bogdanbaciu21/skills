@@ -17,6 +17,8 @@ Two severities, both block by default (exit 1):
              leave the client repo even as a reference. Seeded from LJB's
              .claude/security-patterns.yaml and best-effort re-read from it at
              runtime so this gate inherits LJB's evolving client-secret list.
+  SCOPE      a repo-owned orchestration marker that must not be promoted into
+             the shared/global skills source and then propagated into client repos.
 
 Pure stdlib; safe from bare cron / git hooks. Placeholder-guarded to avoid
 flagging YOUR-KEY-HERE / EXAMPLE / REDACTED docs.
@@ -64,6 +66,15 @@ SENSITIVE_SUBSTRINGS = {
     "ANTHROPIC_ADMIN_KEY", "GITHUB_TOKEN",
 }
 
+SCOPE_SUBSTRINGS = {
+    "builder-pagecraft-html",
+    "Builder Pagecraft HTML",
+    ".builder/skills/builder-pagecraft-html",
+    ".builderrules",
+}
+
+SCOPE_DOC_ALLOWLIST = {"README.md", "CONTRIBUTING.md", "SECURITY.md"}
+
 # Lines that are clearly placeholders/docs, not live material.
 PLACEHOLDER = re.compile(r"(?i)YOUR[_-]?|EXAMPLE|REDACTED|PLACEHOLDER|XXXX|\.\.\.|<[a-z_]+>|FAKE|DUMMY|TEST[_-]?KEY")
 _KEY_PREFIX = re.compile(r"(?i)^(sk-ant-|sk-proj-|sk-|re_|AKIA|ghp_|github_pat_|AIza|glpat-|xox[baprs]-)")
@@ -106,6 +117,7 @@ def _load_ljb_sensitive() -> set[str]:
 
 def scan_text(path: Path, text: str, sensitive: set[str]) -> list[dict]:
     findings: list[dict] = []
+    allow_scope_docs = path.name in SCOPE_DOC_ALLOWLIST
     for i, line in enumerate(text.splitlines(), 1):
         if PLACEHOLDER.search(line):
             continue
@@ -116,6 +128,9 @@ def scan_text(path: Path, text: str, sensitive: set[str]) -> list[dict]:
         for sub in sensitive:
             if sub in line:
                 findings.append({"severity": "SENSITIVE", "rule": sub, "file": str(path), "line": i})
+        for sub in SCOPE_SUBSTRINGS:
+            if sub in line and not allow_scope_docs:
+                findings.append({"severity": "SCOPE", "rule": sub, "file": str(path), "line": i})
     return findings
 
 
@@ -158,7 +173,9 @@ def main() -> int:
         for f in all_findings:
             print(f"{f['severity']:9} {f['rule']:24} {f['file']}:{f['line']}")
         secrets = sum(1 for f in all_findings if f["severity"] == "SECRET")
-        print(f"\n⛔ {len(all_findings)} finding(s): {secrets} SECRET, {len(all_findings) - secrets} SENSITIVE")
+        sensitive_count = sum(1 for f in all_findings if f["severity"] == "SENSITIVE")
+        scope_count = sum(1 for f in all_findings if f["severity"] == "SCOPE")
+        print(f"\n⛔ {len(all_findings)} finding(s): {secrets} SECRET, {sensitive_count} SENSITIVE, {scope_count} SCOPE")
     return 1 if all_findings else 0
 
 

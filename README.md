@@ -33,6 +33,14 @@ This repo provides:
 
 If your goal is to host skills that feel polished like those on curated skill hubs, this structure gives you a strong baseline.
 
+**Boundary:** this repository is the shared/global skill source. It must contain
+portable skills that are safe to propagate into multiple machines and client
+repos. Brain-owned orchestration skills, repo-specific Builder workflows,
+`.builder/` routing, and client-specific bindings stay in their owning repo and
+fan out directly from that repo only after explicit approval. In particular,
+`builder-pagecraft-html` is a `dans-brain` project skill, not a global skills
+repo skill.
+
 ---
 
 ## Repository structure
@@ -64,10 +72,10 @@ skills/
 │  ├─ SKILL.md
 │  ├─ references/brand-system.md
 │  └─ assets/design-system/      (tokens, fonts, images, previews, UI kit)
-├─ pagecraft/                    (multi-skill plugin bundle)
+├─ format-html/                  (multi-skill plugin bundle)
 │  ├─ .claude-plugin/plugin.json
 │  └─ skills/
-│     ├─ pagecraft/              (overview + installer + shared design assets)
+│     ├─ format-html/            (overview + installer + shared design assets)
 │     │  ├─ SKILL.md
 │     │  ├─ install-pagecraft.sh
 │     │  ├─ assets/css/pagecraft.css
@@ -96,8 +104,8 @@ skills/
 ```
 
 > **Bundles vs. loose skills.** Most folders are single skills (one `SKILL.md`).
-> `pagecraft` is a multi-skill **plugin bundle**: its members live under
-> `pagecraft/skills/` and stay self-contained (each owns its own tools, nothing
+> `format-html` is a multi-skill **plugin bundle**: its members live under
+> `format-html/skills/` and stay self-contained (each owns its own tools, nothing
 > vendored or duplicated). `sync-skills.sh` *flattens* bundle members on export,
 > so each still installs as a top-level loose skill (`~/.tool/skills/<name>/`)
 > invokable by its bare name.
@@ -176,11 +184,11 @@ PYTHONDONTWRITEBYTECODE=1 python3 -m unittest tests/test_skillopt_pilot.py
 | `chat-analysis` | Ready | Analyzes Codex or Claude Code session transcripts for friction patterns, redacts sensitive text, and proposes reviewed agent-instruction improvements. |
 | `weekly-update` | Ready | Drafts evidence-driven stakeholder updates from git plus issue-tracker data, with GitHub, Linear, and Jira data contracts. |
 | `x-signal-research` | Ready | Researches public X/Twitter conversation signals with Xquik, preserving source ids, query bounds, evidence labels, sample limits, and approval gates for private reads, writes, monitors, webhooks, and bulk jobs. |
-| `pagecraft` | Ready | Multi-skill **plugin bundle** for HTML formatting + visual safety. Contains the four skills below; `pagecraft/skills/pagecraft` is the overview + installer. |
-| `pagecraft » verify-text-wrap` | Ready | Verifies static HTML portals for caterpillar text, narrow containers, and right-edge layout drift. Canonical home of the `wrap-safe` runtime library (`wrap-safe.css` reset + `wrapcheck.js` probe) it drives. |
-| `pagecraft » table-system-migration` | Ready | Audits, migrates, and regression-tests messy HTML table systems with a public-safe scrub gate. |
-| `pagecraft » number-formats` | Ready | Applies the Macabacus financial number-format standard (en-dash zeros, aligned parenthesized negatives, blue inputs, green links, grey-italic margins, bold totals) to Excel models and HTML tables. Byte-exact codes + openpyxl applicator. |
-| `pagecraft » reskin` | Ready | Detects a repo's design system (a `*-design`/`*-brand` skill, tokens stylesheet, or `reskin.json`) and applies its brand frame (nav/hero/footer + tokens + assets) across the site. Hybrid: runs the repo's bespoke applier if present, else a built-in frame injector. Idempotent + dry-run-able. |
+| `format-html` | Ready | Multi-skill **plugin bundle** for HTML formatting + visual safety. Contains the mechanics skills below; `format-html/skills/format-html` is the overview + installer. |
+| `format-html » verify-text-wrap` | Ready | Verifies static HTML portals for caterpillar text, narrow containers, and right-edge layout drift. Canonical home of the `wrap-safe` runtime library (`wrap-safe.css` reset + `wrapcheck.js` probe) it drives. |
+| `format-html » table-system-migration` | Ready | Audits, migrates, and regression-tests messy HTML table systems with a public-safe scrub gate. |
+| `format-html » number-formats` | Ready | Applies the Macabacus financial number-format standard (en-dash zeros, aligned parenthesized negatives, blue inputs, green links, grey-italic margins, bold totals) to Excel models and HTML tables. Byte-exact codes + openpyxl applicator. |
+| `format-html » reskin` | Ready | Detects a repo's design system (a `*-design`/`*-brand` skill, tokens stylesheet, or `reskin.json`) and applies its brand frame (nav/hero/footer + tokens + assets) across the site. Hybrid: runs the repo's bespoke applier if it has one, else a built-in frame injector. Idempotent + dry-run-able. |
 | `skill-drift-scanner` | Ready | Audits Codex and Claude skill deployment drift, autosync health, scheduler status, and reload requirements across machine-level skill installs. |
 | `excel-wow` | Draft | Placeholder for a future Excel/financial-modeling workflow skill. |
 | `blog-image-gen` | Ready | Generates editorial hero images for blog posts through the blog repo's OpenAI image scripts, with current-doc verification, batch/ingest workflows, and thumbnail review. |

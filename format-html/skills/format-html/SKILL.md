@@ -1,19 +1,24 @@
 ---
-name: pagecraft
-description: Portable HTML artifact and visual-safety bundle for static HTML, portal pages, dashboards, blog posts, one-off deliverables, and SVG-first architecture diagrams. Use when creating or reviewing self-contained HTML pages, visual documents, architecture/system diagrams, robust tables, financial number formatting, headers/section dividers, or text-wrap prevention; when the user says "make this an HTML artifact", "diagram this", "architecture diagram", "visual plan", or reports broken wrapping, phantom right edge, or magician divider. Bundles html, html-diagram, verify-text-wrap, table-system-migration, and number-formats as nested sub-skills.
+name: format-html
+description: Portable HTML artifact and visual-safety mechanics bundle, formerly the old Pagecraft subskill. Use under the pagecraft master skill for static HTML, portal pages, dashboards, blog posts, one-off deliverables, SVG-first architecture diagrams, robust tables, financial number formatting, headers/section dividers, and text-wrap prevention. Bundles html, html-diagram, verify-text-wrap, table-system-migration, and number-formats as nested mechanics.
 ---
 
-# Pagecraft
+# Format HTML
 
-Pagecraft is a portable HTML artifact and finishing **bundle**: focused output
-lanes for new self-contained HTML plus a comprehensive stylesheet and the *real,
-proven* verifiers. It exists so you stop hand-fixing the same HTML, diagram,
-table, number, header, and text-wrap bugs in every repo.
+Format HTML is the portable HTML artifact and finishing **bundle** that used to
+be named `pagecraft`. The master visual lane is now `pagecraft`; load this
+mechanics bundle when you need the old Pagecraft HTML/table/number/wrap tooling.
+It exists so you stop hand-fixing the same HTML, diagram, table, number, header,
+and text-wrap bugs in every repo.
+
+Boundary: this shared skill stays portable. Repo-specific visual-builder lanes,
+tool routing rules, client bindings, and brain-owned orchestration skills live
+in the owning repo and should not be promoted into this shared skill source.
 
 It does not replace a repo's design system. It bundles output modes and checks:
 
 - **`html`** — create self-contained, brand-aware HTML artifacts from source
-  material, then route them through Pagecraft verification.
+  material, then route them through Format HTML verification.
 - **`html-diagram`** — create full-screen, SVG-first architecture/system diagrams
   with brand-aware tokens, minimal prose, and optional interactive flow states.
 - **`wrap-safe`** — the CSS keystone/reset and the `wrapcheck.js` runtime probe.
@@ -69,7 +74,7 @@ obvious bad primitives, allowlist only confirmed non-defects, then ratchet.
 When a repo already has substantial HTML/CSS debt, do the smallest useful
 installation first:
 
-1. Install Pagecraft and commit only the copied assets, scripts, manifest, and
+1. Install Format HTML/Pagecraft assets and commit only the copied assets, scripts, manifest, and
    known-issues scaffold.
 2. Add only `wrap-safe.css` or the single keystone rule to the existing global
    stylesheet.
@@ -85,7 +90,7 @@ installation first:
 User: "This finance HTML is basically right, but make it safe to ship."
 
 Do:
-- Install or reuse Pagecraft.
+- Install or reuse Format HTML/Pagecraft assets.
 - Convert the main financial table to `.bbt` inside `.bbt-wrap`.
 - Run `verify-text-wrap/check-keystone.py` first, then `verify-text-wrap/runner.py`
   if the page is visual or recently failed visually.
@@ -125,13 +130,14 @@ table families first, then migrate in controlled batches with a ratchet.
 
 ## Which subskill should I use?
 
-These are **pagecraft sub-skills** — nested under this skill, not standalone installs.
+These are **format-html sub-skills** nested under this mechanics bundle. Load the
+master `pagecraft` skill first when the work is visual or brand-sensitive.
 Load the sub-skill body from the path below; do not expect a top-level
 `.claude/skills/<name>/` copy.
 
 | Need | Sub-skill | Start here |
 |---|---|---|
-| Install the bundle or finish one static HTML surface | `pagecraft` (this file) | `install-pagecraft.sh`, then these references |
+| Install the bundle or finish one static HTML surface | `format-html` (this file) | `install-pagecraft.sh`, then these references |
 | Create a new self-contained HTML artifact, report, explainer, plan, or prototype | `html` | `../html/SKILL.md` |
 | Create a full-screen architecture, stack, sequence, lineage, or system diagram | `html-diagram` | `../html-diagram/SKILL.md` |
 | Prove wrap/container safety after CSS or deploy | `verify-text-wrap` | `verify-text-wrap/SKILL.md` |
@@ -154,7 +160,7 @@ Load the sub-skill body from the path below; do not expect a top-level
   use parentheses (not red), units stated once in the header.
 - Every exception needs a same-line reason: `/* wrap-exempt: metric-only KPI grid */`.
 - New visual artifacts must keep the repo/client/Bogdan brand contract first and
-  use Pagecraft as the mechanics and verification layer, not as a competing
+  use Format HTML as the mechanics and verification layer, not as a competing
   palette.
 - Before a public launch, client handoff, or durable internal share, run the
   launch-quality sweep after brand/wrap/table checks. Treat it as a prioritized
@@ -171,14 +177,14 @@ Load the sub-skill body from the path below; do not expect a top-level
 
 ## What's in the bundle
 
-Pagecraft is a multi-skill plugin. Each member skill is self-contained (it owns
+Format HTML is a multi-skill plugin. Each member skill is self-contained (it owns
 its own tools — no copies shared or vendored between skills):
 
 ```
-pagecraft/                          the plugin
+format-html/                        the plugin
 ├─ .claude-plugin/plugin.json       plugin manifest
 └─ skills/
-   ├─ pagecraft/                    THIS overview skill
+   ├─ format-html/                  THIS overview skill
    │  ├─ SKILL.md
    │  ├─ install-pagecraft.sh       install the bundle into another repo
    │  ├─ assets/css/pagecraft.css   comprehensive stylesheet: keystone, .bbt

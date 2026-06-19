@@ -160,8 +160,8 @@ Local static build gate:
 ```yaml
 - name: Verify text wrap locally
   run: |
-    python3 pagecraft/skills/verify-text-wrap/check-keystone.py --portal dist
-    python3 pagecraft/skills/verify-text-wrap/runner.py --local --portal dist \
+    python3 format-html/skills/verify-text-wrap/check-keystone.py --portal dist
+    python3 format-html/skills/verify-text-wrap/runner.py --local --portal dist \
       --screenshot-dir '' \
       --json-report /tmp/verify-text-wrap-local.json
 ```
@@ -171,7 +171,7 @@ Post-deploy smoke gate:
 ```yaml
 - name: Verify deployed text wrap
   run: |
-    python3 pagecraft/skills/verify-text-wrap/runner.py \
+    python3 format-html/skills/verify-text-wrap/runner.py \
       --deployed "$DEPLOY_URL" \
       --screenshot-dir /tmp/verify-text-wrap \
       --json-report /tmp/verify-text-wrap-deployed.json
@@ -282,8 +282,8 @@ verify time.
 **Install into a live page** (two lines in `<head>`):
 
 ```html
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/bogdanbaciu21/skills@main/pagecraft/skills/verify-text-wrap/wrap-safe.css">
-<script src="https://cdn.jsdelivr.net/gh/bogdanbaciu21/skills@main/pagecraft/skills/verify-text-wrap/wrapcheck.js" defer></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/bogdanbaciu21/skills@main/format-html/skills/verify-text-wrap/wrap-safe.css">
+<script src="https://cdn.jsdelivr.net/gh/bogdanbaciu21/skills@main/format-html/skills/verify-text-wrap/wrapcheck.js" defer></script>
 ```
 
 Pin a commit SHA (`@<sha>`) instead of `@main` for production. Or `@import` the
