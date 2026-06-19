@@ -1,0 +1,86 @@
+name: Require Issue
+
+# Issue-driven workflow (Dan, 2026-06-19): every PR must trace to a GitHub issue.
+# Server-side half of the gate -- catches commits from ANY harness/machine that
+# reach a PR, complementing the local .githooks/commit-msg hook. Policy is
+# "hard for humans, exempt automation": bot actors are skipped.
+
+on:
+  pull_request_target:
+    types: [opened, reopened, edited, synchronize, ready_for_review]
+
+permissions:
+  issues: write
+  pull-requests: write
+
+jobs:
+  check-issue:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Require an issue reference
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const BOTS = ['dependabot[bot]', 'cursor[bot]', 'github-actions[bot]'];
+            if (BOTS.includes(context.actor)) return;          // exempt automation
+
+            const pr = context.payload.pull_request;
+            if (!pr) return;
+            const owner = context.repo.owner, repo = context.repo.repo, number = pr.number;
+
+            // A reference is: #123 / GH-123 in title or body, a closing keyword,
+            // a recognized work-ticket id, or an issue-shaped head branch.
+            const ref = /(#|GH-)\d+|\b(close[sd]?|fixe?[sd]?|resolve[sd]?)\b[^\n]*#\d+|\b(WORK|LEARN|DEC|AGNT|OPS|UX|GPU|GROW|SKILL|FIN|HLTH|LIFE|DATA|SEC|INFRA)-\d+\b/i;
+            const hay = [pr.title || '', pr.body || '', pr.head?.ref || ''].join('\n');
+
+            let hasRef = ref.test(hay);
+            if (!hasRef) {
+              // Also accept a ref in any commit message on the PR.
+              const commits = await github.rest.pulls.listCommits({ owner, repo, pull_number: number, per_page: 100 });
+              hasRef = commits.data.some(c => ref.test(c.commit.message || ''));
+            }
+
+            async function setLabel(on) {
+              const name = 'needs-issue';
+              if (on) {
+                try { await github.rest.issues.addLabels({ owner, repo, issue_number: number, labels: [name] }); }
+                catch (e) {
+                  try {
+                    await github.rest.issues.createLabel({ owner, repo, name, color: 'b60205', description: 'PR has no linked issue' });
+                    await github.rest.issues.addLabels({ owner, repo, issue_number: number, labels: [name] });
+                  } catch (e2) { core.warning(`label: ${e2.message}`); }
+                }
+              } else {
+                try { await github.rest.issues.removeLabel({ owner, repo, issue_number: number, name }); } catch (e) {}
+              }
+            }
+
+            if (hasRef) {
+              await setLabel(false);
+              const reviews = await github.rest.pulls.listReviews({ owner, repo, pull_number: number });
+              for (const r of reviews.data) {
+                if (r.state === 'CHANGES_REQUESTED' && r.user.type === 'Bot') {
+                  await github.rest.pulls.dismissReview({ owner, repo, pull_number: number, review_id: r.id,
+                    message: 'Issue reference found -- requirement satisfied.' });
+                }
+              }
+              return;
+            }
+
+            await setLabel(true);
+            await github.rest.issues.createComment({ owner, repo, issue_number: number, body: [
+              '⚠️ **No linked issue.** Every unit of work routes through a GitHub issue (Dan, 2026-06-19).',
+              '',
+              'Add a reference to the PR title/body or a commit message:',
+              '- `Fixes #123` / `(#123)` / `Closes #123`, or',
+              '- a work-ticket id like `WORK-389` / `LEARN-067` / `OPS-025`.',
+              '',
+              'Open one with `python3 bin/work_issue.py open --title "..." --harness <claude|codex|cursor> --repo ' + owner + '/' + repo + '`.',
+            ].join('\n') });
+
+            try {
+              await github.rest.pulls.createReview({ owner, repo, pull_number: number, event: 'REQUEST_CHANGES',
+                body: '🚫 **Merge blocked:** link an issue to proceed.' });
+            } catch (e) { core.warning(`review: ${e.message}`); }
+
+            core.setFailed(`PR #${number} has no linked issue.`);

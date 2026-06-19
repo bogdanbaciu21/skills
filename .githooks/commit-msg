@@ -1,0 +1,106 @@
+#!/usr/bin/env bash
+# .githooks/commit-msg  --  issue-driven-workflow gate (HARNESS-AGNOSTIC)
+#
+# Architectural decision (Dan, 2026-06-19): ALL work routes through GitHub
+# issues. This hook is the ONE enforcement point that fires regardless of
+# harness (Claude/Codex/Cursor/human) or machine (Mac/VPS/GEX44), because git
+# hooks run under every committer. (Claude .claude hooks only fire in Claude;
+# CI only fires server-side. Only a git hook catches all three locally.)
+#
+# Policy = "hard for humans, exempt automation":
+#   * A commit is ALLOWED if its message references an issue
+#       (#123, (#123), or a work ticket like WORK-389 / LEARN-067 / OPS-025),
+#       OR carries the escape hatch [skip-issue] / [no-issue] / [ops],
+#       OR is an unattended-automation commit (known prefix or bot identity),
+#       OR is a merge/revert/rebase/cherry-pick replay.
+#   * Otherwise it is BLOCKED with instructions.
+#
+# Tunable: drop a newline-separated list of extra exempt subject-prefix regexes
+# in  .github/work-issue-exempt-prefixes  at the repo root to extend the list
+# without editing this hook.
+#
+# Deliberate one-off bypass:  git commit --no-verify   (use sparingly).
+
+MSG_FILE="$1"
+[ -z "$MSG_FILE" ] && exit 0
+[ -f "$MSG_FILE" ] || exit 0
+
+# Strip git comment lines (#...) and blank-only content for inspection.
+FULL="$(grep -vE '^[[:space:]]*#' "$MSG_FILE" 2>/dev/null || true)"
+SUBJECT="$(printf '%s\n' "$FULL" | grep -vE '^[[:space:]]*$' 2>/dev/null | head -1 || true)"
+
+# Empty message -- let git's own machinery handle it.
+[ -z "$SUBJECT" ] && exit 0
+
+# 1) Escape hatch -------------------------------------------------------------
+if printf '%s' "$FULL" | grep -qiE '\[(skip-issue|no-issue|ops|cron|automation)\]'; then
+  exit 0
+fi
+
+# 2) Issue reference present? -------------------------------------------------
+#    GitHub ref (#123) anywhere, or a recognized work-ticket id.
+if printf '%s' "$FULL" | grep -qE '#[0-9]+'; then
+  exit 0
+fi
+if printf '%s' "$FULL" | grep -qE '\b(WORK|LEARN|DEC|AGNT|OPS|UX|GPU|GROW|SKILL|FIN|HLTH|LIFE|DATA|SEC|INFRA)-[0-9]+\b'; then
+  exit 0
+fi
+
+# 3) Merge / revert / in-progress rebase or cherry-pick replays --------------
+case "${GIT_REFLOG_ACTION:-}" in
+  *rebase*|*merge*|*cherry-pick*|*revert*) exit 0 ;;
+esac
+GITDIR="$(git rev-parse --git-dir 2>/dev/null || echo .git)"
+if [ -d "$GITDIR/rebase-merge" ] || [ -d "$GITDIR/rebase-apply" ] || \
+   [ -f "$GITDIR/MERGE_HEAD" ] || [ -f "$GITDIR/CHERRY_PICK_HEAD" ]; then
+  exit 0
+fi
+
+# 4) Unattended-automation subject prefixes ----------------------------------
+AUTOMATION_RE='^(auto:|auto\(|cicd|corpus|VPS ambient|outlook auto-ingest|life-scan|Refresh life scan|insight-lock|skillopt|Merge|Revert|spread|vendor-spend|deps(:| )|bump |Bump |[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2})'
+if printf '%s' "$SUBJECT" | grep -qiE "$AUTOMATION_RE"; then
+  exit 0
+fi
+EXTRA_FILE="$(git rev-parse --show-toplevel 2>/dev/null)/.github/work-issue-exempt-prefixes"
+if [ -f "$EXTRA_FILE" ]; then
+  while IFS= read -r pat; do
+    [ -z "$pat" ] && continue
+    case "$pat" in \#*) continue ;; esac
+    if printf '%s' "$SUBJECT" | grep -qiE "$pat"; then
+      exit 0
+    fi
+  done < "$EXTRA_FILE"
+fi
+
+# 5) Known bot/automation committer identities -------------------------------
+AUTHOR_IDENT="$(git var GIT_AUTHOR_IDENT 2>/dev/null || true)"
+AUTHOR_EMAIL="$(printf '%s' "$AUTHOR_IDENT" | sed -n 's/.*<\(.*\)>.*/\1/p')"
+case "$AUTHOR_EMAIL" in
+  *dependabot*|cursoragent@cursor.com|*"cursor[bot]"*|cicd-heal@dans-brain.local) exit 0 ;;
+esac
+
+# 6) Block -------------------------------------------------------------------
+cat >&2 <<'EOF'
+
+  [commit-msg] BLOCKED -- issue-driven workflow
+
+  Every unit of work routes through a GitHub issue (Dan's 2026-06-19 rule).
+  Your commit message has no issue reference and is not recognized automation.
+
+  Fix one of these ways:
+
+    1. Reference your session/work issue in the message:
+         <subject>  (#123)
+       Open one if you do not have it yet:
+         python3 bin/work_issue.py open --title "<what you are doing>" \
+             --harness claude|codex|cursor --repo <owner>/<repo>
+
+    2. Use a recognized work-ticket id (WORK-/LEARN-/DEC-/AGNT-/OPS-/...).
+
+    3. Unattended automation only: prefix the subject with its stream
+       (auto:, cicd, corpus, life-scan, ...) or add [ops] to the message.
+
+    4. Deliberate one-off: git commit --no-verify
+
+EOF
+exit 1
