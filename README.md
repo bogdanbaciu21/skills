@@ -183,6 +183,7 @@ PYTHONDONTWRITEBYTECODE=1 python3 -m unittest tests/test_skillopt_pilot.py
 | `insight-lock` | Ready | Preserves and distills a high-value conversation into durable downstream context — raw capture, distilled insight memo, retrieval hooks, and a light future-use note. The capture skill `parallel-dispatch` runners use per track. |
 | `chat-analysis` | Ready | Analyzes Codex or Claude Code session transcripts for friction patterns, redacts sensitive text, and proposes reviewed agent-instruction improvements. |
 | `weekly-update` | Ready | Drafts evidence-driven stakeholder updates from git plus issue-tracker data, with GitHub, Linear, and Jira data contracts. |
+| `x-signal-research` | Ready | Researches public X/Twitter conversation signals with Xquik, preserving source ids, query bounds, evidence labels, sample limits, and approval gates for private reads, writes, monitors, webhooks, and bulk jobs. |
 | `format-html` | Ready | Multi-skill **plugin bundle** for HTML formatting + visual safety. Contains the mechanics skills below; `format-html/skills/format-html` is the overview + installer. |
 | `format-html » verify-text-wrap` | Ready | Verifies static HTML portals for caterpillar text, narrow containers, and right-edge layout drift. Canonical home of the `wrap-safe` runtime library (`wrap-safe.css` reset + `wrapcheck.js` probe) it drives. |
 | `format-html » table-system-migration` | Ready | Audits, migrates, and regression-tests messy HTML table systems with a public-safe scrub gate. |
