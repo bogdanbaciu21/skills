@@ -6,10 +6,10 @@ description: Apply a repo's design system across its HTML pages — a "reskin." 
 # Reskin
 
 Apply the design system a repo already carries across its pages — the generalized
-version of the per-repo "apply brand frame" scripts (e.g. Acme's
+version of the per-repo "apply brand frame" scripts (e.g. a repo's own
 `apply-brand-frame.py`). Repo-aware: it works off whatever design system the
-current repo exposes, so the same `reskin apply` command brands an Acme portal, an
-Acme comp portal, or a bogdanbaciu site.
+current repo exposes, so the same `reskin apply` command brands a client portal,
+an internal app, or a personal site.
 
 ## Hybrid model — one command, two engines
 
@@ -42,13 +42,13 @@ that already contains the `framed_marker` is skipped.
 ```json
 {
   "design_system": {
-    "source": ".claude/skills/acme-design",   // dir holding the brand (skill or standalone repo)
+    "source": ".claude/skills/acme-design",     // dir holding the brand (skill or standalone repo)
     "tokens_css": "colors_and_type.css",         // relative to source
     "assets": "assets",                          // relative to source — logos, icons, fonts
     "frame": "frame"                             // OPTIONAL — dir of nav.html/hero.html/footer.html
   },
-  "served_root": "client-portal",                 // dir whose HTML pages get reskinned ("." for repo root)
-  "assets_target": "assets/client-brand",           // where assets land under served_root
+  "served_root": "client-portal",                // dir whose HTML pages get reskinned ("." for repo root)
+  "assets_target": "assets/client-brand",        // where assets land under served_root
   "framed_marker": "class=\"brand-nav\"",        // presence on a page = already framed (idempotency)
 
   // EITHER declare a bespoke applier (hybrid run-path):

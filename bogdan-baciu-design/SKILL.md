@@ -134,11 +134,11 @@ Do not:
 
 ### Example 2: Client-facing artifact
 
-User: "Make this Acme dashboard look polished."
+User: "Make this client dashboard look polished."
 
 Do not apply this skill directly. Client context wins. Use the client design
-system (`acme-design`) unless the user explicitly asks for Dan's personal
-brand.
+system (e.g. an installed `*-design` skill) unless the user explicitly asks for
+Dan's personal brand.
 
 ### Example 3: Plain document or one-pager
 

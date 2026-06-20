@@ -28,7 +28,7 @@ Do:
 
 ### Example 2: Event prep from a long thread
 
-User: "lock this down before my Client call."
+User: "lock this down before my client call."
 
 Do:
 - Add the Event Prep block because there is a real external clock.

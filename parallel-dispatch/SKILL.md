@@ -53,7 +53,7 @@ landing queue**:
 | **Coordinator** | Pull fresh `main`, land one track at a time via `git land` (or repo-specific land path), re-run gates after each land, stop on conflict or scope drift | Let every runner push concurrently, use piped push commands that mask exit codes, or land while another track is still writing |
 
 **When to keep serial (default):** 2+ code tracks, shared repo, any overlap risk,
-dans-brain canonical checkout (permanently dirty), Acme/shared-tree history, or
+dans-brain canonical checkout (permanently dirty), client/shared-tree history, or
 when the concept-loop flagged multi-agent overlap / landing friction.
 
 **When parallel push is allowed:** Dan explicitly opts in **and** the validator
@@ -66,12 +66,12 @@ filling the coordinator playbook and code-track prompts.
 ### Step 0.6 — Babysit open PRs with a bounded `/loop`
 
 Use this recipe when Dan asks to babysit PRs, keep agent branches moving, or run
-a standing `/loop` over `dans-brain`, `brain/_repos/*`, and Acme-adjacent repos.
+a standing `/loop` over `dans-brain`, `brain/_repos/*`, and client-adjacent repos.
 The point is to turn scattered branch/CI state into a small action queue, not to
 merge risky work by momentum.
 
 1. Inventory the repos and open PRs: root repo first, then active submodules
-   under `brain/_repos/`, then explicitly named repos such as Acme.
+   under `brain/_repos/`, then explicitly named client repos.
 2. For each PR, record branch, author/agent, files touched, check status, merge
    conflict status, and whether the PR is mechanical or needs judgment.
 3. Apply the CI/CD tier gate: mechanical `auto` failures can be fixed, verified,

@@ -26,7 +26,7 @@ import argparse, glob, json, os, re, shlex, shutil, subprocess, sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 
-# Proven strip patterns from apply-brand-frame.py — the "old chrome" removed
+# Proven strip patterns from apply-brand-frame.py: the "old chrome" removed
 # before injecting the new frame. Overridable per-repo via reskin.json.
 DEFAULT_STRIP = [
     r'\s*<nav class="[a-z-]+">.*?</nav>\s*',
@@ -124,7 +124,7 @@ def detect(repo):
     if os.path.isfile(os.path.join(repo, "reskin.json")):
         f["manifest"] = "reskin.json"
 
-    # Installed design/brand skill (Acme acme-design, Acme acme-brand, …).
+    # Installed design/brand skill (e.g. acme-design, acme-brand, …).
     # tokens/assets/frame are recorded RELATIVE TO the skill dir (= source).
     for pat in (".claude/skills/*-design", ".claude/skills/*-brand", ".claude/skills/*design*"):
         for d in sorted(glob.glob(os.path.join(repo, pat))):
@@ -185,7 +185,7 @@ def scaffold(f):
     if f["frame_dir"]:   ds["frame"] = f["frame_dir"]
     m = {
         "design_system": ds or {"source": "TBU", "tokens_css": "TBU", "assets": "TBU"},
-        "served_root": "TBU — dir whose HTML pages get reskinned (e.g. client-portal or .)",
+        "served_root": "TBU: dir whose HTML pages get reskinned (e.g. client-portal or .)",
         "assets_target": "TBU — where assets land under served_root (e.g. assets/<brand>)",
         "framed_marker": DEFAULT_MARKER,
         "pages": [{"path": "TBU/page.html", "eyebrow": "section", "headline_pre": "Title",
@@ -206,7 +206,7 @@ def _render(tpl, page):
 
 
 def generic_frame(repo, m, page, dry):
-    """Built-in injector — mirrors apply-brand-frame.py, but nav/hero/footer
+    """Built-in injector: mirrors apply-brand-frame.py, but nav/hero/footer
     come from the design system's frame/ templates instead of being hardcoded."""
     ds = m["design_system"]
     frame_dir = ds.get("frame")

@@ -20,3 +20,9 @@ __pycache__/
 
 # SkillOpt pilot review artifacts
 **/skillopt-pilot/
+
+# Private secret-scan seed (client-SPECIFIC markers must NEVER be committed here;
+# point SECRET_SCAN_SEED_YAML at one of these locally, or use SECRET_SCAN_EXTRA).
+.secret-scan-extra
+security-patterns.yaml
+**/security-patterns.yaml

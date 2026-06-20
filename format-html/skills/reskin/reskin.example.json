@@ -1,7 +1,7 @@
 {
   "_comment": "Two shapes of reskin.json. Copy ONE to your repo root as reskin.json and edit. See SKILL.md.",
 
-  "_example_bespoke (Acme-style: run the repo's own applier)": {
+  "_example_bespoke (run the repo's own applier)": {
     "design_system": {
       "source": ".claude/skills/acme-design",
       "tokens_css": "colors_and_type.css",

@@ -3,7 +3,7 @@
 
 WHY: the codex-skill-sync sweep propagates skills source -> install roots on a
 TIMER, unattended, and skills get seeded/promoted ACROSS repos — including into
-and out of client repos (Acme). A skill that carries a live credential or a
+and out of client repos. A skill that carries a live credential or a
 client-confidential marker would be spread everywhere. Nothing checked for that.
 This is the gate: scan a skill tree before it is copied into another repo, before
 it is promoted into the canonical source, and (as a standing check) across all
@@ -12,11 +12,11 @@ skills via skill_coverage_audit.py.
 Two severities, both block by default (exit 1):
   SECRET     a live-looking credential VALUE (Anthropic/OpenAI/AWS/GitHub/Google/
              Slack/GitLab keys, private keys, JWTs, live access links).
-  SENSITIVE  a client-confidential MARKER — not necessarily a value, but auth
+  SENSITIVE  a client-confidential MARKER: not necessarily a value, but auth
              internals / identity headers / client invite links that must not
-             leave the client repo even as a reference. Seeded from Acme's
-             .claude/security-patterns.yaml and best-effort re-read from it at
-             runtime so this gate inherits Acme's evolving client-secret list.
+             leave the client repo even as a reference. Generic markers live
+             below; client-SPECIFIC markers are injected privately at runtime via
+             SECRET_SCAN_EXTRA / SECRET_SCAN_SEED_YAML, never committed here.
   SCOPE      a repo-owned orchestration marker that must not be promoted into
              the shared/global skills source and then propagated into client repos.
 
@@ -34,11 +34,15 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import re
 import sys
 from pathlib import Path
 
-Acme_PATTERNS_YAML = Path.home() / "Desktop" / "Acme" / ".claude" / "security-patterns.yaml"
+# Client-SPECIFIC markers are kept OUT of this public repo and injected privately
+# at runtime: SECRET_SCAN_EXTRA="tok1,tok2" (CI feeds this from a repo secret),
+# and/or SECRET_SCAN_SEED_YAML=<path to a local security-patterns.yaml>.
+EXTRA_SEED_YAML = os.environ.get("SECRET_SCAN_SEED_YAML", "").strip()
 
 # --- SECRET: live credential VALUE shapes. Length-guarded to clear placeholders. -
 SECRET_PATTERNS = [
@@ -60,9 +64,11 @@ SECRET_PATTERNS = [
         r"\s*[:=]\s*['\"][A-Za-z0-9/+_-]{20,}['\"]")),
 ]
 
-# --- SENSITIVE: client-confidential markers (seeded from Acme security-patterns.yaml). -
+# --- SENSITIVE: generic client-confidential markers. Client-SPECIFIC markers are
+#     injected privately at runtime (SECRET_SCAN_EXTRA / SECRET_SCAN_SEED_YAML),
+#     never hardcoded in this public repo. -
 SENSITIVE_SUBSTRINGS = {
-    "PORTAL_WRITE_KEY", "x-portal-key", "x-portal-admin-id", "x-portal-verified-user",
+    "PORTAL_WRITE_KEY", "x-portal-key",
     "ANTHROPIC_ADMIN_KEY", "GITHUB_TOKEN",
 }
 
@@ -98,20 +104,29 @@ SKIP_SUFFIXES = {".png", ".jpg", ".jpeg", ".gif", ".pdf", ".zip", ".mp4", ".woff
 MAX_BYTES = 1_000_000
 
 
-def _load_acme_sensitive() -> set[str]:
-    """Best-effort: re-read Acme's security-patterns.yaml substrings so the gate
-    inherits its evolving client-secret list. No yaml dependency — line regex."""
+def _load_extra_sensitive() -> set[str]:
+    """Best-effort: pull client-SPECIFIC markers from the environment so they never
+    live in this public repo. Two private, optional sources:
+      SECRET_SCAN_EXTRA      comma/newline-separated substrings (CI injects these
+                             from a repo secret; same-repo pushes/PRs only).
+      SECRET_SCAN_SEED_YAML  path to a local security-patterns.yaml to re-read.
+    No yaml dependency: line regex."""
     extra: set[str] = set()
-    if not Acme_PATTERNS_YAML.exists():
-        return extra
-    try:
-        text = Acme_PATTERNS_YAML.read_text(encoding="utf-8", errors="replace")
-        for m in re.finditer(r"substrings:\s*\[([^\]]*)\]", text):
-            for tok in re.findall(r"['\"]([^'\"]+)['\"]", m.group(1)):
-                if len(tok) >= 6 and not tok.startswith("sk-ant") and tok != "AKIA":
-                    extra.add(tok)  # key shapes already covered by SECRET_PATTERNS
-    except Exception:
-        pass
+    for tok in re.split(r"[,\n]", os.environ.get("SECRET_SCAN_EXTRA", "")):
+        tok = tok.strip()
+        if len(tok) >= 4:
+            extra.add(tok)
+    if EXTRA_SEED_YAML:
+        seed = Path(EXTRA_SEED_YAML).expanduser()
+        if seed.exists():
+            try:
+                text = seed.read_text(encoding="utf-8", errors="replace")
+                for m in re.finditer(r"substrings:\s*\[([^\]]*)\]", text):
+                    for tok in re.findall(r"['\"]([^'\"]+)['\"]", m.group(1)):
+                        if len(tok) >= 6 and not tok.startswith("sk-ant") and tok != "AKIA":
+                            extra.add(tok)  # key shapes already covered by SECRET_PATTERNS
+            except Exception:
+                pass
     return extra
 
 
@@ -137,7 +152,7 @@ def scan_text(path: Path, text: str, sensitive: set[str]) -> list[dict]:
 def scan_tree(root: Path, sensitive: set[str] | None = None) -> list[dict]:
     """Scan a file or directory tree; return list of findings."""
     if sensitive is None:
-        sensitive = SENSITIVE_SUBSTRINGS | _load_acme_sensitive()
+        sensitive = SENSITIVE_SUBSTRINGS | _load_extra_sensitive()
     root = Path(root)
     files = [root] if root.is_file() else [p for p in root.rglob("*") if p.is_file()]
     out: list[dict] = []
@@ -160,7 +175,7 @@ def main() -> int:
     ap.add_argument("--json", action="store_true")
     args = ap.parse_args()
 
-    sensitive = SENSITIVE_SUBSTRINGS | _load_acme_sensitive()
+    sensitive = SENSITIVE_SUBSTRINGS | _load_extra_sensitive()
     all_findings: list[dict] = []
     for p in args.paths:
         all_findings.extend(scan_tree(Path(p), sensitive))

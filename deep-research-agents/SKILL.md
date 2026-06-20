@@ -1,6 +1,6 @@
 ---
 name: deep-research-agents
-description: "Use Dan's paid deep-research providers as one capability: Claude Managed Agent, Gemini Deep Research, Parallel.ai, Exa, and Firecrawl Research Index. Trigger when the user asks for deep research, a research harness, multi-angle research fan-out, five angles, Workflow tool unavailable, Gemini API deep research, Claude managed agent research, Parallel.ai research, or wants the same research methodology to work across repos such as dans-brain, bogdanbaciu-dot-com, and Acme."
+description: "Use Dan's paid deep-research providers as one capability: Claude Managed Agent, Gemini Deep Research, Parallel.ai, Exa, and Firecrawl Research Index. Trigger when the user asks for deep research, a research harness, multi-angle research fan-out, five angles, Workflow tool unavailable, Gemini API deep research, Claude managed agent research, Parallel.ai research, or wants the same research methodology to work across repos such as dans-brain and bogdanbaciu-dot-com."
 ---
 
 # Deep Research Agents
@@ -100,9 +100,9 @@ cd "$DANS_BRAIN_ROOT" && uv run python bin/deep_research.py "overall question" \
   Use `--plan-only` for a no-API check.
 - `bogdanbaciu-dot-com`: Phoenix modules under `lib/bogdan/research/` and the
   admin `/admin/research` surface.
-- `acme`: client portal research functions under
-  `client-portal/netlify/functions/research-*`, with provider `"all"` fanning out to
-  Claude, Gemini, and Parallel.ai.
+- `client`: portal research functions under
+  `client-portal/netlify/functions/research-*`, with provider `"all"` fanning out
+  to Claude, Gemini, and Parallel.ai.
 
 ## Operating Rules
 

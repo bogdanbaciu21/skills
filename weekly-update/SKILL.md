@@ -89,7 +89,7 @@ Optionally ask (only if relevant):
 
 ### Step 3.5 — The Personal Preamble (two-voice composition)
 
-The canonical artifact is a **two-voice hybrid**: a short personal preamble in plain prose ABOVE the formal institutional report. Sent emails are typically composed as `[plain-prose preamble] + [formal Acme-style report block] + [auto-appended firm signature]`. Generate both voices.
+The canonical artifact is a **two-voice hybrid**: a short personal preamble in plain prose ABOVE the formal institutional report. Sent emails are typically composed as `[plain-prose preamble] + [formal institutional report block] + [auto-appended firm signature]`. Generate both voices.
 
 The preamble is *not* the formal report's TL;DR. It's the human cover note — the thing that makes the email feel sent by a person, not generated. It also carries **soft asks** (cadence preferences, CC confirmations, consent items, scope clarifications) that don't belong in the institutional "The Ask" table.
 
