@@ -37,6 +37,27 @@ itself.
 It is pure Python standard library. No `pip install`, no framework, no hosted
 service in the middle.
 
+## Why this matters: one model is weak counsel
+
+A single LLM is a single distribution. Ask it for advice and then ask it to
+critique that advice, and the critique is drawn from the same weights, the same
+training data, the same blind spots. It surfaces the objections it was already
+disposed to surface, and stays silent on the ones baked into its own priors. It
+also tends toward agreement: prompt it for a recommendation and it will often
+rationalize the answer it already gave, then red-team it gently. One model
+interrogating itself is theater, not counsel.
+
+Real counsel comes from a diversity of intelligence. Different models fail in
+different places. A conclusion that survives Claude, GPT, and Gemini each arguing
+from a different seat is far more trustworthy than one model's confident
+monologue, and when they disagree, the disagreement is the signal: it points
+straight at the load-bearing assumption you should go verify.
+
+That is the whole design. The value of deep-decide is not more compute on one
+model. It is uncorrelated judgment: several perspectives, ideally across several
+models, forced to dissent, so the verdict you get has actually been argued
+against rather than agreed with.
+
 ## A research arsenal, built in
 
 A decision is only as good as the evidence under it. So the skill ships its own
