@@ -66,7 +66,12 @@ except Exception:  # noqa: BLE001
 # --------------------------------------------------------------------------- #
 
 ANTHROPIC_VERSION = "2023-06-01"
-HTTP_TIMEOUT = 180
+HTTP_TIMEOUT = 600  # top reasoning models at high effort can take minutes
+
+# Reasoning depth applied to every provider that supports it. Override per run
+# with DEEP_DECIDE_EFFORT. Anthropic scale: low | medium | high | xhigh | max.
+DEFAULT_EFFORT = os.environ.get("DEEP_DECIDE_EFFORT", "high")
+_OPENAI_EFFORT = DEFAULT_EFFORT if DEFAULT_EFFORT in {"low", "medium", "high"} else "high"
 
 
 def _http_post_json(url: str, headers: dict, payload: dict) -> dict:
@@ -77,38 +82,52 @@ def _http_post_json(url: str, headers: dict, payload: dict) -> dict:
 
 
 def call_anthropic(prompt: str, model: str) -> str:
+    """Anthropic flagship with adaptive thinking + effort dialed up."""
     key = os.environ.get("ANTHROPIC_API_KEY", "")
     body = {
         "model": model,
-        "max_tokens": 8000,
+        "max_tokens": 16000,
         "messages": [{"role": "user", "content": prompt}],
+        "thinking": {"type": "adaptive"},
+        "output_config": {"effort": DEFAULT_EFFORT},
     }
     out = _http_post_json(
         "https://api.anthropic.com/v1/messages",
-        {
-            "x-api-key": key,
-            "anthropic-version": ANTHROPIC_VERSION,
-            "content-type": "application/json",
-        },
+        {"x-api-key": key, "anthropic-version": ANTHROPIC_VERSION, "content-type": "application/json"},
         body,
     )
     parts = [b.get("text", "") for b in out.get("content", []) if b.get("type") == "text"]
     return "\n".join(p for p in parts if p).strip()
 
 
-def call_openai(prompt: str, model: str) -> str:
-    key = os.environ.get("OPENAI_API_KEY", "")
+def _openai_compatible(prompt: str, model: str, *, base: str, key: str) -> str:
+    """Any OpenAI-compatible chat endpoint (OpenAI, OpenRouter, Cursor, ...)."""
     body = {
         "model": model,
-        "max_completion_tokens": 8000,
+        "max_completion_tokens": 16000,
         "messages": [{"role": "user", "content": prompt}],
+        "reasoning_effort": _OPENAI_EFFORT,
     }
-    out = _http_post_json(
-        "https://api.openai.com/v1/chat/completions",
-        {"Authorization": f"Bearer {key}", "content-type": "application/json"},
-        body,
-    )
+    out = _http_post_json(base, {"Authorization": f"Bearer {key}", "content-type": "application/json"}, body)
     return (out["choices"][0]["message"]["content"] or "").strip()
+
+
+def call_openai(prompt: str, model: str) -> str:
+    return _openai_compatible(prompt, model, base="https://api.openai.com/v1/chat/completions",
+                              key=os.environ.get("OPENAI_API_KEY", ""))
+
+
+def call_openrouter(prompt: str, model: str) -> str:
+    return _openai_compatible(prompt, model, base="https://openrouter.ai/api/v1/chat/completions",
+                              key=os.environ.get("OPENROUTER_API_KEY", ""))
+
+
+def call_cursor(prompt: str, model: str) -> str:
+    # Cursor's OpenAI-compatible endpoint. Set CURSOR_API_BASE to its chat URL.
+    base = os.environ.get("CURSOR_API_BASE", "")
+    if not base:
+        raise RuntimeError("set CURSOR_API_BASE to Cursor's OpenAI-compatible chat endpoint")
+    return _openai_compatible(prompt, model, base=base, key=os.environ.get("CURSOR_API_KEY", ""))
 
 
 def call_gemini(prompt: str, model: str) -> str:
@@ -123,12 +142,16 @@ def call_gemini(prompt: str, model: str) -> str:
     return "\n".join(p.get("text", "") for p in parts).strip()
 
 
+# (key-env, model-env, default flagship model, call-fn). Models are each
+# provider's current top model; override any with its DEEP_DECIDE_*_MODEL env var.
 PROVIDERS = {
-    "claude": ("ANTHROPIC_API_KEY", "DEEP_DECIDE_ANTHROPIC_MODEL", "claude-opus-4-8", call_anthropic),
-    "openai": ("OPENAI_API_KEY", "DEEP_DECIDE_OPENAI_MODEL", "gpt-4o", call_openai),
-    "gemini": ("GEMINI_API_KEY", "DEEP_DECIDE_GEMINI_MODEL", "gemini-2.0-flash", call_gemini),
+    "claude":     ("ANTHROPIC_API_KEY",  "DEEP_DECIDE_ANTHROPIC_MODEL",  "claude-opus-4-8", call_anthropic),
+    "openai":     ("OPENAI_API_KEY",     "DEEP_DECIDE_OPENAI_MODEL",     "gpt-5",           call_openai),
+    "gemini":     ("GEMINI_API_KEY",     "DEEP_DECIDE_GEMINI_MODEL",     "gemini-2.5-pro",  call_gemini),
+    "openrouter": ("OPENROUTER_API_KEY", "DEEP_DECIDE_OPENROUTER_MODEL", "openai/gpt-5",    call_openrouter),
+    "cursor":     ("CURSOR_API_KEY",     "DEEP_DECIDE_CURSOR_MODEL",     "gpt-5",           call_cursor),
 }
-PROVIDER_ORDER = ["claude", "openai", "gemini"]
+PROVIDER_ORDER = ["claude", "openai", "gemini", "openrouter", "cursor"]
 
 
 def configured_providers() -> list[str]:

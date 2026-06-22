@@ -1,4 +1,0 @@
-interface:
-  display_name: "Table System Migration"
-  short_description: "Migrate and regression-test content tables"
-  default_prompt: "Use $table-system-migration to audit, migrate, and verify this site's table system."

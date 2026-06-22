@@ -27,11 +27,18 @@ The script reads credentials from the environment. Set at least one; set more
 than one to get genuine cross-model dissent (perspectives are rotated across the
 providers you configured):
 
+Each default is that provider's current flagship, and the calls run at high
+reasoning effort with adaptive thinking on where the provider supports it.
+Override any model with its env var, or the depth with `DEEP_DECIDE_EFFORT`
+(`low` | `medium` | `high` | `xhigh` | `max`, default `high`).
+
 | Env var | Provider | Model env override | Default model |
 |---|---|---|---|
 | `ANTHROPIC_API_KEY` | Claude | `DEEP_DECIDE_ANTHROPIC_MODEL` | `claude-opus-4-8` |
-| `OPENAI_API_KEY` | OpenAI | `DEEP_DECIDE_OPENAI_MODEL` | `gpt-4o` |
-| `GEMINI_API_KEY` | Gemini | `DEEP_DECIDE_GEMINI_MODEL` | `gemini-2.0-flash` |
+| `OPENAI_API_KEY` | OpenAI | `DEEP_DECIDE_OPENAI_MODEL` | `gpt-5` |
+| `GEMINI_API_KEY` | Gemini | `DEEP_DECIDE_GEMINI_MODEL` | `gemini-2.5-pro` |
+| `OPENROUTER_API_KEY` | OpenRouter (any model) | `DEEP_DECIDE_OPENROUTER_MODEL` | `openai/gpt-5` |
+| `CURSOR_API_KEY` (+ `CURSOR_API_BASE`) | Cursor | `DEEP_DECIDE_CURSOR_MODEL` | `gpt-5` |
 
 A subscription (ChatGPT, Claude.ai, etc.) is not an API key. These calls bill
 your API account. Check what is configured before running:

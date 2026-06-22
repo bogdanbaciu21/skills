@@ -1,9 +1,0 @@
-{
-  "known": [
-    {
-      "page": "index.html",
-      "match": "tag:p",
-      "reason": "Fixture entry used to validate known-issue file shape only."
-    }
-  ]
-}

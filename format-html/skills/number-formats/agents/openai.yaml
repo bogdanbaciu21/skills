@@ -1,4 +1,0 @@
-interface:
-  display_name: "Number Formats"
-  short_description: "Macabacus number-format standard for models & tables"
-  default_prompt: "Use Number Formats to apply the Macabacus standard — en-dash zeros, parenthesized aligned negatives, $ on the top row only, blue inputs, green links, grey-italic margins, bold totals — to a spreadsheet or HTML table."

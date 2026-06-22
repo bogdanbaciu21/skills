@@ -1,4 +1,0 @@
-interface:
-  display_name: "Format HTML"
-  short_description: "HTML formatting guardrails formerly named Pagecraft"
-  default_prompt: "Use $format-html to format, harden, and verify static HTML so tables, headers, numbers, and text wrapping stay polished and robust."

@@ -86,4 +86,4 @@ nothing spends money until you ask it to with `--execute`.
 The goal is a better decision with its uncertainty intact, not a confident answer
 that hides what it does not know.
 
-Code and docs: https://github.com/bogdanbaciu21/skills/tree/main/deep-decide
+Code and docs: [bogdanbaciu21/skills/deep-decide](https://github.com/bogdanbaciu21/skills/tree/main/deep-decide)

@@ -1,4 +1,0 @@
-interface:
-  display_name: "Reskin"
-  short_description: "Apply a repo's design system across its pages"
-  default_prompt: "Use Reskin to detect the current repo's design system and apply its brand frame (nav/hero/footer + tokens + assets) across the site — running the repo's bespoke applier if it has one, else the built-in frame injector."
