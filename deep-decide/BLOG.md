@@ -83,6 +83,18 @@ preserves disagreement instead of averaging it away. It recommends, but it never
 sends, deploys, buys, or commits anything. And the no-cost plan is the default:
 nothing spends money until you ask it to with `--execute`.
 
+## Research basis
+
+This is not a hunch. A panel of independent reasoners that argue and are then
+judged beats one model talking to itself, and there is a literature behind every
+piece of it: multi-agent debate (Du et al. 2023, arXiv:2305.14325; Liang et al.
+2023, arXiv:2305.19118; Khan et al. 2024, arXiv:2402.06782), ensembling across
+models (Wang et al. 2024, Mixture-of-Agents, arXiv:2406.04692), self-consistency
+and self-critique (arXiv:2203.11171; arXiv:2303.17651), and LLM-as-judge for the
+synthesis pass along with its known limits (Zheng et al. 2023, arXiv:2306.05685;
+Gu et al. 2024, arXiv:2411.15594; Guerdan et al. 2025, arXiv:2503.05965). The
+full reading list is in [REFERENCES.md](https://github.com/bogdanbaciu21/skills/tree/main/deep-decide/REFERENCES.md).
+
 The goal is a better decision with its uncertainty intact, not a confident answer
 that hides what it does not know.
 
