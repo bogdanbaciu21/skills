@@ -97,8 +97,6 @@ skills/
 │        ├─ SKILL.md
 │        ├─ reskin.py            (detect → sync → reframe; hybrid bespoke/generic)
 │        └─ reskin.example.json
-├─ excel-wow/
-│  └─ SKILL.md
 └─ blog-image-gen/
    └─ SKILL.md
 ```
@@ -142,23 +140,10 @@ This repo includes a conservative SkillOpt-style pilot at
 applies curated section patches to a copy of the body, and writes
 `proposed.md` plus `receipt.json` for human review.
 
-The first concrete benchmark lives at `excel-wow/evals/skillopt_pilot.jsonl`.
-It is intentionally aimed at the draft `excel-wow` skill so the pilot has real
-headroom to measure.
-
-**LOCAL Mac - zsh**
-
-```bash
-cd /Users/danb/src/skills
-PYTHONDONTWRITEBYTECODE=1 python3 scripts/skillopt_pilot.py \
-  --skill excel-wow/SKILL.md \
-  --benchmark excel-wow/evals/skillopt_pilot.jsonl \
-  --out-dir /tmp/excel-wow-skillopt-pilot
-```
-
-Review `/tmp/excel-wow-skillopt-pilot/proposed.md` and
-`/tmp/excel-wow-skillopt-pilot/receipt.json`; copy changes manually only after
-review. Generated in-repo `skillopt-pilot/` folders are ignored by git.
+The old `excel-wow` placeholder and its pilot benchmark were retired. New
+SkillOpt pilots should live under the skill they actually exercise, usually in
+`<skill>/evals/skillopt_pilot.jsonl`, and should be run against that skill's
+real `SKILL.md`.
 
 Run the pilot tests with:
 
@@ -190,7 +175,6 @@ PYTHONDONTWRITEBYTECODE=1 python3 -m unittest tests/test_skillopt_pilot.py
 | `format-html » number-formats` | Ready | Applies the Macabacus financial number-format standard (en-dash zeros, aligned parenthesized negatives, blue inputs, green links, grey-italic margins, bold totals) to Excel models and HTML tables. Byte-exact codes + openpyxl applicator. |
 | `format-html » reskin` | Ready | Detects a repo's design system (a `*-design`/`*-brand` skill, tokens stylesheet, or `reskin.json`) and applies its brand frame (nav/hero/footer + tokens + assets) across the site. Hybrid: runs the repo's bespoke applier if it has one, else a built-in frame injector. Idempotent + dry-run-able. |
 | `skill-drift-scanner` | Ready | Audits Codex and Claude skill deployment drift, autosync health, scheduler status, and reload requirements across machine-level skill installs. |
-| `excel-wow` | Draft | Placeholder for a future Excel/financial-modeling workflow skill. |
 | `blog-image-gen` | Ready | Generates editorial hero images for blog posts through the blog repo's OpenAI image scripts, with current-doc verification, batch/ingest workflows, and thumbnail review. |
 | `bogdan-baciu-design` | Ready | Applies Bogdan Baciu's personal editorial design system to sites, prototypes, documents, slide decks, and scoped financial artifacts, bundling tokens, fonts, imagery, previews, and the brand reference. |
 | `deep-research-agents` | Ready | Treats Claude Managed Agent, Gemini Deep Research, and Parallel.ai as one deep-research capability with repo-specific harness guidance. |
