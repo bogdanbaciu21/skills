@@ -1,0 +1,25 @@
+name: Sync Devin blueprint
+
+on:
+  push:
+    branches: [main]
+    paths: ['.devin/blueprint.yaml']
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Sync blueprint to Devin
+        run: |
+          curl -sf -X POST \
+            "https://api.devin.ai/v3beta1/organizations/${{ secrets.DEVIN_ORG_ID }}/snapshot-setup/sync" \
+            -H "Authorization: Bearer ${{ secrets.DEVIN_API_TOKEN }}" \
+            -H "Content-Type: application/json" \
+            -d '{"repo_name": "${{ github.repository }}"}'
+      - name: Trigger Devin snapshot build
+        run: |
+          curl -sf -X POST \
+            "https://api.devin.ai/v3beta1/organizations/${{ secrets.DEVIN_ORG_ID }}/snapshot-setup/builds" \
+            -H "Authorization: Bearer ${{ secrets.DEVIN_API_TOKEN }}" \
+            -H "Content-Type: application/json" \
+            -d '{}'
