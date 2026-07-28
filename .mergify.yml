@@ -1,0 +1,20 @@
+pull_request_rules:
+  - name: queue
+    conditions:
+      - label=ready-to-merge
+    actions:
+      queue:
+        merge_method: squash
+
+queue_rules:
+  - name: default
+    merge_method: squash
+    conditions:
+      - label=ready-to-merge
+
+commands_restrictions:
+  queue:
+    conditions:
+      - or:
+          - sender-permission >= write
+          - sender = devin-ai-integration[bot]
