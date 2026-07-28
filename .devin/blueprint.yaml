@@ -1,0 +1,13 @@
+clone:
+  depth: 1
+  lfs: false
+  submodules: false
+initialize: |
+  command -v uv >/dev/null 2>&1 || curl -LsSf https://astral.sh/uv/install.sh | sh
+  uv python install 3.12
+maintenance: |
+  pip install -r requirements.txt
+knowledge:
+  - name: test
+    contents: |
+      python3 -m pytest
