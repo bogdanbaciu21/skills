@@ -1,16 +1,18 @@
+queue_rules:
+  - name: default
+    merge_method: squash
+    queue_conditions:
+      - label=ready-to-merge
+    merge_conditions:
+      - label=ready-to-merge
+
 pull_request_rules:
-  - name: queue
+  - name: queue when ready
     conditions:
       - label=ready-to-merge
     actions:
       queue:
-        merge_method: squash
-
-queue_rules:
-  - name: default
-    merge_method: squash
-    conditions:
-      - label=ready-to-merge
+        name: default
 
 commands_restrictions:
   queue:
@@ -18,3 +20,10 @@ commands_restrictions:
       - or:
           - sender-permission >= write
           - sender = devin-ai-integration[bot]
+
+merge_protections:
+  - name: ready label
+    if:
+      - base=main
+    success_conditions:
+      - label=ready-to-merge
