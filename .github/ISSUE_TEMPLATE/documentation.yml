@@ -1,0 +1,42 @@
+name: Documentation correction
+description: Correct a specific, source-verifiable documentation problem.
+title: "[Docs]: "
+labels: ["documentation"]
+body:
+  - type: input
+    id: location
+    attributes:
+      label: Page and heading
+      placeholder: README.md - section name
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: Incorrect or missing statement
+      description: Quote only the smallest necessary excerpt and explain the user impact.
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Reproducible source evidence
+      description: Command output, source file/symbol, current primary documentation, or broken-link result.
+    validations:
+      required: true
+  - type: textarea
+    id: correction
+    attributes:
+      label: Proposed correction and verification
+      description: Supply corrected wording and how another reviewer can verify it from a clean checkout.
+    validations:
+      required: true
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Documentation checks
+      options:
+        - label: I checked the latest source revision and all links/assets affected by the correction.
+          required: true
+        - label: The evidence contains no private paths, credentials, prompts, identities, or customer data.
+          required: true

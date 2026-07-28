@@ -1,0 +1,60 @@
+name: Bug report
+description: Report reproducible behavior in the latest source.
+title: "[Bug]: "
+labels: ["bug", "needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: "Do not include secrets, prompts, device-link URLs, customer data, identities, or private paths. Security vulnerabilities belong in the private SECURITY.md route."
+  - type: input
+    id: revision
+    attributes:
+      label: Affected revision
+      description: Exact commit SHA on the latest main source.
+      placeholder: 40-character commit SHA
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: OS, architecture, language/runtime versions, and relevant sanitized configuration.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Minimal reproduction
+      description: Numbered steps using synthetic data, starting from a known state.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Sanitized evidence
+      description: Logs, test output, screenshot, or recording that another reviewer can reproduce.
+    validations:
+      required: true
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Safety and search checks
+      options:
+        - label: I reproduced this on the latest source and searched existing open issues.
+          required: true
+        - label: I removed secrets, prompts, device-link data, identities, customer data, and private paths.
+          required: true
+        - label: This is not a security vulnerability or conduct report.
+          required: true

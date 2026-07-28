@@ -1,0 +1,26 @@
+name: Security report - stop and report privately
+description: Redirect a suspected vulnerability away from public issues.
+title: "[Not security]: "
+labels: ["needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: "## Do not disclose a vulnerability here
+
+Close this form and follow [SECURITY.md](../../SECURITY.md). Prefer GitHub **Report a vulnerability** when available. Otherwise email bogdanbaciu@gmail.com with subject `[Skills Security]` and request a safer transfer channel before sending exploit material."
+  - type: checkboxes
+    id: redirect
+    attributes:
+      label: Required confirmation
+      options:
+        - label: This submission contains no suspected vulnerability, exploit, secret, affected-user data, or zero-day detail.
+          required: true
+        - label: If I have security evidence, I will stop and use SECURITY.md privately instead.
+          required: true
+  - type: textarea
+    id: nonsecurity
+    attributes:
+      label: Non-security routing evidence
+      description: Explain why this is an ordinary bug/question and provide a synthetic reproduction. Otherwise do not submit.
+    validations:
+      required: true
