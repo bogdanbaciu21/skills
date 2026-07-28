@@ -1,0 +1,49 @@
+name: Feature request
+description: Propose an evidence-backed user outcome, not an unbounded idea.
+title: "[Feature]: "
+labels: ["enhancement", "needs-evidence"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: User problem and evidence
+      description: Who encounters the problem, in what workflow, how often, and what observation or artifact supports it?
+    validations:
+      required: true
+  - type: textarea
+    id: current
+    attributes:
+      label: Current workaround and alternatives
+      description: Describe existing behavior, workarounds, and simpler alternatives considered.
+    validations:
+      required: true
+  - type: textarea
+    id: outcome
+    attributes:
+      label: Bounded outcome and acceptance proof
+      description: State observable success, non-goals, and the evidence that would prove it.
+    validations:
+      required: true
+  - type: dropdown
+    id: surface
+    attributes:
+      label: Primary surface
+      options: [Web, Mobile, CLI, API, Documentation, Release/tooling, Other]
+    validations:
+      required: true
+  - type: textarea
+    id: impact
+    attributes:
+      label: Privacy, security, compatibility, and operating impact
+      description: Identify new data recipients, permissions, migrations, failure modes, or state "none found" with reasoning.
+    validations:
+      required: true
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Proposal checks
+      options:
+        - label: I supplied user evidence and reproducible acceptance criteria.
+          required: true
+        - label: I am not presenting this request as a committed roadmap or release promise.
+          required: true
