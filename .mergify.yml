@@ -19,6 +19,7 @@ commands_restrictions:
     conditions:
       - or:
           - sender-permission >= write
+          - sender = devin-ai-integration
           - sender = devin-ai-integration[bot]
 
 merge_protections:
