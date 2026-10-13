@@ -1,0 +1,34 @@
+name: mergify-config
+
+# Validates .mergify.yml against the published Mergify schema whenever it
+# changes. A bad queue config dequeues every PR, so catch it before it merges.
+# `mergify config validate` needs no token. CLI version is pinned.
+
+on:
+  pull_request:
+    paths:
+      - ".mergify.yml"
+      - ".github/workflows/mergify-config.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: mergify-config-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+
+      - name: Install Mergify CLI (pinned)
+        uses: Mergifyio/setup-cli@dc99f07e699b94b39e5495c24596372813eadcbc # v1.3.0
+        with:
+          mergify_cli_version: 2026.10.5
+
+      - name: Validate .mergify.yml
+        run: mergify config -f .mergify.yml validate
