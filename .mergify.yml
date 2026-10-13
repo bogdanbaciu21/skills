@@ -1,6 +1,12 @@
+# Branch protection requires up-to-date branches, which Mergify only supports
+# with in-place checks: one parallel check, batch_size 1, identical conditions.
+merge_queue:
+  max_parallel_checks: 1
+
 queue_rules:
   - name: default
     merge_method: squash
+    batch_size: 1
     queue_conditions:
       - label=ready-to-merge
     merge_conditions:
